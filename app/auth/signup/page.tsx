@@ -64,9 +64,8 @@ export default function SignUpPage() {
 
       if (data?.user?.email_confirmed_at) {
         // Email confirmation is disabled, user is ready to go
-        // Redirect to onboarding
-        console.log("[v0] Redirecting to onboarding")
-        router.push("/auth/onboarding")
+        console.log("[v0] Redirecting to signals")
+        router.push("/signals")
       } else {
         // Email confirmation is enabled, need to check email
         router.push("/auth/check-email")
