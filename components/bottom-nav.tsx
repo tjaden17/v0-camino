@@ -1,6 +1,6 @@
 "use client"
 
-import { Target, Bookmark, User } from "lucide-react"
+import { TrendingUp, Target, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -17,23 +17,26 @@ export function BottomNav() {
             <Button
               variant="ghost"
               size="sm"
-              className={cn("flex flex-col items-center gap-1 h-auto py-2", pathname === "/mission" && "text-primary")}
+              className={cn(
+                "flex flex-col items-center gap-1 h-auto py-2",
+                pathname.startsWith("/mission") && "text-primary",
+              )}
             >
-              <Bookmark className="h-5 w-5" />
+              <Target className="h-5 w-5" />
               <span className="text-xs">Mission</span>
             </Button>
           </Link>
-          <Link href="/guidance">
+          <Link href="/signals">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
                 "flex flex-col items-center gap-1 h-auto py-2",
-                (pathname === "/" || pathname === "/guidance") && "text-primary",
+                pathname.startsWith("/signals") && "text-primary",
               )}
             >
-              <Target className="h-5 w-5" />
-              <span className="text-xs">Guidance</span>
+              <TrendingUp className="h-5 w-5" />
+              <span className="text-xs">Signals</span>
             </Button>
           </Link>
           <Link href="/profile">

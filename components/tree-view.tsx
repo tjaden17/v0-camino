@@ -2,11 +2,13 @@
 
 import type { SubIssue } from "@/lib/issue-tree-data"
 import { issueTreeData } from "@/lib/issue-tree-data"
-import { ArrowDown, ArrowUp, Minus, Share2, ChevronUp, ChevronDown } from "lucide-react"
+import { ArrowDown, ArrowUp, Minus, Share2, ChevronUp, ChevronDown, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ShareDialog } from "@/components/share-dialog"
+import { getAdjustedTrendValue } from "@/lib/date-range-utils"
+import type { DateRange } from "@/lib/date-range-utils"
 
 interface TreeViewProps {
   currentIssueId: string
@@ -16,6 +18,7 @@ interface TreeViewProps {
   onPreviousIssue: () => void
   canGoUp: boolean
   canGoDown: boolean
+  dateRange?: DateRange
 }
 
 export function TreeView({
@@ -26,8 +29,10 @@ export function TreeView({
   onPreviousIssue,
   canGoUp,
   canGoDown,
+  dateRange = "7days",
 }: TreeViewProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set()) // Start with empty set so all nodes are collapsed by default (CEO view)
   const lastClickRef = useRef<{ issueId: string; time: number } | null>(null)
 
   const findIssueById = (issues: SubIssue[], id: string): SubIssue | null => {
@@ -97,11 +102,23 @@ export function TreeView({
     }
   }
 
+  const toggleNode = (issueId: string) => {
+    const newExpanded = new Set(expandedNodes)
+    if (newExpanded.has(issueId)) {
+      newExpanded.delete(issueId)
+    } else {
+      newExpanded.add(issueId)
+    }
+    setExpandedNodes(newExpanded)
+  }
+
   const renderIssue = (issue: SubIssue, depth = 0, indexPath: number[] = []) => {
     const isCurrent = issue.id === currentIssueId
     const isSelected = selectedIssue?.id === issue.id
     const hasSubIssues = issue.subIssues && issue.subIssues.length > 0
+    const isExpanded = expandedNodes.has(issue.id)
     const validationStatus = getValidationStatus(issue)
+    const isHighlighted = issue.highlighted
 
     const numberLabel = indexPath.join(".")
 
@@ -116,6 +133,8 @@ export function TreeView({
 
     const ownerInitials = getInitials(issue.owner)
 
+    const adjustedTrendValue = getAdjustedTrendValue(issue.trendValue, dateRange)
+
     return (
       <div key={issue.id} className="space-y-1">
         <button
@@ -129,6 +148,18 @@ export function TreeView({
           style={{ paddingLeft: `${depth * 16 + 12}px` }}
         >
           <div className="flex-1 min-w-0 pr-2 flex items-center gap-2">
+            {hasSubIssues && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  toggleNode(issue.id)
+                }}
+                className="shrink-0 text-muted-foreground hover:text-foreground"
+              >
+                {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </button>
+            )}
+            {!hasSubIssues && <div className="w-4 shrink-0" />}
             {getValidationDot(validationStatus)}
             <span className="text-xs font-mono text-muted-foreground shrink-0">{numberLabel}</span>
             <div className="font-medium text-xs sm:text-sm break-words">{issue.name}</div>
@@ -140,10 +171,10 @@ export function TreeView({
           </div>
           <div className={cn("flex items-center gap-1 shrink-0", getTrendColor(issue.trend))}>
             {getTrendIcon(issue.trend)}
-            <span className="text-xs font-bold">{issue.trendValue}</span>
+            <span className="text-xs font-bold">{adjustedTrendValue}</span>
           </div>
         </button>
-        {hasSubIssues && (
+        {hasSubIssues && isExpanded && (
           <div className="space-y-1">
             {issue.subIssues!.map((subIssue, index) => renderIssue(subIssue, depth + 1, [...indexPath, index + 1]))}
           </div>
@@ -199,7 +230,7 @@ export function TreeView({
           </div>
           <div className={cn("flex items-center gap-1 shrink-0", getTrendColor(issueTreeData.trend))}>
             {getTrendIcon(issueTreeData.trend)}
-            <span className="text-xs font-bold">{issueTreeData.trendValue}</span>
+            <span className="text-xs font-bold">{getAdjustedTrendValue(issueTreeData.trendValue, dateRange)}</span>
           </div>
         </button>
 

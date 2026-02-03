@@ -13,6 +13,11 @@ export interface UserProfile {
   savedIssueIds: string[]
   companyMission: string
   roleMission: string
+  upcomingDecisions?: Array<{
+    title: string
+    dueDate: string
+    category: string
+  }>
 }
 
 export interface DataIntegration {
@@ -38,6 +43,10 @@ export const userProfile: UserProfile = {
   savedIssueIds: ["csat-score", "support-score", "response-time"],
   companyMission: "Achieve $50M ARR by expanding into 3 new geographic markets",
   roleMission: "Drive product adoption and customer satisfaction to support revenue growth",
+  upcomingDecisions: [
+    { title: "Q1 Product Roadmap", dueDate: "Jan 15, 2025", category: "Strategy" },
+    { title: "Feature Prioritization", dueDate: "Jan 22, 2025", category: "Planning" },
+  ],
 }
 
 export const dataIntegrations: DataIntegration[] = [
