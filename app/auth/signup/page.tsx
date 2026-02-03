@@ -64,25 +64,8 @@ export default function SignUpPage() {
 
       if (data?.user?.email_confirmed_at) {
         // Email confirmation is disabled, user is ready to go
-        // Check for pending invites before redirecting
-        console.log("[v0] Checking for pending invites")
-        
-        try {
-          const inviteResponse = await fetch("/api/organization/check-pending-invites")
-          if (inviteResponse.ok) {
-            const inviteData = await inviteResponse.json()
-            if (inviteData.hasPendingInvite) {
-              console.log("[v0] Found pending invite, redirecting to accept invite")
-              router.push(`/auth/accept-invite?invite=${inviteData.invite.token}`)
-              return
-            }
-          }
-        } catch (err) {
-          console.log("[v0] Error checking invites:", err)
-          // Continue to onboarding if check fails
-        }
-
-        // No pending invites, redirect to onboarding
+        // Redirect to onboarding
+        console.log("[v0] Redirecting to onboarding")
         router.push("/auth/onboarding")
       } else {
         // Email confirmation is enabled, need to check email

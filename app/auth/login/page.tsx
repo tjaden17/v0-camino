@@ -54,21 +54,7 @@ export default function LoginPage() {
         )
       }
 
-      console.log("[v0] Login successful, checking onboarding status")
-      
-      // Check if user has completed onboarding
-      const onboardingResponse = await fetch("/api/user/onboarding-status")
-      if (onboardingResponse.ok) {
-        const onboardingData = await onboardingResponse.json()
-        if (!onboardingData.onboardingCompleted) {
-          console.log("[v0] Onboarding not completed, redirecting")
-          await new Promise((resolve) => setTimeout(resolve, 500))
-          router.push("/auth/onboarding")
-          return
-        }
-      }
-
-      console.log("[v0] Redirecting to signals dashboard")
+      console.log("[v0] Login successful, redirecting to signals")
       await new Promise((resolve) => setTimeout(resolve, 500))
       router.push("/signals")
     } catch (error: unknown) {
