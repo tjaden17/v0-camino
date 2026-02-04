@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { sql } from "@/lib/db/neon"
 import { getSignals, getSavedSignalIds } from "@/lib/signals-service"
 import { SignalsPageClient } from "@/components/signals-page-client"
 
@@ -14,21 +15,23 @@ export default async function SignalsPage() {
     redirect("/auth/login")
   }
 
-  console.log("[v0] Signals page - user:", user.id)
+  // Get user's organization and role from Neon profile (where onboarding saves it)
+  const profileResult = await sql`
+    SELECT organization_id, role FROM profiles WHERE id = ${user.id} LIMIT 1
+  `
+  
+  const profile = profileResult?.[0] || null
+  const organizationId = profile?.organization_id || null
+  const userRole = profile?.role || "manager"
+
+  console.log("[v0] Signals page - user:", user.id, "org:", organizationId, "role:", userRole)
 
   const [signals, savedSignalIds] = await Promise.all([
-    getSignals(null),
-    getSavedSignalIds(user.id),
+    getSignals(organizationId),
+    getSavedSignalIds(user.id)
   ])
 
   console.log("[v0] Signals page - found", signals.length, "signals")
 
-  return (
-    <SignalsPageClient
-      signals={signals}
-      userId={user.id}
-      savedSignalIds={savedSignalIds}
-      userRole="manager"
-    />
-  )
+  return <SignalsPageClient signals={signals} userId={user.id} savedSignalIds={savedSignalIds} userRole={userRole} />
 }

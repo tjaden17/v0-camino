@@ -54,9 +54,9 @@ export default function LoginPage() {
         )
       }
 
-      console.log("[v0] Login successful, redirecting to signals")
+      console.log("[v0] Login successful, redirecting to mission")
       await new Promise((resolve) => setTimeout(resolve, 500))
-      router.push("/signals")
+      router.push("/mission")
     } catch (error: unknown) {
       console.log("[v0] Login error:", error)
       if (error instanceof Error && error.message.includes("Missing Supabase")) {

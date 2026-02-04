@@ -64,8 +64,8 @@ export default function SignUpPage() {
 
       if (data?.user?.email_confirmed_at) {
         // Email confirmation is disabled, user is ready to go
-        console.log("[v0] Redirecting to signals")
-        router.push("/signals")
+        // Redirect to mission page instead of check-email
+        router.push("/mission")
       } else {
         // Email confirmation is enabled, need to check email
         router.push("/auth/check-email")
