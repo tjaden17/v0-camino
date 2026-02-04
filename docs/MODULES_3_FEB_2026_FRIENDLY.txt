@@ -129,6 +129,11 @@ How It Works
   5. Implications on Goals — Business impact
 
 • Additionally generates Opportunities and Risks with action items
+• Performs causal chain analysis to map signal relationships:
+  - Identifies which signals influence others
+  - Traces sequences of cause-and-effect (e.g., "churn up → NPS down → revenue at risk")
+  - Detects leading indicators (signals that typically precede others)
+  - Visualizes causal networks for complex multi-source scenarios
 • Caches interpretations to avoid redundant AI calls
 
 Current State
@@ -136,6 +141,7 @@ Current State
 5-section unified interpretation — Built
 Opportunity detection — Built
 Risk detection — Built
+Causal chain analysis — Not started
 Caching — Built
 Cross-signal pattern recognition — Not started
 Predictive insights — Not started
@@ -151,6 +157,9 @@ Open Questions
   change?
 • How do we handle AI hallucination/accuracy issues?
 • Can we add confidence scores to interpretations?
+• How do we determine causality vs correlation in causal chains?
+• Should causal chains be AI-inferred or rule-based or both?
+• How do we visualize complex causal networks (especially multi-org scenarios)?
 
 
 ================================================================================
