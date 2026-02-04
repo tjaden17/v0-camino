@@ -1,0 +1,387 @@
+TECHNOLOGY SPECIFICATION - MODULES MVP
+Signal Intelligence Platform
+February 2026
+
+================================================================================
+1. ARCHITECTURE OVERVIEW
+================================================================================
+
+System consists of 5 interconnected modules operating in sequence:
+
+Import Module → Staging Module → Signal Core Module → Signal Analysis Module → Dashboard Module
+
+Each module is independently deployable and testable. Data flows unidirectionally through the pipeline.
+
+1.1 Module Responsibilities
+
+IMPORT MODULE
+- Entry point for all data (CSV, Excel, API integrations)
+- File parsing and validation
+- Data normalization to universal schema
+- Stores raw data in import_staging table
+
+STAGING MODULE
+- Transforms normalized data into signal-ready format
+- Handles data quality checks and filling
+- Creates time-series data for signal calculation
+- Stores processed data in data_staging table
+
+SIGNAL CORE MODULE
+- Detects and calculates signals from staged data
+- Runs anomaly detection algorithms
+- Generates signal scores and confidence levels
+- Stores signals in signals table
+
+SIGNAL ANALYSIS MODULE
+- Interprets signals using AI
+- Performs causal chain analysis
+- Generates opportunities and risks
+- Produces 5-section interpretations
+- Stores interpretations in interpretations table
+
+DASHBOARD MODULE
+- Aggregates signals and interpretations
+- Ranks signals by user relevance
+- Displays causal chains and relationships
+- User-facing API layer
+
+1.2 Data Flow
+
+User uploads file
+  ↓
+Import Module validates & normalizes
+  ↓
+Staging Module transforms
+  ↓
+Signal Core Module calculates
+  ↓
+Signal Analysis Module interprets
+  ↓
+Dashboard Module displays
+
+
+================================================================================
+2. DATABASE SCHEMA (MVP)
+================================================================================
+
+Organizations
+- id (UUID, PK)
+- name (TEXT)
+- user_id (UUID, FK → auth.users)
+- created_at (TIMESTAMP)
+- updated_at (TIMESTAMP)
+
+Data Uploads
+- id (UUID, PK)
+- organization_id (UUID, FK)
+- file_name (TEXT)
+- file_size (INTEGER)
+- row_count (INTEGER)
+- uploaded_at (TIMESTAMP)
+- status (TEXT: pending, processing, complete, failed)
+
+Import Staging
+- id (UUID, PK)
+- upload_id (UUID, FK)
+- organization_id (UUID, FK)
+- raw_data (JSONB)
+- normalized_data (JSONB)
+- import_status (TEXT)
+- created_at (TIMESTAMP)
+
+Data Staging
+- id (UUID, PK)
+- organization_id (UUID, FK)
+- upload_id (UUID, FK)
+- metric_name (TEXT)
+- metric_value (NUMERIC)
+- metric_date (DATE)
+- data_type (TEXT: revenue, churn, nps, etc)
+- quality_score (NUMERIC 0-100)
+- created_at (TIMESTAMP)
+
+Signals
+- id (UUID, PK)
+- organization_id (UUID, FK)
+- metric_name (TEXT)
+- signal_type (TEXT: trend, anomaly, threshold)
+- signal_value (NUMERIC)
+- change_percent (NUMERIC)
+- confidence_score (NUMERIC 0-100)
+- is_anomaly (BOOLEAN)
+- calculated_at (TIMESTAMP)
+- created_at (TIMESTAMP)
+
+Signal Interpretations
+- id (UUID, PK)
+- signal_id (UUID, FK)
+- organization_id (UUID, FK)
+- executive_summary (TEXT)
+- key_takeaway (TEXT)
+- benchmark_comparison (TEXT)
+- root_cause_analysis (TEXT)
+- business_implications (TEXT)
+- opportunities (JSONB array)
+- risks (JSONB array)
+- generated_at (TIMESTAMP)
+- cached (BOOLEAN)
+
+Causal Chains
+- id (UUID, PK)
+- organization_id (UUID, FK)
+- source_signal_id (UUID, FK → signals.id)
+- target_signal_id (UUID, FK → signals.id)
+- correlation_strength (NUMERIC 0-1)
+- typical_lag_days (INTEGER)
+- confidence_level (TEXT: high, medium, low)
+- created_at (TIMESTAMP)
+
+
+================================================================================
+3. API ENDPOINTS
+================================================================================
+
+BASE URL: /api
+
+IMPORT MODULE
+POST /upload
+  Input: file (multipart form data)
+  Output: { upload_id, status, row_count }
+  
+POST /upload/validate
+  Input: { upload_id }
+  Output: { valid, errors[], warnings[] }
+
+STAGING MODULE
+POST /stage
+  Input: { upload_id }
+  Output: { staged_record_count, quality_report }
+  
+GET /stage/status/{upload_id}
+  Output: { status, staged_count, failed_count, estimated_time }
+
+SIGNAL CORE MODULE
+POST /signals/calculate
+  Input: { upload_id, metrics[] }
+  Output: { signal_count, signals[] }
+  
+GET /signals
+  Query: ?organization_id=, ?metric_name=, ?limit=50
+  Output: { signals[], total_count, has_more }
+  
+GET /signals/{id}
+  Output: { signal details, time_series_data[] }
+
+SIGNAL ANALYSIS MODULE
+POST /signals/{id}/interpret
+  Input: { signal_id }
+  Output: { interpretation_id, summary, sections{} }
+  
+GET /signals/interpretations
+  Query: ?organization_id=, ?limit=50
+  Output: { interpretations[] }
+
+CAUSAL CHAINS
+GET /causal-chains
+  Query: ?organization_id=, ?signal_id=
+  Output: { chains[], network_graph{} }
+  
+POST /causal-chains/detect
+  Input: { organization_id }
+  Output: { chain_count, detection_complete }
+
+DASHBOARD MODULE
+GET /dashboard/overview
+  Query: ?organization_id=
+  Output: { top_signals[], recent_interpretations[], causal_networks[] }
+  
+GET /dashboard/signals/ranked
+  Query: ?organization_id=, ?user_role=
+  Output: { ranked_signals[], relevance_scores[] }
+
+
+================================================================================
+4. AI INTEGRATION
+================================================================================
+
+Provider: Vercel AI Gateway (default)
+Model: gpt-4-turbo (configurable)
+
+4.1 AI Endpoints
+
+Signal Interpretation
+- Endpoint: Signal Analysis Module
+- Prompt: 5-section analysis of signal with data context
+- Input: { signal_data, historical_trend, benchmarks }
+- Output: { executive_summary, takeaway, benchmark_comp, root_cause, implications }
+- Caching: Yes (same signal data = reuse interpretation)
+- Cost: ~$0.01 per signal interpretation
+
+Opportunity Detection
+- Input: Signal + interpretation
+- Output: [ { opportunity, action_items, potential_impact } ]
+- Runs after interpretation
+
+Risk Detection
+- Input: Signal + interpretation  
+- Output: [ { risk, mitigation_strategy, severity } ]
+- Runs after interpretation
+
+Causal Chain Reasoning (Optional AI Enhancement)
+- Input: Two correlated signals
+- Output: { likely_causal_explanation, confidence }
+- Fallback: Use time-lag correlation only
+
+4.2 Prompt Template (Interpretation)
+
+"You are a data analyst for a {user_role} at {company_name}.
+
+Signal: {metric_name}
+Current Value: {current_value}
+Change: {change_percent}% over {period}
+Benchmark: {benchmark_value}
+History: {trend_description}
+
+Provide analysis in these 5 sections:
+1. Executive Summary (1-2 sentences)
+2. Key Takeaway (why it's changing)
+3. Benchmark Comparison (how it compares)
+4. Root Cause Analysis (deeper drivers)
+5. Implications on Goals (business impact)
+
+Be specific, actionable, and data-driven."
+
+4.3 Caching Strategy
+
+Cache key: hash(signal_id + data_value + date)
+TTL: 30 days
+Hit rate target: 70% (repeated queries for same metrics)
+
+
+================================================================================
+5. COMPONENT STRUCTURE (Frontend)
+================================================================================
+
+/components
+  /import
+    - UploadModal.tsx (file input, validation UI)
+    - ImportProgress.tsx (upload progress bar)
+    
+  /staging
+    - DataQualityBadge.tsx (quality score display)
+    - StagedDataPreview.tsx (table of staged records)
+    
+  /signals
+    - SignalCard.tsx (individual signal display)
+    - SignalList.tsx (paginated signal list)
+    - SignalDetailPanel.tsx (expanded signal view)
+    
+  /analysis
+    - InterpretationView.tsx (5-section layout)
+    - OpportunitiesPanel.tsx (opportunities + actions)
+    - RisksPanel.tsx (risks + mitigations)
+    
+  /causal-chains
+    - CausalChainGraph.tsx (visual network)
+    - CausalRelationshipCard.tsx (signal pair view)
+    - CausalChainList.tsx (list of chains)
+    
+  /dashboard
+    - DashboardLayout.tsx (main layout)
+    - TopSignalsWidget.tsx (ranked signals)
+    - CausalNetworkWidget.tsx (chain visualization)
+
+/pages
+  /upload → /components/import/UploadModal
+  /signals → /components/signals/SignalList
+  /signals/[id] → /components/signals/SignalDetailPanel
+  /dashboard → /components/dashboard/DashboardLayout
+  /causal-chains → /components/causal-chains/CausalChainGraph
+
+/hooks
+  - useUpload() → POST /upload, track status
+  - useSignals() → GET /signals, paginate
+  - useInterpretation() → POST /signals/{id}/interpret
+  - useCausalChains() → GET /causal-chains
+  - useDashboard() → GET /dashboard/overview
+
+/lib
+  - upload-service.ts
+  - staging-service.ts
+  - signals-service.ts
+  - interpretation-service.ts
+  - causal-chain-service.ts
+
+
+================================================================================
+6. DEPLOYMENT & ENVIRONMENTS
+================================================================================
+
+Development
+- Deploy to: Vercel preview URLs
+- Database: Supabase dev project
+- AI: Vercel AI Gateway (sandbox)
+
+Staging
+- Deploy to: yourapp-staging.vercel.app
+- Database: Supabase staging project
+- AI: Vercel AI Gateway (staging)
+
+Production
+- Deploy to: yourapp.vercel.app
+- Database: Supabase production project
+- AI: Vercel AI Gateway (production, rate limited)
+
+
+================================================================================
+7. ERROR HANDLING & VALIDATION
+================================================================================
+
+Import Module
+- Max file size: 50MB
+- Supported formats: CSV, Excel (.xlsx)
+- Invalid files → return error details, user can retry
+
+Staging Module
+- Missing data → fill with previous value or interpolate
+- Invalid data types → flag as quality warning
+- Duplicates → deduplicate by metric_date
+
+Signal Core Module
+- Insufficient data points (< 7 days) → skip signal calculation
+- Anomaly detection threshold: Z-score > 2.5
+
+Signal Analysis Module
+- AI timeout (> 30s) → use cached interpretation or fallback text
+- Rate limiting → queue interpretations, process async
+
+Causal Chains
+- Minimum correlation strength to display: 0.6
+- Only show chains with lag < 90 days
+
+
+================================================================================
+8. PERFORMANCE TARGETS
+================================================================================
+
+File Upload: < 5s for 10k rows
+Data Staging: < 10s for 50k rows
+Signal Calculation: < 15s for 100 metrics
+Signal Interpretation: < 5s (cached), < 30s (AI generation)
+Dashboard Load: < 2s
+Causal Chain Detection: < 30s for full org
+
+
+================================================================================
+9. MVPSCOPE (What Ships First)
+================================================================================
+
+✓ Import Module (CSV upload only)
+✓ Staging Module (basic normalization)
+✓ Signal Core Module (trend + anomaly detection)
+✓ Signal Analysis Module (5-section interpretation)
+✓ Causal Chains (time-lagged correlation only)
+✗ Advanced AI (not MVP)
+✗ Multi-user collaboration (v2)
+✗ Custom signal templates (v2)
+✗ Prediction engine (v3)
