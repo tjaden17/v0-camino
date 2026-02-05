@@ -4,85 +4,84 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Instagram-inspired clean, minimal color scheme with subtle borders and bright backgrounds */
-  --background: oklch(1 0 0); /* Pure white background */
-  --foreground: oklch(0.05 0 0); /* Near-black text */
-  --card: oklch(1 0 0); /* White cards */
-  --card-foreground: oklch(0.05 0 0); /* Near-black card text */
+  /* Updated to Amplitude's signature purple/indigo palette */
+  --background: oklch(0.99 0.005 270);
+  --foreground: oklch(0.15 0.01 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 270);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.05 0 0);
-  --primary: oklch(0.55 0.22 265); /* Vibrant purple accent */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0); /* Light gray background */
-  --secondary-foreground: oklch(0.05 0 0);
-  --muted: oklch(0.98 0 0); /* Very light gray for subtle backgrounds */
-  --muted-foreground: oklch(0.5 0.01 265); /* Medium gray for secondary text */
-  --accent: oklch(0.6 0.24 250); /* Bright blue accent */
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.58 0.21 25); /* Bright red for errors */
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.55 0.16 145); /* Instagram-style green */
-  --success-foreground: oklch(1 0 0);
-  --border: oklch(0.91 0 0); /* Light gray borders like Instagram */
-  --input: oklch(0.98 0 0);
-  --ring: oklch(0.55 0.22 265);
-  --chart-1: oklch(0.55 0.22 265);
-  --chart-2: oklch(0.6 0.24 250);
-  --chart-3: oklch(0.55 0.16 145);
-  --chart-4: oklch(0.65 0.2 200);
-  --chart-5: oklch(0.5 0.15 40);
-  --radius: 0.5rem; /* Smaller, Instagram-style radius */
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.05 0 0);
-  --sidebar-primary: oklch(0.05 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.98 0 0);
-  --sidebar-accent-foreground: oklch(0.05 0 0);
-  --sidebar-border: oklch(0.91 0 0);
-  --sidebar-ring: oklch(0.7 0 0);
+  --popover-foreground: oklch(0.15 0.01 270);
+  /* Amplitude's signature deep purple/indigo */
+  --primary: oklch(0.52 0.18 285);
+  --primary-foreground: oklch(0.99 0.005 285);
+  /* Lighter purple for secondary elements */
+  --secondary: oklch(0.72 0.14 285);
+  --secondary-foreground: oklch(0.15 0.01 285);
+  --muted: oklch(0.96 0.01 270);
+  --muted-foreground: oklch(0.48 0.02 270);
+  /* Teal accent like Amplitude uses */
+  --accent: oklch(0.65 0.16 195);
+  --accent-foreground: oklch(0.99 0.005 195);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0.005 27);
+  --border: oklch(0.92 0.01 270);
+  --input: oklch(0.92 0.01 270);
+  --ring: oklch(0.52 0.18 285);
+  /* Amplitude-style chart colors: purples, blues, teals, oranges */
+  --chart-1: oklch(0.52 0.18 285);
+  --chart-2: oklch(0.65 0.16 195);
+  --chart-3: oklch(0.62 0.2 260);
+  --chart-4: oklch(0.7 0.18 45);
+  --chart-5: oklch(0.68 0.2 310);
+  --radius: 0.5rem;
+  --sidebar: oklch(0.98 0.005 270);
+  --sidebar-foreground: oklch(0.15 0.01 270);
+  --sidebar-primary: oklch(0.52 0.18 285);
+  --sidebar-primary-foreground: oklch(0.99 0.005 285);
+  --sidebar-accent: oklch(0.96 0.01 270);
+  --sidebar-accent-foreground: oklch(0.15 0.01 270);
+  --sidebar-border: oklch(0.92 0.01 270);
+  --sidebar-ring: oklch(0.52 0.18 285);
 }
 
 .dark {
-  /* Dark theme kept for potential future use */
-  --background: oklch(0.1 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.14 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.65 0.25 270);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.6 0.28 250);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.65 0.2 150);
-  --success-foreground: oklch(0.98 0 0);
-  --border: oklch(0.2 0 0);
-  --input: oklch(0.2 0 0);
-  --ring: oklch(0.65 0.25 270);
-  --chart-1: oklch(0.65 0.25 270);
-  --chart-2: oklch(0.6 0.28 250);
-  --chart-3: oklch(0.65 0.2 150);
-  --chart-4: oklch(0.7 0.22 200);
-  --chart-5: oklch(0.55 0.15 40);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Updated dark mode with Amplitude's purple-focused palette */
+  --background: oklch(0.13 0.01 270);
+  --foreground: oklch(0.98 0.005 270);
+  --card: oklch(0.16 0.01 270);
+  --card-foreground: oklch(0.98 0.005 270);
+  --popover: oklch(0.16 0.01 270);
+  --popover-foreground: oklch(0.98 0.005 270);
+  --primary: oklch(0.65 0.2 285);
+  --primary-foreground: oklch(0.13 0.01 285);
+  --secondary: oklch(0.72 0.14 285);
+  --secondary-foreground: oklch(0.13 0.01 285);
+  --muted: oklch(0.22 0.01 270);
+  --muted-foreground: oklch(0.62 0.02 270);
+  --accent: oklch(0.68 0.18 195);
+  --accent-foreground: oklch(0.13 0.01 195);
+  --destructive: oklch(0.55 0.24 27);
+  --destructive-foreground: oklch(0.98 0.005 27);
+  --border: oklch(0.22 0.01 270);
+  --input: oklch(0.22 0.01 270);
+  --ring: oklch(0.65 0.2 285);
+  --chart-1: oklch(0.65 0.2 285);
+  --chart-2: oklch(0.68 0.18 195);
+  --chart-3: oklch(0.62 0.2 260);
+  --chart-4: oklch(0.7 0.18 45);
+  --chart-5: oklch(0.68 0.2 310);
+  --sidebar: oklch(0.16 0.01 270);
+  --sidebar-foreground: oklch(0.98 0.005 270);
+  --sidebar-primary: oklch(0.65 0.2 285);
+  --sidebar-primary-foreground: oklch(0.98 0.005 285);
+  --sidebar-accent: oklch(0.22 0.01 270);
+  --sidebar-accent-foreground: oklch(0.98 0.005 270);
+  --sidebar-border: oklch(0.22 0.01 270);
+  --sidebar-ring: oklch(0.65 0.2 285);
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -99,8 +98,6 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -130,24 +127,15 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Prevent horizontal overflow on all pages */
-  html,
-  body {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
 }
 
 @layer utilities {
-  .touch-pan-y {
-    touch-action: pan-y;
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  .touch-pan-x {
-    touch-action: pan-x;
-  }
-
-  .touch-none {
-    touch-action: none;
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
