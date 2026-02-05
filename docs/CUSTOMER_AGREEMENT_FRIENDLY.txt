@@ -74,12 +74,15 @@ Provider shall process Customer Data solely for the purpose of:
 
 Provider implements and maintains the following security measures:
 
-Encryption in Transit — TLS 1.2+ for all data transmission
-Encryption at Rest — AES-256 encryption for stored data
-Access Control — Role-based access, multi-factor authentication
-Infrastructure — SOC 2 compliant cloud infrastructure (Vercel, Neon)
-Monitoring — Continuous security monitoring and logging
-Incident Response — 24-hour breach notification commitment
+Encryption in Transit — TLS 1.2+ for all data transmission (implemented)
+Access Control — Role-based access control (implemented)
+Infrastructure — SOC 2 compliant cloud infrastructure (Vercel, Neon) (implemented)
+Monitoring — Security monitoring and event logging (in development)
+Incident Response — 24-hour breach notification commitment (implemented)
+
+The following security features are under active development and will be available in future releases:
+  • Encryption at Rest — AES-256 encryption for stored data
+  • Multi-Factor Authentication (MFA) — Optional MFA for user accounts
 
 3.4 Data Location & Storage
 
