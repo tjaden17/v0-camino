@@ -49,9 +49,8 @@ export async function POST(request: Request) {
 
     console.log('[workflow-signals] Processing:', file_name, 'rows:', data_rows.length)
 
-    // Step 1: Check staging data for existing uploads
+    // Step 1: Check staging data for existing uploads (mock for now - table may not exist)
     const existingData = await checkExistingStagedData(TEST_ORG_ID)
-    console.log('[workflow-signals] Existing columns:', existingData.columns_previously_uploaded)
 
     // Step 2: Auto-detect numeric columns as signals
     const detectedSignals = detectSignalsFromData(data_rows)
@@ -87,39 +86,18 @@ export async function POST(request: Request) {
 }
 
 /**
- * Query staging tables to check what columns have been previously uploaded
+ * Check staging data - returns mock data for now since table may not exist
  */
 async function checkExistingStagedData(
   orgId: string,
 ): Promise<{ columns_previously_uploaded: string[]; last_upload_date: string | null }> {
   try {
-    // Query staging_fields table for this organization
-    const result = await sql`
-      SELECT DISTINCT 
-        normalized_field_name,
-        MAX(created_at) as last_upload_date
-      FROM staging_fields
-      WHERE organization_id = ${orgId}
-      GROUP BY normalized_field_name
-      ORDER BY last_upload_date DESC
-      LIMIT 100
-    `
-
-    if (!result || result.length === 0) {
-      console.log('[workflow-signals] No existing staged data found')
-      return { columns_previously_uploaded: [], last_upload_date: null }
-    }
-
-    const columns = result.map((row: any) => row.normalized_field_name as string)
-    const lastUploadDate = result[0]?.last_upload_date
-      ? new Date(result[0].last_upload_date).toISOString()
-      : null
-
-    console.log('[workflow-signals] Found', columns.length, 'previously uploaded columns')
-    return { columns_previously_uploaded: columns, last_upload_date: lastUploadDate }
+    // For test workflow, skip database check and return mock data
+    // In production, this would query: SELECT * FROM staging_fields WHERE organization_id = ${orgId}
+    console.log('[workflow-signals] Skipping staging check for test workflow')
+    return { columns_previously_uploaded: [], last_upload_date: null }
   } catch (err) {
-    console.warn('[workflow-signals] Could not query staging data (table may not exist yet):', err instanceof Error ? err.message : String(err))
-    // Return empty data if table doesn't exist - this is expected during early development
+    console.warn('[workflow-signals] Staging check failed:', err instanceof Error ? err.message : String(err))
     return { columns_previously_uploaded: [], last_upload_date: null }
   }
 }
