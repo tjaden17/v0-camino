@@ -118,8 +118,8 @@ async function checkExistingStagedData(
     console.log('[workflow-signals] Found', columns.length, 'previously uploaded columns')
     return { columns_previously_uploaded: columns, last_upload_date: lastUploadDate }
   } catch (err) {
-    console.warn('[workflow-signals] Could not query staging data (db may not be ready):', err)
-    // In test mode, this is expected - staging tables might not exist yet
+    console.warn('[workflow-signals] Could not query staging data (table may not exist yet):', err instanceof Error ? err.message : String(err))
+    // Return empty data if table doesn't exist - this is expected during early development
     return { columns_previously_uploaded: [], last_upload_date: null }
   }
 }
