@@ -1,37 +1,28 @@
 'use client'
 
 import React from "react"
-
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { SignalCard } from '@/components/signal-card'
 import { Loader2 } from 'lucide-react'
 
-interface TestSignal {
-  id: string
-  name: string
-  category: string
-  latest_value: number
-  previous_value: number
-  trend: 'increasing' | 'decreasing' | 'stable'
-  benchmark_value: number
-  change_percentage: number
-  interpretation?: string
-  opportunities?: string[]
-  risks?: string[]
-  dataQuality?: {
-    score: number
-    issues: string[]
+interface TestWorkflowState {
+  signals: any[]
+  existingData?: {
+    columns_previously_uploaded: string[]
+    last_upload_date: string | null
+    recommendation: string
   }
+  error?: string
 }
 
 export default function TestWorkflowPage() {
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const [signals, setSignals] = useState<TestSignal[]>([])
-  const [selectedSignal, setSelectedSignal] = useState<TestSignal | null>(null)
+  const [signals, setSignals] = useState<any[]>([])
+  const [selectedSignal, setSelectedSignal] = useState<any | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [existingData, setExistingData] = useState<TestWorkflowState['existingData'] | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -90,25 +81,13 @@ export default function TestWorkflowPage() {
       const signalsData = await discoveryResponse.json()
       console.log('[test-workflow] Signals discovered:', signalsData)
 
-      // Process signals with AI analysis
-      const testSignals: TestSignal[] = signalsData.signals.map((signal: any) => ({
-        id: signal.id || Math.random().toString(),
-        name: signal.name,
-        category: signal.category || 'Custom',
-        latest_value: signal.latest_value || 0,
-        previous_value: signal.previous_value || 0,
-        trend: signal.trend || 'stable',
-        benchmark_value: signal.benchmark_value || 0,
-        change_percentage: signal.change_percentage || 0,
-        interpretation: signal.interpretation,
-        opportunities: signal.opportunities,
-        risks: signal.risks,
-        dataQuality: {
-          score: 85,
-          issues: [],
-        },
-      }))
+      // Store existing data info
+      if (signalsData.existing_data) {
+        setExistingData(signalsData.existing_data)
+      }
 
+      // Process signals with AI analysis
+      const testSignals = signalsData.signals || []
       setSignals(testSignals)
       if (testSignals.length > 0) {
         setSelectedSignal(testSignals[0])
@@ -189,6 +168,45 @@ export default function TestWorkflowPage() {
           <div className="lg:col-span-2 space-y-6">
             {signals.length > 0 && (
               <>
+                {/* Existing Data Info */}
+                {existingData && (
+                  <Card className="border-blue-200 bg-blue-50">
+                    <CardHeader>
+                      <CardTitle className="text-blue-900">Previous Uploads</CardTitle>
+                      <CardDescription>
+                        {existingData.columns_previously_uploaded.length > 0
+                          ? `${existingData.columns_previously_uploaded.length} columns previously uploaded`
+                          : 'First upload detected'}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {existingData.columns_previously_uploaded.length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium text-blue-900">Columns:</p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {existingData.columns_previously_uploaded.map((col) => (
+                              <span
+                                key={col}
+                                className="inline-block bg-blue-200 text-blue-900 text-xs px-2 py-1 rounded"
+                              >
+                                {col}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {existingData.last_upload_date && (
+                        <p className="text-xs text-blue-700">
+                          Last upload: {new Date(existingData.last_upload_date).toLocaleDateString()}
+                        </p>
+                      )}
+                      <p className="text-sm text-blue-900 font-medium border-t pt-2">
+                        {existingData.recommendation}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Step 2: Detected Signals</CardTitle>
@@ -200,11 +218,21 @@ export default function TestWorkflowPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {signals.map((signal) => (
                         <div
-                          key={signal.id}
+                          key={signal.name}
                           onClick={() => setSelectedSignal(signal)}
-                          className="cursor-pointer"
+                          className="cursor-pointer p-4 border rounded-lg hover:bg-muted transition-colors"
                         >
-                          <SignalCard signal={signal} />
+                          <h4 className="font-semibold">{signal.name}</h4>
+                          <p className="text-sm text-muted-foreground">{signal.category}</p>
+                          <p className="text-lg font-bold mt-2">{signal.value}</p>
+                          <p
+                            className={`text-sm ${
+                              signal.change_percent > 0 ? 'text-green-600' : 'text-red-600'
+                            }`}
+                          >
+                            {signal.change_percent > 0 ? '+' : ''}
+                            {signal.change_percent.toFixed(1)}%
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -223,34 +251,28 @@ export default function TestWorkflowPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm text-muted-foreground">Current Value</p>
-                          <p className="text-2xl font-bold">
-                            {selectedSignal.latest_value.toLocaleString()}
-                          </p>
+                          <p className="text-2xl font-bold">{selectedSignal.value}</p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Change</p>
                           <p
                             className={`text-2xl font-bold ${
-                              selectedSignal.change_percentage > 0
+                              selectedSignal.change_percent > 0
                                 ? 'text-green-600'
                                 : 'text-red-600'
                             }`}
                           >
-                            {selectedSignal.change_percentage > 0 ? '+' : ''}
-                            {selectedSignal.change_percentage.toFixed(1)}%
+                            {selectedSignal.change_percent > 0 ? '+' : ''}
+                            {selectedSignal.change_percent.toFixed(1)}%
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Trend</p>
-                          <p className="text-lg font-semibold capitalize">
-                            {selectedSignal.trend}
-                          </p>
+                          <p className="text-lg font-semibold capitalize">{selectedSignal.trend}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Benchmark</p>
-                          <p className="text-lg font-semibold">
-                            {selectedSignal.benchmark_value.toLocaleString()}
-                          </p>
+                          <p className="text-sm text-muted-foreground">Category</p>
+                          <p className="text-lg font-semibold">{selectedSignal.category}</p>
                         </div>
                       </div>
 
@@ -269,7 +291,7 @@ export default function TestWorkflowPage() {
                         <div className="space-y-2 border-t pt-4">
                           <h4 className="font-semibold">Opportunities</h4>
                           <ul className="text-sm space-y-1">
-                            {selectedSignal.opportunities.map((opp, idx) => (
+                            {selectedSignal.opportunities.map((opp: string, idx: number) => (
                               <li key={idx} className="text-muted-foreground flex gap-2">
                                 <span>•</span>
                                 <span>{opp}</span>
@@ -284,7 +306,7 @@ export default function TestWorkflowPage() {
                         <div className="space-y-2 border-t pt-4">
                           <h4 className="font-semibold">Risks</h4>
                           <ul className="text-sm space-y-1">
-                            {selectedSignal.risks.map((risk, idx) => (
+                            {selectedSignal.risks.map((risk: string, idx: number) => (
                               <li key={idx} className="text-muted-foreground flex gap-2">
                                 <span>•</span>
                                 <span>{risk}</span>
