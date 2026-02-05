@@ -5,9 +5,11 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ServiceFlow } from '@/components/service-flow'
+import { SignalConfirmation } from '@/components/signal-confirmation'
 import { Loader2 } from 'lucide-react'
 
 import type { ServiceStep } from '@/components/service-flow'
+import type { SignalStatus } from '@/components/signal-confirmation'
 
 interface TestWorkflowState {
   signals: any[]
@@ -109,20 +111,15 @@ export default function TestWorkflowPage() {
     { name: 'Staging Check', description: 'Check for existing data', status: 'pending' },
     { name: 'Results Display', description: 'Render signals and analysis', status: 'pending' },
   ])
+  const [dataRows, setDataRows] = useState<any[]>([])
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [confirmationSignals, setConfirmationSignals] = useState<SignalStatus[]>([])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setFile(e.target.files[0])
       setError(null)
     }
-  }
-
-  const updateServiceStep = (stepName: string, status: ServiceStep['status'], timestamp?: string) => {
-    setServiceSteps(prev => prev.map(step => 
-      step.name === stepName 
-        ? { ...step, status, timestamp: timestamp || new Date().toLocaleTimeString() }
-        : step
-    ))
   }
 
   const handleUploadAndProcess = async () => {
@@ -140,7 +137,6 @@ export default function TestWorkflowPage() {
       formData.append('file', file)
 
       // Step 1: File Upload
-      updateServiceStep('File Upload', 'loading')
       const uploadResponse = await fetch('/api/test/workflow-upload', {
         method: 'POST',
         body: formData,
@@ -149,45 +145,82 @@ export default function TestWorkflowPage() {
       if (!uploadResponse.ok) {
         throw new Error(`Upload failed: ${uploadResponse.statusText}`)
       }
-      updateServiceStep('File Upload', 'complete')
 
       // Step 2: Data Extraction
-      updateServiceStep('Data Extraction', 'loading')
       const uploadData = await uploadResponse.json()
       const dataRows = uploadData.rows || []
 
       if (dataRows.length === 0) {
         throw new Error('No data rows found in file')
       }
-      updateServiceStep('Data Extraction', 'complete')
 
+      // Store data rows and show confirmation page
+      setDataRows(uploadData.rows || [])
+
+      // Generate signal status for confirmation
+      const firstRow = uploadData.rows[0] || {}
+      const columns = Object.keys(firstRow)
+      const confirmationSigs: SignalStatus[] = []
+
+      for (const col of columns) {
+        const values = uploadData.rows
+          .map((row: any) => parseFloat(String(row[col])))
+          .filter((val: number) => !isNaN(val))
+
+        if (values.length === 0) continue
+
+        const dataPointPercent = (values.length / uploadData.rows.length) * 100
+        let status: SignalStatus['status'] = 'incomplete'
+        if (dataPointPercent === 100 && values.length >= 2) {
+          status = 'complete'
+        } else if (dataPointPercent >= 70) {
+          status = 'partial'
+        }
+
+        confirmationSigs.push({
+          name: col,
+          category: 'Metric',
+          value: values[values.length - 1] || 0,
+          status,
+          completenessPercent: Math.round(dataPointPercent),
+          dataPoints: values.length,
+          missingData: dataPointPercent < 100 ? [`${(100 - dataPointPercent).toFixed(0)}% incomplete data`] : undefined,
+        })
+      }
+
+      setConfirmationSignals(confirmationSigs)
+      setShowConfirmation(true)
+
+      // Don't continue to AI analysis until user confirms
+      return
+
+    } catch (err) {
+      console.error('[test-workflow] Error:', err)
+      setError(err instanceof Error ? err.message : 'Unknown error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleConfirmAndAnalyze = async () => {
+    if (dataRows.length === 0) return
+
+    setLoading(true)
+    
+    try {
       // Step 3: Signal Detection (happens on server)
-      updateServiceStep('Signal Detection', 'loading')
-      
-      // Step 4: AI Analysis (happens on server)
-      updateServiceStep('AI Analysis', 'loading')
-      
-      // Step 5: Staging Check (happens on server)
-      updateServiceStep('Staging Check', 'loading')
-
-      // Call signal discovery endpoint
       const discoveryResponse = await fetch('/api/test/workflow-signals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           data_rows: dataRows,
-          file_name: file.name,
+          file_name: file?.name || 'upload',
         }),
       })
 
       if (!discoveryResponse.ok) {
-        updateServiceStep('Signal Detection', 'error')
         throw new Error(`Signal discovery failed: ${discoveryResponse.statusText}`)
       }
-
-      updateServiceStep('Signal Detection', 'complete')
-      updateServiceStep('AI Analysis', 'complete')
-      updateServiceStep('Staging Check', 'complete')
 
       const signalsData = await discoveryResponse.json()
 
@@ -204,17 +237,22 @@ export default function TestWorkflowPage() {
       }
 
       // Step 6: Results Display
-      updateServiceStep('Results Display', 'complete')
+      setServiceSteps(prev => prev.map(step => ({ ...step, status: 'complete' })))
+      setShowConfirmation(false)
     } catch (err) {
       console.error('[test-workflow] Error:', err)
       setError(err instanceof Error ? err.message : 'Unknown error occurred')
       // Mark remaining steps as error
-      setServiceSteps(prev => prev.map(step => 
-        step.status === 'loading' ? { ...step, status: 'error' } : step
-      ))
+      setServiceSteps(prev => prev.map(step => ({ ...step, status: 'error' })))
     } finally {
       setLoading(false)
     }
+  }
+
+  const updateServiceStep = (stepName: string, status: string) => {
+    setServiceSteps(prev => prev.map(step => 
+      step.name === stepName ? { ...step, status } : step
+    ))
   }
 
   return (
@@ -391,7 +429,20 @@ export default function TestWorkflowPage() {
 
               {/* Signals Grid */}
               <div className="lg:col-span-2 space-y-6">
-                {signals.length > 0 && (
+                {/* Confirmation Page */}
+                {showConfirmation && (
+                  <SignalConfirmation
+                    signals={confirmationSignals}
+                    totalRows={dataRows.length}
+                    totalColumns={Object.keys(dataRows[0] || {}).length}
+                    fileName={file?.name || 'upload'}
+                    onConfirm={handleConfirmAndAnalyze}
+                    isProcessing={loading}
+                  />
+                )}
+
+                {/* Results Display (after confirmation) */}
+                {!showConfirmation && signals.length > 0 && (
                   <>
                     {/* Existing Data Info */}
                     {existingData && (
@@ -546,7 +597,7 @@ export default function TestWorkflowPage() {
                   </>
                 )}
 
-                {!loading && signals.length === 0 && file && (
+                {!loading && signals.length === 0 && file && !showConfirmation && (
                   <Card>
                     <CardContent className="pt-6 text-center text-muted-foreground">
                       <p>Upload a file to see signals appear here</p>
