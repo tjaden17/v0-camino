@@ -4,7 +4,10 @@ import React from "react"
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { ServiceFlow } from '@/components/service-flow'
 import { Loader2 } from 'lucide-react'
+
+import type { ServiceStep } from '@/components/service-flow'
 
 interface TestWorkflowState {
   signals: any[]
@@ -98,12 +101,28 @@ export default function TestWorkflowPage() {
   const [error, setError] = useState<string | null>(null)
   const [existingData, setExistingData] = useState<TestWorkflowState['existingData'] | null>(null)
   const [selectedProfile, setSelectedProfile] = useState<UserProfile | null>(null)
+  const [serviceSteps, setServiceSteps] = useState<ServiceStep[]>([
+    { name: 'File Upload', description: 'Parse CSV/Excel file', status: 'pending' },
+    { name: 'Data Extraction', description: 'Extract rows and columns', status: 'pending' },
+    { name: 'Signal Detection', description: 'Auto-detect numeric columns as signals', status: 'pending' },
+    { name: 'AI Analysis', description: 'Generate interpretations via OpenAI', status: 'pending' },
+    { name: 'Staging Check', description: 'Check for existing data', status: 'pending' },
+    { name: 'Results Display', description: 'Render signals and analysis', status: 'pending' },
+  ])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setFile(e.target.files[0])
       setError(null)
     }
+  }
+
+  const updateServiceStep = (stepName: string, status: ServiceStep['status'], timestamp?: string) => {
+    setServiceSteps(prev => prev.map(step => 
+      step.name === stepName 
+        ? { ...step, status, timestamp: timestamp || new Date().toLocaleTimeString() }
+        : step
+    ))
   }
 
   const handleUploadAndProcess = async () => {
@@ -114,12 +133,14 @@ export default function TestWorkflowPage() {
 
     setLoading(true)
     setError(null)
+    setServiceSteps(prev => prev.map(s => ({ ...s, status: 'pending', timestamp: undefined })))
 
     try {
       const formData = new FormData()
       formData.append('file', file)
 
-      // Use the test upload endpoint
+      // Step 1: File Upload
+      updateServiceStep('File Upload', 'loading')
       const uploadResponse = await fetch('/api/test/workflow-upload', {
         method: 'POST',
         body: formData,
@@ -128,18 +149,28 @@ export default function TestWorkflowPage() {
       if (!uploadResponse.ok) {
         throw new Error(`Upload failed: ${uploadResponse.statusText}`)
       }
+      updateServiceStep('File Upload', 'complete')
 
+      // Step 2: Data Extraction
+      updateServiceStep('Data Extraction', 'loading')
       const uploadData = await uploadResponse.json()
-      console.log('[test-workflow] Upload response:', uploadData)
-
-      // Extract data rows from upload
       const dataRows = uploadData.rows || []
 
       if (dataRows.length === 0) {
         throw new Error('No data rows found in file')
       }
+      updateServiceStep('Data Extraction', 'complete')
 
-      // Call signal discovery
+      // Step 3: Signal Detection (happens on server)
+      updateServiceStep('Signal Detection', 'loading')
+      
+      // Step 4: AI Analysis (happens on server)
+      updateServiceStep('AI Analysis', 'loading')
+      
+      // Step 5: Staging Check (happens on server)
+      updateServiceStep('Staging Check', 'loading')
+
+      // Call signal discovery endpoint
       const discoveryResponse = await fetch('/api/test/workflow-signals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -150,11 +181,15 @@ export default function TestWorkflowPage() {
       })
 
       if (!discoveryResponse.ok) {
+        updateServiceStep('Signal Detection', 'error')
         throw new Error(`Signal discovery failed: ${discoveryResponse.statusText}`)
       }
 
+      updateServiceStep('Signal Detection', 'complete')
+      updateServiceStep('AI Analysis', 'complete')
+      updateServiceStep('Staging Check', 'complete')
+
       const signalsData = await discoveryResponse.json()
-      console.log('[test-workflow] Signals discovered:', signalsData)
 
       // Store existing data info
       if (signalsData.existing_data) {
@@ -167,9 +202,16 @@ export default function TestWorkflowPage() {
       if (testSignals.length > 0) {
         setSelectedSignal(testSignals[0])
       }
+
+      // Step 6: Results Display
+      updateServiceStep('Results Display', 'complete')
     } catch (err) {
       console.error('[test-workflow] Error:', err)
       setError(err instanceof Error ? err.message : 'Unknown error occurred')
+      // Mark remaining steps as error
+      setServiceSteps(prev => prev.map(step => 
+        step.status === 'loading' ? { ...step, status: 'error' } : step
+      ))
     } finally {
       setLoading(false)
     }
@@ -287,57 +329,65 @@ export default function TestWorkflowPage() {
             </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Upload Section */}
-              <Card className="lg:col-span-1">
-                <CardHeader>
-                  <CardTitle>Step 2: Upload Data</CardTitle>
-                  <CardDescription>CSV or Excel file with metrics</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                    <input
-                      type="file"
-                      onChange={handleFileChange}
-                      accept=".csv,.xlsx,.xls"
-                      className="hidden"
-                      id="file-input"
-                    />
-                    <label
-                      htmlFor="file-input"
-                      className="cursor-pointer block"
-                    >
-                      <div className="text-sm text-muted-foreground">
-                        {file ? (
-                          <div>
-                            <p className="font-medium text-foreground">{file.name}</p>
-                            <p className="text-xs mt-1">Ready to process</p>
-                          </div>
-                        ) : (
-                          <div>
-                            <p className="font-medium">Click to select file</p>
-                            <p className="text-xs mt-1">or drag and drop</p>
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  </div>
-
-                  <Button
-                    onClick={handleUploadAndProcess}
-                    disabled={!file || loading}
-                    className="w-full"
-                  >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loading ? 'Processing...' : 'Upload & Analyze'}
-                  </Button>
-
-                  {error && (
-                    <div className="bg-red-50 text-red-700 text-sm p-3 rounded">
-                      {error}
+              {/* Left Column: Upload Section */}
+              <div className="lg:col-span-1 space-y-4">
+                {/* Upload Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Step 2: Upload Data</CardTitle>
+                    <CardDescription>CSV or Excel file with metrics</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        accept=".csv,.xlsx,.xls"
+                        className="hidden"
+                        id="file-input"
+                      />
+                      <label
+                        htmlFor="file-input"
+                        className="cursor-pointer block"
+                      >
+                        <div className="text-sm text-muted-foreground">
+                          {file ? (
+                            <div>
+                              <p className="font-medium text-foreground">{file.name}</p>
+                              <p className="text-xs mt-1">Ready to process</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-medium">Click to select file</p>
+                              <p className="text-xs mt-1">or drag and drop</p>
+                            </div>
+                          )}
+                        </div>
+                      </label>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    <Button
+                      onClick={handleUploadAndProcess}
+                      disabled={!file || loading}
+                      className="w-full"
+                    >
+                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {loading ? 'Processing...' : 'Upload & Analyze'}
+                    </Button>
+
+                    {error && (
+                      <div className="bg-red-50 text-red-700 text-sm p-3 rounded">
+                        {error}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Service Flow Visualization */}
+                {loading && (
+                  <ServiceFlow steps={serviceSteps} isActive={loading} />
+                )}
+              </div>
 
               {/* Signals Grid */}
               <div className="lg:col-span-2 space-y-6">
