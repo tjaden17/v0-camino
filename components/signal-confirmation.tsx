@@ -82,19 +82,19 @@ export function SignalConfirmation({
           <CardContent>
             <div className="space-y-3">
               {completeSignals.map((signal) => (
-                <div key={signal.name} className="flex items-start justify-between p-3 bg-white rounded border border-green-100">
-                  <div>
-                    <p className="font-medium text-green-900">{signal.name}</p>
-                    <p className="text-xs text-green-700 mt-1">
+                <div key={signal.name} className="flex items-start justify-between p-4 bg-white rounded border border-green-100">
+                  <div className="flex-1">
+                    <p className="font-semibold text-lg text-green-900">{signal.name}</p>
+                    <p className="text-sm text-green-700 mt-2">
                       {signal.dataPoints || 0} data points • {signal.category}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-green-900">{signal.value}</div>
-                    <div className="w-16 h-2 bg-green-200 rounded-full mt-1">
+                  <div className="text-right ml-4">
+                    <div className="text-2xl font-bold text-green-900">{signal.value.toLocaleString()}</div>
+                    <div className="w-20 h-2 bg-green-200 rounded-full mt-2">
                       <div className="w-full h-full bg-green-600 rounded-full" />
                     </div>
-                    <p className="text-xs text-green-700 mt-1">100%</p>
+                    <p className="text-sm font-semibold text-green-700 mt-2">✓ Complete</p>
                   </div>
                 </div>
               ))}
