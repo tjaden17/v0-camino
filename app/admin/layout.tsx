@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { LayoutDashboard, Users, Settings, Building2, LogOut, Database, Activity, Plug, HelpCircle, FileUp, Zap } from "lucide-react"
+import { LayoutDashboard, Users, Settings, Building2, LogOut, Database, Activity, Plug, HelpCircle, FileUp, Zap, Target } from "lucide-react"
 
 export default function AdminLayout({
   children,
@@ -74,6 +74,7 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin/dashboard", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/delivery", label: "Delivery", icon: Target },
     { href: "/admin/data", label: "Data", icon: Database },
     { href: "/admin/signals", label: "Signals", icon: Activity },
     { href: "/admin/signal-hub", label: "Signal Hub", icon: Zap },
