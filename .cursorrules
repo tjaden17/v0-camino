@@ -1,0 +1,222 @@
+# Camino - Cursor Rules
+# Last updated: 7 Feb 2026
+
+## Project Overview
+
+Camino is a mobile-first business intelligence platform that turns raw business data (CSV uploads, integrations) into actionable signals with AI-powered interpretation. The target user is a small business executive/manager who needs to understand their data without being a data analyst.
+
+North Star metric: 1 upload (manager) + 1 view/week (any user)
+
+Current phase: MVP Tier 1 - getting the core pipeline to "start charging" state.
+
+
+## Tech Stack
+
+- Framework: Next.js 16 (App Router) with React 19.2
+- Language: TypeScript 5
+- Styling: Tailwind CSS v4 with shadcn/ui components
+- Database: Supabase (PostgreSQL with RLS)
+- AI: Vercel AI SDK v6 (ai@6.0.6)
+- File parsing: xlsx for Excel/CSV
+- Hosting: Vercel
+- Icons: lucide-react (^0.454.0)
+- Forms: react-hook-form + zod
+- Charts: Recharts via shadcn/ui chart components
+- Date utils: date-fns 4.1.0
+
+
+## Architecture
+
+### Route Groups
+- `app/(protected)/*` - Customer-facing pages (auth-guarded, mobile-first, bottom nav)
+- `app/admin/*` - Admin panel (sidebar nav, desktop layout)
+- `app/auth/*` - Authentication flows (login, signup, onboarding)
+- `app/api/*` - API routes (REST endpoints)
+- `app/test/*` - Test/debug pages (smoke tests, e2e, review)
+
+### Supabase Clients
+There are TWO Supabase client files. Use the correct one:
+- `lib/supabase/client.ts` - Browser/client components. Uses `createBrowserClient()`. Call in 'use client' components.
+- `lib/supabase/server.ts` - Server components and API routes. Uses `createServerClient()` with cookies. Always `await createClient()`.
+- `lib/supabase/admin.ts` - Service role client for admin operations. Uses SUPABASE_SERVICE_ROLE_KEY.
+
+### Key Services (lib/)
+- `upload-service.ts` - CSV upload processing
+- `staging-service.ts` - Data staging before signal creation
+- `signal-discovery-service.ts` - AI-powered signal detection from staged data
+- `signal-calculation-service.ts` - Statistical calculations (sum, avg, trend, change%)
+- `interpretation-service.ts` - AI interpretation (5-section analysis: what_we_found, what_it_means, so_what)
+- `signals-service.ts` - CRUD operations for signals table
+- `organization-service.ts` - Organization management
+- `admin-service.ts` - Admin user management, password resets
+- `csv-parser.ts` / `xlsx-parser.ts` - File parsing utilities
+
+### Critical Pipeline (Tier 1 MVP)
+This is the core value loop. Every change to these files needs extra care:
+
+```
+Upload CSV (upload-page-client.tsx)
+  -> POST /api/upload (route.ts) - parses file, stages data
+  -> Signal Discovery (signal-discovery-service.ts) - AI identifies signals
+  -> POST /api/upload/calculate (route.ts) - statistical calculations
+  -> Signal Calculation (signal-calculation-service.ts) - computes values
+  -> AI Interpretation (interpretation-service.ts) - generates 5-section analysis
+  -> Display (signals-page-client.tsx, signal-detail-client.tsx) - signal cards + expanded view
+```
+
+
+## Database
+
+### Environments
+- Production: `fimcowyogwffkpckicjl` (supabase-orange-yacht) - customer-facing
+- Development: `juacwfiquhzawpzaylen` (camino-dev) - testing and development
+
+For local dev, use .env.local pointing at camino-dev:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://juacwfiquhzawpzaylen.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<camino-dev anon key>
+SUPABASE_SERVICE_ROLE_KEY=<camino-dev service role key>
+```
+
+### Core Tables (18 total)
+- profiles - User profiles, linked to auth.users
+- organizations - Customer organizations
+- organization_members - User-org membership with roles (admin/read-only)
+- signals - Discovered signals with values, trends, status
+- data_points - Time-series data for signals (signal_id, date, value)
+- signal_interpretations - Cached AI interpretations (what_we_found, what_it_means, so_what)
+- saved_signals - User bookmarks
+- signal_shares - Share tracking
+- kpi_ownership - Which user owns which signal
+- decisions - Business decisions linked to signals
+- decision_signals - Junction table for decisions-signals
+- benchmark_history - Historical benchmark values
+- data_quality_metrics - Completeness/timeliness/accuracy scores
+- signal_analytics - Pre-computed analytics per period
+- signal_alerts - Threshold breaches, missing data alerts
+- upload_history - Upload tracking (file_name, status, signals_created)
+- integrations - OAuth connections (zoho-crm, zoho-desk, hubspot)
+- sync_history - Integration sync tracking
+
+### RLS Pattern
+All tables have Row Level Security enabled. Common patterns:
+- Profiles: users can only see/edit their own profile
+- Signals: open read for all authenticated users, authenticated write
+- Organizations: members can read, admins can update
+- Upload history: users can only see their own uploads
+
+### Migration Discipline
+1. Write SQL in `/scripts/` with descriptive name
+2. Run against camino-dev first
+3. Test the app against dev
+4. Run the EXACT SAME file against prod (no freehand SQL)
+5. Commit the script to git
+
+
+## Coding Conventions
+
+### General
+- Use TypeScript strict mode
+- Prefer `const` over `let`
+- Use async/await, never raw promises
+- Error handling: always try/catch in API routes, return meaningful JSON errors
+- No console.log in production code (use console.error for actual errors)
+
+### Components
+- Split pages into page.tsx (server) + *-client.tsx (client component)
+- Use shadcn/ui components from `@/components/ui/*`
+- Import utility: `import { cn } from "@/lib/utils"`
+- Icons from lucide-react only
+- Mobile-first: design for 375px width, then scale up
+
+### API Routes
+- Always validate input with zod or manual checks
+- Always check auth: `const supabase = await createClient()` then `supabase.auth.getUser()`
+- Return consistent JSON: `{ success: boolean, data?: any, error?: string }`
+- Use parameterized queries (Supabase handles this via its client)
+
+### Styling
+- Tailwind CSS v4 with design tokens (bg-background, text-foreground, etc.)
+- Never use direct colors (no bg-white, text-black) - use semantic tokens
+- Fonts: Geist (sans) and Geist Mono (mono) via --font-sans and --font-mono
+- Spacing: use Tailwind scale (p-4, gap-6) not arbitrary values
+- Mobile breakpoints: default is mobile, use md: and lg: for larger screens
+
+### Protected Pages Pattern
+```tsx
+// app/(protected)/example/page.tsx (server component, thin wrapper)
+import { ExampleClient } from "@/components/example-client"
+export default function ExamplePage() {
+  return <ExampleClient />
+}
+
+// components/example-client.tsx (client component, all logic)
+"use client"
+import { createBrowserClient } from "@/lib/supabase/client"
+export function ExampleClient() {
+  const supabase = createBrowserClient()
+  // ... component logic
+}
+```
+
+### Admin Pages Pattern
+Admin pages can be client components directly in the page file since the admin layout already handles auth:
+```tsx
+// app/admin/example/page.tsx
+"use client"
+import { createBrowserClient } from "@/lib/supabase/client"
+export default function AdminExamplePage() {
+  const supabase = createBrowserClient()
+  // ... admin logic
+}
+```
+
+
+## What NOT To Do
+
+- Do NOT use localStorage for data persistence
+- Do NOT add new npm packages without checking if an existing one covers the need
+- Do NOT modify the Supabase client files without understanding both client/server patterns
+- Do NOT run migrations directly on prod - always dev first
+- Do NOT build features outside the current sprint scope (check /docs/delivery-plan.ts)
+- Do NOT add purple/violet colors (design system uses blue primary + neutral accents)
+- Do NOT use `space-*` Tailwind classes - use `gap-*` instead
+- Do NOT create new service files when existing ones cover the domain
+
+
+## Current Sprint Focus
+
+Tier 1 MVP (target: start charging):
+1. Upload CSV -> Stage -> Discover signals (working, needs real data testing)
+2. Signal calculation (sum, avg, trend, change%) 
+3. AI interpretation (5-section analysis)
+4. Signal list + expanded card display
+5. Master admin user management
+
+See /docs/delivery-plan.ts for full story breakdown and status.
+See /docs/DELIVERY_PLAN_MVP.md for the human-readable delivery plan.
+
+
+## File Organization
+
+```
+/app
+  /(protected)     Customer-facing pages
+  /admin           Admin panel
+  /auth            Login, signup, onboarding
+  /api             API routes
+  /test            Test pages
+/components
+  /ui              shadcn/ui base components (DO NOT EDIT)
+  /admin           Admin-specific components
+  /upload          Upload-specific components
+  /intelligence    Intelligence feature components
+  *.tsx            Shared components
+/lib
+  /supabase        Supabase client setup
+  /modules         Feature module exports
+  *.ts             Service files
+/scripts           SQL migration scripts (numbered)
+/docs              Delivery plans, documentation
+/public            Static assets, icons
+```
