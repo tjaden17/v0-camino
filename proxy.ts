@@ -1,10 +1,8 @@
 import type { NextRequest } from "next/server"
+import { updateSession } from "@/lib/supabase/proxy"
 
 export async function proxy(request: NextRequest) {
-  // In v0, server-side Supabase calls don't work due to environment restrictions
-  // All authentication is handled client-side in the (protected) layout
-  // Simply allow all requests through
-  return
+  return await updateSession(request)
 }
 
 export const config = {
