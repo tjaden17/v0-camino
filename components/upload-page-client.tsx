@@ -554,18 +554,14 @@ export function UploadPageClient({
                       <span className="text-sm font-bold">{signalContext.dataCompleteness}%</span>
                     </div>
                     <Progress value={signalContext.dataCompleteness} className="h-2 mb-3" />
-                    <div className="grid grid-cols-4 gap-2 text-center">
+                    <div className="grid grid-cols-3 gap-2 text-center">
                       <div>
                         <div className="text-lg font-bold text-emerald-600">{signalContext.priorityMatch.length}</div>
-                        <div className="text-[10px] text-muted-foreground leading-tight">Priority Match</div>
+                        <div className="text-[10px] text-muted-foreground leading-tight">Relevant</div>
                       </div>
                       <div>
                         <div className="text-lg font-bold text-blue-600">{signalContext.available.length}</div>
-                        <div className="text-[10px] text-muted-foreground leading-tight">Available</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-amber-600">{signalContext.recommended.length}</div>
-                        <div className="text-[10px] text-muted-foreground leading-tight">Recommended</div>
+                        <div className="text-[10px] text-muted-foreground leading-tight">Other</div>
                       </div>
                       <div>
                         <div className="text-lg font-bold text-muted-foreground">{signalContext.requestedMissing.length}</div>
@@ -575,12 +571,12 @@ export function UploadPageClient({
                   </div>
                 )}
 
-                {/* PRIORITY MATCH - User asked for it AND data supports it */}
+                {/* RELEVANT SIGNALS - User asked for it AND data supports it */}
                 {signalContext && signalContext.priorityMatch.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <Target className="h-4 w-4 text-emerald-500" />
-                      <span className="text-sm font-medium">Priority Match ({signalContext.priorityMatch.length})</span>
+                      <span className="text-sm font-medium">Relevant Signals ({signalContext.priorityMatch.length})</span>
                       <span className="text-xs text-muted-foreground ml-auto">Matches your goals and data</span>
                     </div>
                     <div className="space-y-2">
@@ -639,12 +635,12 @@ export function UploadPageClient({
                   </div>
                 )}
 
-                {/* AVAILABLE - Data supports it, user didn't explicitly ask */}
+                {/* OTHER SIGNALS - Data supports it, user didn't explicitly ask */}
                 {signalContext && signalContext.available.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm font-medium">Available ({signalContext.available.length})</span>
+                      <span className="text-sm font-medium">Other Signals ({signalContext.available.length})</span>
                       <span className="text-xs text-muted-foreground ml-auto">Your data supports these</span>
                     </div>
                     <div className="space-y-2">
@@ -672,65 +668,6 @@ export function UploadPageClient({
                             <p className="text-xs text-emerald-600 mt-1">
                               {'Matched: ' + cs.matchedFields.join(", ")}
                             </p>
-                          </div>
-                          {(cs.dataGuidance || cs.missingFields.length > 0) && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                toggleGuidance(cs.signal.signalId)
-                              }}
-                              className={cn(
-                                "shrink-0 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors",
-                                expandedGuidance.has(cs.signal.signalId)
-                                  ? "bg-primary/10 text-primary"
-                                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                              )}
-                            >
-                              <Lightbulb className="h-3 w-3" />
-                              How
-                              {expandedGuidance.has(cs.signal.signalId) ? (
-                                <ChevronUp className="h-3 w-3" />
-                              ) : (
-                                <ChevronDown className="h-3 w-3" />
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* RECOMMENDED - Best practice for profile, data may be missing */}
-                {signalContext && signalContext.recommended.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Lightbulb className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm font-medium">Recommended ({signalContext.recommended.length})</span>
-                      <span className="text-xs text-muted-foreground ml-auto">Best practice for your profile</span>
-                    </div>
-                    <div className="space-y-2">
-                      {signalContext.recommended.map((cs) => (
-                        <div
-                          key={cs.signal.signalId}
-                          className={cn(
-                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-                            "bg-muted/50 hover:bg-muted"
-                          )}
-                        >
-                          <Checkbox
-                            checked={false}
-                            disabled
-                            className="mt-0.5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{cs.signal.signalName}</span>
-                              <Badge variant="outline" className="text-[10px]">{cs.signal.category}</Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">{cs.reason || cs.signal.description}</p>
                           </div>
                           {(cs.dataGuidance || cs.missingFields.length > 0) && (
                             <button
