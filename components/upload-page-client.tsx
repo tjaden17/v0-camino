@@ -31,7 +31,6 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import type { SignalDiscoveryResult, DiscoveredSignal } from "@/lib/signal-discovery-service"
 import type { SignalContextResult, ContextualSignal, DataGuidance } from "@/lib/signal-context-service"
-import { SignalRow } from "@/components/signal-row" // Import SignalRow component
 
 interface UploadHistory {
   id: string
@@ -400,15 +399,55 @@ export function UploadPageClient({
                     </div>
                     <div className="space-y-2">
                       {signalContext.priorityMatch.map((cs) => (
-                        <SignalRow
+                        <div
                           key={cs.signal.signalId}
-                          cs={cs}
-                          colorClass="emerald"
-                          selected={selectedSignals.has(cs.signal.signalId)}
-                          onToggle={() => toggleSignal(cs.signal.signalId)}
-                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
-                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
-                        />
+                          className={cn(
+                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+                            selectedSignals.has(cs.signal.signalId)
+                              ? "bg-emerald-500/10 border border-emerald-500/30"
+                              : "bg-muted/50 hover:bg-muted"
+                          )}
+                        >
+                          <Checkbox
+                            checked={selectedSignals.has(cs.signal.signalId)}
+                            onCheckedChange={() => toggleSignal(cs.signal.signalId)}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">{cs.signal.signalName}</span>
+                              <Badge variant="outline" className="text-[10px]">{cs.signal.category}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{cs.reason || cs.signal.description}</p>
+                            <p className="text-xs text-emerald-600 mt-1">
+                              {'Matched: ' + cs.matchedFields.join(", ")}
+                            </p>
+                          </div>
+                          {(cs.dataGuidance || cs.missingFields.length > 0) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                toggleGuidance(cs.signal.signalId)
+                              }}
+                              className={cn(
+                                "shrink-0 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors",
+                                expandedGuidance.has(cs.signal.signalId)
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                              )}
+                            >
+                              <Lightbulb className="h-3 w-3" />
+                              How
+                              {expandedGuidance.has(cs.signal.signalId) ? (
+                                <ChevronUp className="h-3 w-3" />
+                              ) : (
+                                <ChevronDown className="h-3 w-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -424,15 +463,55 @@ export function UploadPageClient({
                     </div>
                     <div className="space-y-2">
                       {signalContext.available.map((cs) => (
-                        <SignalRow
+                        <div
                           key={cs.signal.signalId}
-                          cs={cs}
-                          colorClass="blue"
-                          selected={selectedSignals.has(cs.signal.signalId)}
-                          onToggle={() => toggleSignal(cs.signal.signalId)}
-                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
-                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
-                        />
+                          className={cn(
+                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+                            selectedSignals.has(cs.signal.signalId)
+                              ? "bg-blue-500/10 border border-blue-500/30"
+                              : "bg-muted/50 hover:bg-muted"
+                          )}
+                        >
+                          <Checkbox
+                            checked={selectedSignals.has(cs.signal.signalId)}
+                            onCheckedChange={() => toggleSignal(cs.signal.signalId)}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">{cs.signal.signalName}</span>
+                              <Badge variant="outline" className="text-[10px]">{cs.signal.category}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{cs.reason || cs.signal.description}</p>
+                            <p className="text-xs text-emerald-600 mt-1">
+                              {'Matched: ' + cs.matchedFields.join(", ")}
+                            </p>
+                          </div>
+                          {(cs.dataGuidance || cs.missingFields.length > 0) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                toggleGuidance(cs.signal.signalId)
+                              }}
+                              className={cn(
+                                "shrink-0 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors",
+                                expandedGuidance.has(cs.signal.signalId)
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                              )}
+                            >
+                              <Lightbulb className="h-3 w-3" />
+                              How
+                              {expandedGuidance.has(cs.signal.signalId) ? (
+                                <ChevronUp className="h-3 w-3" />
+                              ) : (
+                                <ChevronDown className="h-3 w-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -448,17 +527,50 @@ export function UploadPageClient({
                     </div>
                     <div className="space-y-2">
                       {signalContext.recommended.map((cs) => (
-                        <SignalRow
+                        <div
                           key={cs.signal.signalId}
-                          cs={cs}
-                          colorClass="amber"
-                          selected={false}
-                          disabled
-                          onToggle={() => {}}
-                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
-                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
-                          showGuidanceByDefault
-                        />
+                          className={cn(
+                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+                            "bg-muted/50 hover:bg-muted"
+                          )}
+                        >
+                          <Checkbox
+                            checked={false}
+                            disabled
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">{cs.signal.signalName}</span>
+                              <Badge variant="outline" className="text-[10px]">{cs.signal.category}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{cs.reason || cs.signal.description}</p>
+                          </div>
+                          {(cs.dataGuidance || cs.missingFields.length > 0) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                toggleGuidance(cs.signal.signalId)
+                              }}
+                              className={cn(
+                                "shrink-0 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors",
+                                expandedGuidance.has(cs.signal.signalId)
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                              )}
+                            >
+                              <Lightbulb className="h-3 w-3" />
+                              How
+                              {expandedGuidance.has(cs.signal.signalId) ? (
+                                <ChevronUp className="h-3 w-3" />
+                              ) : (
+                                <ChevronDown className="h-3 w-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -474,17 +586,53 @@ export function UploadPageClient({
                     </div>
                     <div className="space-y-2">
                       {signalContext.requestedMissing.map((cs) => (
-                        <SignalRow
+                        <div
                           key={cs.signal.signalId}
-                          cs={cs}
-                          colorClass="gray"
-                          selected={false}
-                          disabled
-                          onToggle={() => {}}
-                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
-                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
-                          showGuidanceByDefault
-                        />
+                          className={cn(
+                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+                            "bg-muted/50 hover:bg-muted"
+                          )}
+                        >
+                          <Checkbox
+                            checked={false}
+                            disabled
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">{cs.signal.signalName}</span>
+                              <Badge variant="outline" className="text-[10px]">{cs.signal.category}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{cs.reason || cs.signal.description}</p>
+                            <p className="text-xs text-amber-600 mt-1">
+                              {'Missing: ' + cs.missingFields.join(", ")}
+                            </p>
+                          </div>
+                          {(cs.dataGuidance || cs.missingFields.length > 0) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                toggleGuidance(cs.signal.signalId)
+                              }}
+                              className={cn(
+                                "shrink-0 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors",
+                                expandedGuidance.has(cs.signal.signalId)
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                              )}
+                            >
+                              <Lightbulb className="h-3 w-3" />
+                              How
+                              {expandedGuidance.has(cs.signal.signalId) ? (
+                                <ChevronUp className="h-3 w-3" />
+                              ) : (
+                                <ChevronDown className="h-3 w-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -499,7 +647,7 @@ export function UploadPageClient({
                     </div>
                     <div className="space-y-2">
                       {discovery.availableSignals.map((ds) => (
-                        <label
+                        <div
                           key={ds.signal.signalId}
                           className={cn(
                             "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
@@ -516,14 +664,38 @@ export function UploadPageClient({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-sm">{ds.signal.signalName}</span>
-                              <Badge variant="outline" className="text-xs">{ds.signal.category}</Badge>
+                              <Badge variant="outline" className="text-[10px]">{ds.signal.category}</Badge>
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">{ds.signal.description}</p>
                             <p className="text-xs text-emerald-600 mt-1">
                               {'Matched: ' + ds.matchedFields.join(", ")}
                             </p>
                           </div>
-                        </label>
+                          {(ds.dataGuidance || ds.missingFields.length > 0) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                toggleGuidance(ds.signal.signalId)
+                              }}
+                              className={cn(
+                                "shrink-0 flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors",
+                                expandedGuidance.has(ds.signal.signalId)
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                              )}
+                            >
+                              <Lightbulb className="h-3 w-3" />
+                              How
+                              {expandedGuidance.has(ds.signal.signalId) ? (
+                                <ChevronUp className="h-3 w-3" />
+                              ) : (
+                                <ChevronDown className="h-3 w-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -643,6 +815,89 @@ export function UploadPageClient({
       </main>
 
       <BottomNav />
+    </div>
+  )
+}
+
+// ============================================
+// DataGuidancePanel - Shows how to get missing data
+// ============================================
+
+function DataGuidancePanel({
+  guidance,
+  missingFields,
+}: {
+  guidance: DataGuidance
+  missingFields: string[]
+}) {
+  const difficultyColors: Record<string, string> = {
+    easy: "text-emerald-600 bg-emerald-500/10",
+    moderate: "text-amber-600 bg-amber-500/10",
+    advanced: "text-red-600 bg-red-500/10",
+  }
+
+  return (
+    <div className="px-3 pb-3 pt-0">
+      <div className="rounded-lg bg-background border border-border p-3">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-semibold">How to get this data</span>
+          <Badge
+            variant="secondary"
+            className={cn("text-[10px]", difficultyColors[guidance.difficulty] || "")}
+          >
+            {guidance.difficulty}
+          </Badge>
+        </div>
+
+        {/* Summary */}
+        <p className="text-xs text-muted-foreground mb-3">{guidance.summary}</p>
+
+        {/* Data Source */}
+        <div className="flex items-center gap-2 mb-3">
+          <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
+          <span className="text-xs font-medium">{guidance.dataSource}</span>
+        </div>
+
+        {/* Export Steps */}
+        {guidance.exportSteps.length > 0 && (
+          <div className="mb-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Steps</span>
+            <ol className="mt-1.5 space-y-1">
+              {guidance.exportSteps.map((step, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <span className="shrink-0 w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold mt-0.5">
+                    {i + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* Expected Columns */}
+        {guidance.exampleColumns.length > 0 && (
+          <div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Expected columns</span>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {guidance.exampleColumns.map((col) => (
+                <code
+                  key={col}
+                  className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded font-mono",
+                    missingFields.some((mf) => col.toLowerCase().includes(mf.toLowerCase()))
+                      ? "bg-amber-500/10 text-amber-700 border border-amber-500/30"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {col}
+                </code>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
