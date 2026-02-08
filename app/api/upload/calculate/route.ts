@@ -408,6 +408,21 @@ export async function POST(request: NextRequest) {
       rows = result.rows as Record<string, string>[]
     }
 
+    // Record this upload in staged_uploads for data history tracking
+    let uploadId: string | null = null
+    try {
+      const columns = rows[0] ? Object.keys(rows[0]) : []
+      const uploadResult = await sql`
+        INSERT INTO staged_uploads (user_id, organization_id, file_name, file_type, source_type, row_count, column_count, status)
+        VALUES (${user.id}, ${organizationId}, ${file.name}, ${isExcel ? 'xlsx' : 'csv'}, 'manual_upload', ${rows.length}, ${columns.length}, 'processed')
+        RETURNING id
+      `
+      uploadId = uploadResult?.[0]?.id || null
+    } catch (uploadErr) {
+      console.error("[v0] Failed to record upload:", uploadErr)
+      // Non-fatal - continue with signal creation
+    }
+
     // Calculate and save each selected signal
     const createdSignals: any[] = []
     const errors: string[] = []
@@ -464,6 +479,45 @@ export async function POST(request: NextRequest) {
         
         if (result && result.length > 0) {
           createdSignals.push(result[0])
+          // Record signal opportunity linked to this upload
+          if (uploadId) {
+            try {
+              // Check if signal opportunity already exists for this org
+              const existing = organizationId
+                ? await sql`SELECT id FROM signal_opportunities WHERE signal_name = ${signalDef.signalName} AND organization_id = ${organizationId} LIMIT 1`
+                : await sql`SELECT id FROM signal_opportunities WHERE signal_name = ${signalDef.signalName} AND user_id = ${user.id} LIMIT 1`
+
+              if (existing && existing.length > 0) {
+                await sql`
+                  UPDATE signal_opportunities SET
+                    status = 'active',
+                    is_calculable = true,
+                    confidence_score = ${discovered.matchScore || 0.8},
+                    available_fields = ${JSON.stringify(discovered.matchedFields)},
+                    missing_fields = ${JSON.stringify(discovered.missingFields || [])},
+                    source_uploads = ${JSON.stringify([{ upload_id: uploadId, file_name: file.name }])},
+                    updated_at = NOW()
+                  WHERE id = ${existing[0].id}
+                `
+              } else {
+                await sql`
+                  INSERT INTO signal_opportunities (
+                    user_id, organization_id, signal_name, signal_category,
+                    status, discovery_type, is_calculable, confidence_score,
+                    required_fields, available_fields, missing_fields, source_uploads
+                  ) VALUES (
+                    ${user.id}, ${organizationId}, ${signalDef.signalName}, ${signalDef.category},
+                    'active', 'new', true, ${discovered.matchScore || 0.8},
+                    ${JSON.stringify(signalDef.requiredFields)}, ${JSON.stringify(discovered.matchedFields)},
+                    ${JSON.stringify(discovered.missingFields || [])},
+                    ${JSON.stringify([{ upload_id: uploadId, file_name: file.name }])}
+                  )
+                `
+              }
+            } catch (oppErr) {
+              // Non-fatal
+            }
+          }
         }
       } catch (insertError) {
         errors.push(`Failed to save ${signalDef.signalName}: ${insertError instanceof Error ? insertError.message : 'Unknown error'}`)

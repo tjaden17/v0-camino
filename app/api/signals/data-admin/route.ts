@@ -19,26 +19,46 @@ export async function GET() {
     `
     const orgId = profileResult?.[0]?.organization_id
 
-    // 1. Upload history - staged_uploads for this user/org
-    const uploads = await sql`
-      SELECT 
-        su.id,
-        su.file_name,
-        su.file_type,
-        su.source_type,
-        su.row_count,
-        su.column_count,
-        su.status,
-        su.uploaded_at,
-        su.processed_at,
-        su.metadata,
-        (SELECT count(*) FROM staged_fields sf WHERE sf.upload_id = su.id) as field_count
-      FROM staged_uploads su
-      WHERE su.user_id = ${user.id}
-        ${orgId ? sql`OR su.organization_id = ${orgId}` : sql``}
-      ORDER BY su.uploaded_at DESC
-      LIMIT 50
-    `
+    // 1. Upload history - staged_uploads for this org (or user if no org)
+    const uploads = orgId
+      ? await sql`
+          SELECT 
+            su.id,
+            su.file_name,
+            su.file_type,
+            su.source_type,
+            su.row_count,
+            su.column_count,
+            su.status,
+            su.uploaded_at,
+            su.processed_at,
+            su.metadata,
+            su.user_id,
+            (SELECT count(*) FROM staged_fields sf WHERE sf.upload_id = su.id) as field_count
+          FROM staged_uploads su
+          WHERE su.organization_id = ${orgId}
+          ORDER BY su.uploaded_at DESC
+          LIMIT 50
+        `
+      : await sql`
+          SELECT 
+            su.id,
+            su.file_name,
+            su.file_type,
+            su.source_type,
+            su.row_count,
+            su.column_count,
+            su.status,
+            su.uploaded_at,
+            su.processed_at,
+            su.metadata,
+            su.user_id,
+            (SELECT count(*) FROM staged_fields sf WHERE sf.upload_id = su.id) as field_count
+          FROM staged_uploads su
+          WHERE su.user_id = ${user.id}
+          ORDER BY su.uploaded_at DESC
+          LIMIT 50
+        `
 
     // 2. Integration history - active integrations for this org
     const integrations = orgId
@@ -86,51 +106,86 @@ export async function GET() {
       : []
 
     // 4. Per-upload signal details: what signals came from each upload
-    const uploadIds = uploads.map((u: any) => u.id)
-    let uploadSignalDetails: any[] = []
-    if (uploadIds.length > 0) {
-      uploadSignalDetails = await sql`
-        SELECT
-          so.id,
-          so.signal_name,
-          so.signal_category,
-          so.status,
-          so.discovery_type,
-          so.is_calculable,
-          so.confidence_score,
-          so.required_fields,
-          so.available_fields,
-          so.missing_fields,
-          so.source_uploads,
-          so.created_at,
-          so.updated_at
-        FROM signal_opportunities so
-        WHERE so.user_id = ${user.id}
-          ${orgId ? sql`OR so.organization_id = ${orgId}` : sql``}
-        ORDER BY so.created_at DESC
-      `
-    }
+    const uploadSignalDetails = orgId
+      ? await sql`
+          SELECT
+            so.id,
+            so.signal_name,
+            so.signal_category,
+            so.status,
+            so.discovery_type,
+            so.is_calculable,
+            so.confidence_score,
+            so.required_fields,
+            so.available_fields,
+            so.missing_fields,
+            so.source_uploads,
+            so.created_at,
+            so.updated_at
+          FROM signal_opportunities so
+          WHERE so.organization_id = ${orgId}
+          ORDER BY so.created_at DESC
+        `
+      : await sql`
+          SELECT
+            so.id,
+            so.signal_name,
+            so.signal_category,
+            so.status,
+            so.discovery_type,
+            so.is_calculable,
+            so.confidence_score,
+            so.required_fields,
+            so.available_fields,
+            so.missing_fields,
+            so.source_uploads,
+            so.created_at,
+            so.updated_at
+          FROM signal_opportunities so
+          WHERE so.user_id = ${user.id}
+          ORDER BY so.created_at DESC
+        `
 
     // 5. Partial / incomplete signals - those with missing fields
-    const partialSignals = await sql`
-      SELECT
-        so.id,
-        so.signal_name,
-        so.signal_category,
-        so.required_fields,
-        so.available_fields,
-        so.missing_fields,
-        so.confidence_score,
-        so.source_uploads,
-        so.status,
-        so.created_at
-      FROM signal_opportunities so
-      WHERE (so.user_id = ${user.id} ${orgId ? sql`OR so.organization_id = ${orgId}` : sql``})
-        AND so.is_calculable = false
-        AND so.missing_fields IS NOT NULL
-        AND jsonb_array_length(so.missing_fields) > 0
-      ORDER BY so.confidence_score DESC
-    `
+    const partialSignals = orgId
+      ? await sql`
+          SELECT
+            so.id,
+            so.signal_name,
+            so.signal_category,
+            so.required_fields,
+            so.available_fields,
+            so.missing_fields,
+            so.confidence_score,
+            so.source_uploads,
+            so.status,
+            so.created_at
+          FROM signal_opportunities so
+          WHERE so.organization_id = ${orgId}
+            AND so.is_calculable = false
+            AND so.missing_fields IS NOT NULL
+            AND jsonb_array_length(so.missing_fields) > 0
+          ORDER BY so.confidence_score DESC
+        `
+      : await sql`
+          SELECT
+            so.id,
+            so.signal_name,
+            so.signal_category,
+            so.required_fields,
+            so.available_fields,
+            so.missing_fields,
+            so.confidence_score,
+            so.source_uploads,
+            so.status,
+            so.created_at
+          FROM signal_opportunities so
+          WHERE so.user_id = ${user.id}
+            AND so.is_calculable = false
+            AND so.missing_fields IS NOT NULL
+            AND jsonb_array_length(so.missing_fields) > 0
+          ORDER BY so.confidence_score DESC
+        `
 
     // 6. Active signals count and data freshness
     const signalStats = orgId
