@@ -63,8 +63,9 @@ export function UploadPageClient({
   
   const [uploadState, setUploadState] = useState<UploadState>("idle")
   const [dragActive, setDragActive] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [progress, setProgress] = useState(0)
+  const [analyzeProgress, setAnalyzeProgress] = useState<{ current: number; total: number; fileName: string }>({ current: 0, total: 0, fileName: "" })
   const [error, setError] = useState<string | null>(null)
   const [discovery, setDiscovery] = useState<SignalDiscoveryResult | null>(null)
   const [signalContext, setSignalContext] = useState<SignalContextResult | null>(null)
@@ -72,6 +73,8 @@ export function UploadPageClient({
   const [result, setResult] = useState<{ signalsCreated: number } | null>(null)
   const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(userOrgId)
   const [expandedGuidance, setExpandedGuidance] = useState<Set<string>>(new Set())
+  // Track which file each signal came from (signalId -> fileName[])
+  const [signalFileSources, setSignalFileSources] = useState<Map<string, string[]>>(new Map())
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -87,27 +90,40 @@ export function UploadPageClient({
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      analyzeFile(e.dataTransfer.files[0])
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      analyzeFiles(Array.from(e.dataTransfer.files))
     }
   }, [selectedOrgId])
 
-  const analyzeFile = async (selectedFile: File) => {
+  const validateFile = (f: File): boolean => {
     const validTypes = [
       "text/csv",
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ]
+    return validTypes.includes(f.type) || 
+      f.name.endsWith(".csv") || 
+      f.name.endsWith(".xlsx") || 
+      f.name.endsWith(".xls")
+  }
 
-    const isValidType = validTypes.includes(selectedFile.type) || 
-      selectedFile.name.endsWith(".csv") || 
-      selectedFile.name.endsWith(".xlsx") || 
-      selectedFile.name.endsWith(".xls")
+  const analyzeFiles = async (selectedFiles: File[]) => {
+    // Filter to valid files
+    const validFiles = selectedFiles.filter(validateFile)
+    const invalidCount = selectedFiles.length - validFiles.length
 
-    if (!isValidType) {
+    if (invalidCount > 0) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload a CSV or Excel file",
+        title: `${invalidCount} file${invalidCount > 1 ? "s" : ""} skipped`,
+        description: "Only CSV and Excel files are supported",
+        variant: "destructive",
+      })
+    }
+
+    if (validFiles.length === 0) {
+      toast({
+        title: "No valid files",
+        description: "Please upload CSV or Excel files",
         variant: "destructive",
       })
       return
@@ -122,42 +138,109 @@ export function UploadPageClient({
       return
     }
 
-    setFile(selectedFile)
+    setFiles(validFiles)
     setError(null)
     setUploadState("analyzing")
-    setProgress(30)
+    setProgress(0)
 
     try {
-      const formData = new FormData()
-      formData.append("file", selectedFile)
+      // Analyze each file sequentially, merging discovery results
+      let mergedAvailable: DiscoveredSignal[] = []
+      let mergedPartial: DiscoveredSignal[] = []
+      let totalRows = 0
+      const allRecommendations: string[] = []
+      const fileSources = new Map<string, string[]>()
+      let latestSignalContext: SignalContextResult | null = null
 
-      const response = await fetch("/api/upload/discover", {
-        method: "POST",
-        body: formData,
-      })
+      for (let i = 0; i < validFiles.length; i++) {
+        const currentFile = validFiles[i]
+        setAnalyzeProgress({ current: i + 1, total: validFiles.length, fileName: currentFile.name })
+        setProgress(Math.round(((i) / validFiles.length) * 80))
 
-      setProgress(80)
+        const formData = new FormData()
+        formData.append("file", currentFile)
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Analysis failed" }))
-        throw new Error(errorData.error || "Failed to analyze file")
+        const response = await fetch("/api/upload/discover", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: "Analysis failed" }))
+          throw new Error(`${currentFile.name}: ${errorData.error || "Failed to analyze"}`)
+        }
+
+        const data = await response.json()
+
+        if (data.discovery) {
+          totalRows += data.discovery.totalRowsAnalyzed || 0
+
+          // Merge available signals - keep best match score per signalId
+          for (const sig of data.discovery.availableSignals) {
+            const existing = mergedAvailable.find(s => s.signal.signalId === sig.signal.signalId)
+            if (!existing || sig.matchScore > existing.matchScore) {
+              mergedAvailable = mergedAvailable.filter(s => s.signal.signalId !== sig.signal.signalId)
+              mergedAvailable.push(sig)
+            }
+            // Track file source
+            const sources = fileSources.get(sig.signal.signalId) || []
+            if (!sources.includes(currentFile.name)) sources.push(currentFile.name)
+            fileSources.set(sig.signal.signalId, sources)
+          }
+
+          // Merge partial signals - promote to available if another file has the data
+          for (const sig of (data.discovery.partialSignals || [])) {
+            const alreadyAvailable = mergedAvailable.find(s => s.signal.signalId === sig.signal.signalId)
+            if (alreadyAvailable) continue // Already fully available from another file
+            
+            const existingPartial = mergedPartial.find(s => s.signal.signalId === sig.signal.signalId)
+            if (!existingPartial || sig.matchScore > existingPartial.matchScore) {
+              mergedPartial = mergedPartial.filter(s => s.signal.signalId !== sig.signal.signalId)
+              mergedPartial.push(sig)
+            }
+            const sources = fileSources.get(sig.signal.signalId) || []
+            if (!sources.includes(currentFile.name)) sources.push(currentFile.name)
+            fileSources.set(sig.signal.signalId, sources)
+          }
+
+          // Collect recommendations
+          for (const rec of (data.discovery.recommendations || [])) {
+            if (!allRecommendations.includes(rec)) allRecommendations.push(rec)
+          }
+        }
+
+        // Use the latest signalContext (they all query same user profile, so last is fine)
+        if (data.signalContext) {
+          latestSignalContext = data.signalContext
+        }
       }
 
-      const data = await response.json()
       setProgress(100)
+      setSignalFileSources(fileSources)
 
-      if (!data.discovery) {
-        throw new Error("No signals could be discovered from this file")
+      // Build merged discovery object
+      const mergedDiscovery: SignalDiscoveryResult = {
+        dataSource: validFiles.map(f => f.name).join(", "),
+        detectedColumns: [],
+        availableSignals: mergedAvailable,
+        partialSignals: mergedPartial,
+        unavailableSignals: [],
+        totalRowsAnalyzed: totalRows,
+        recommendations: allRecommendations,
       }
 
-      setDiscovery(data.discovery)
-      if (data.signalContext) {
-        setSignalContext(data.signalContext)
+      if (mergedAvailable.length === 0 && mergedPartial.length === 0 && !latestSignalContext) {
+        throw new Error("No signals could be discovered from the uploaded files")
+      }
+
+      setDiscovery(mergedDiscovery)
+      if (latestSignalContext) {
+        setSignalContext(latestSignalContext)
       }
       
       // Auto-select all available signals + priority matches
-      const availableIds = data.discovery.availableSignals.map((s: DiscoveredSignal) => s.signal.signalId)
-      const priorityIds = (data.signalContext?.priorityMatch || []).map((s: ContextualSignal) => s.signal.signalId)
+      const availableIds = mergedAvailable.map((s) => s.signal.signalId)
+      const priorityIds = (latestSignalContext?.priorityMatch || []).map((s) => s.signal.signalId)
       setSelectedSignals(new Set([...availableIds, ...priorityIds]))
       
       setUploadState("discovered")
@@ -174,10 +257,10 @@ export function UploadPageClient({
   }
 
   const processSelectedSignals = async () => {
-    if (!file || !discovery || selectedSignals.size === 0) return
+    if (files.length === 0 || !discovery || selectedSignals.size === 0) return
 
     setUploadState("processing")
-    setProgress(20)
+    setProgress(10)
 
     try {
       const signalsToProcess = [
@@ -185,35 +268,52 @@ export function UploadPageClient({
         ...discovery.partialSignals.filter(s => selectedSignals.has(s.signal.signalId))
       ]
 
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("selectedSignals", JSON.stringify(signalsToProcess))
-      if (selectedOrgId) {
-        formData.append("organizationId", selectedOrgId)
+      let totalCreated = 0
+      const allErrors: string[] = []
+
+      // Process each file through calculate
+      for (let i = 0; i < files.length; i++) {
+        const currentFile = files[i]
+        setProgress(Math.round(10 + ((i) / files.length) * 80))
+
+        // Only send signals that came from this file
+        const signalsForThisFile = signalsToProcess.filter(s => {
+          const sources = signalFileSources.get(s.signal.signalId)
+          return !sources || sources.includes(currentFile.name)
+        })
+
+        if (signalsForThisFile.length === 0) continue
+
+        const formData = new FormData()
+        formData.append("file", currentFile)
+        formData.append("selectedSignals", JSON.stringify(signalsForThisFile))
+        if (selectedOrgId) {
+          formData.append("organizationId", selectedOrgId)
+        }
+
+        const response = await fetch("/api/upload/calculate", {
+          method: "POST",
+          body: formData,
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          allErrors.push(`${currentFile.name}: ${data.error || "Failed to process"}`)
+          continue
+        }
+
+        totalCreated += data.signalsCreated || 0
+        if (data.errors) allErrors.push(...data.errors)
       }
 
-      setProgress(50)
-
-      const response = await fetch("/api/upload/calculate", {
-        method: "POST",
-        body: formData,
-      })
-
-      setProgress(90)
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to process signals")
-      }
-
-      setResult({ signalsCreated: data.signalsCreated || 0 })
+      setResult({ signalsCreated: totalCreated })
       setProgress(100)
       setUploadState("complete")
 
       toast({
         title: "Signals created",
-        description: `Successfully created ${data.signalsCreated} signals`,
+        description: `Successfully created ${totalCreated} signal${totalCreated !== 1 ? "s" : ""} from ${files.length} file${files.length !== 1 ? "s" : ""}${allErrors.length > 0 ? ` (${allErrors.length} warnings)` : ""}`,
       })
 
     } catch (err) {
@@ -247,15 +347,28 @@ export function UploadPageClient({
     setExpandedGuidance(next)
   }
 
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const addMoreFiles = (newFiles: File[]) => {
+    const valid = newFiles.filter(validateFile)
+    if (valid.length === 0) return
+    // Reset to idle with accumulated files, user re-triggers analysis
+    setFiles(prev => [...prev, ...valid])
+  }
+
   const resetUpload = () => {
-    setFile(null)
+    setFiles([])
     setUploadState("idle")
     setProgress(0)
+    setAnalyzeProgress({ current: 0, total: 0, fileName: "" })
     setError(null)
     setDiscovery(null)
     setSignalContext(null)
     setSelectedSignals(new Set())
     setExpandedGuidance(new Set())
+    setSignalFileSources(new Map())
     setResult(null)
   }
 
@@ -295,42 +408,74 @@ export function UploadPageClient({
           <CardContent className="p-0">
             {/* Idle State - Dropzone */}
             {uploadState === "idle" && (
-              <div
-                className={cn(
-                  "p-8 text-center transition-all cursor-pointer",
-                  dragActive 
-                    ? "bg-primary/10 border-2 border-dashed border-primary" 
-                    : "bg-muted/30 hover:bg-muted/50"
-                )}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <FileSpreadsheet className="h-8 w-8 text-primary" />
+              <div>
+                <div
+                  className={cn(
+                    "p-8 text-center transition-all cursor-pointer",
+                    dragActive 
+                      ? "bg-primary/10 border-2 border-dashed border-primary" 
+                      : "bg-muted/30 hover:bg-muted/50"
+                  )}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <FileSpreadsheet className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Drop your data files here
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Upload one or multiple CSV/Excel files - we'll merge signals across all of them
+                  </p>
+                  <Button variant="outline" size="lg">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Choose Files
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const selected = e.target.files
+                      if (selected && selected.length > 0) {
+                        analyzeFiles(Array.from(selected))
+                      }
+                      // Reset input so re-selecting the same files works
+                      e.target.value = ""
+                    }}
+                  />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">
-                  Drop your data file here
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  We'll automatically discover what signals can be generated
-                </p>
-                <Button variant="outline" size="lg">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Choose File
-                </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  className="hidden"
-                  onChange={(e) => {
-                    const selectedFile = e.target.files?.[0]
-                    if (selectedFile) analyzeFile(selectedFile)
-                  }}
-                />
+
+                {/* Queued files (if user adds before analyzing) */}
+                {files.length > 0 && (
+                  <div className="p-4 border-t border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium">{files.length} file{files.length !== 1 ? "s" : ""} ready</span>
+                      <Button size="sm" onClick={() => analyzeFiles(files)}>
+                        Analyze All
+                        <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {files.map((f, i) => (
+                        <div key={`${f.name}-${i}`} className="flex items-center gap-2 p-2 rounded bg-muted/50">
+                          <FileSpreadsheet className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <span className="text-xs truncate flex-1">{f.name}</span>
+                          <span className="text-[10px] text-muted-foreground shrink-0">{(f.size / 1024).toFixed(0)} KB</span>
+                          <button type="button" onClick={() => removeFile(i)} className="shrink-0 p-0.5 rounded hover:bg-muted">
+                            <X className="h-3 w-3 text-muted-foreground" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -340,12 +485,34 @@ export function UploadPageClient({
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Loader2 className="h-8 w-8 text-primary animate-spin" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Analyzing your data...</h3>
-                <p className="text-sm text-muted-foreground mb-4">{file?.name}</p>
+                <h3 className="text-lg font-semibold mb-2">
+                  Analyzing {files.length > 1 ? `${files.length} files` : "your data"}...
+                </h3>
+                {analyzeProgress.total > 1 && (
+                  <p className="text-sm font-medium text-primary mb-1">
+                    File {analyzeProgress.current} of {analyzeProgress.total}
+                  </p>
+                )}
+                <p className="text-sm text-muted-foreground mb-4 truncate max-w-xs mx-auto">
+                  {analyzeProgress.fileName || files[0]?.name}
+                </p>
                 <Progress value={progress} className="h-2 max-w-xs mx-auto" />
                 <p className="text-xs text-muted-foreground mt-2">
                   Detecting columns and matching against signal library
                 </p>
+                {files.length > 1 && (
+                  <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+                    {files.map((f, i) => (
+                      <Badge 
+                        key={`${f.name}-${i}`}
+                        variant={i < analyzeProgress.current ? "default" : "secondary"}
+                        className="text-[10px]"
+                      >
+                        {f.name.length > 20 ? `${f.name.slice(0, 17)}...` : f.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -355,10 +522,29 @@ export function UploadPageClient({
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="h-5 w-5 text-primary" />
                   <h3 className="font-semibold">Signal Analysis</h3>
-                  <Badge variant="secondary" className="ml-auto">
-                    {discovery.totalRowsAnalyzed} rows analyzed
-                  </Badge>
+                  <div className="ml-auto flex gap-1.5">
+                    {files.length > 1 && (
+                      <Badge variant="outline" className="text-xs">
+                        {files.length} files
+                      </Badge>
+                    )}
+                    <Badge variant="secondary">
+                      {discovery.totalRowsAnalyzed.toLocaleString()} rows
+                    </Badge>
+                  </div>
                 </div>
+
+                {/* File list summary for multi-file */}
+                {files.length > 1 && (
+                  <div className="mb-4 flex flex-wrap gap-1.5">
+                    {files.map((f, i) => (
+                      <Badge key={`${f.name}-${i}`} variant="outline" className="text-[10px] gap-1">
+                        <FileSpreadsheet className="h-2.5 w-2.5" />
+                        {f.name.length > 25 ? `${f.name.slice(0, 22)}...` : f.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
 
                 {/* Data Completeness Bar (if context available) */}
                 {signalContext && (
@@ -741,7 +927,7 @@ export function UploadPageClient({
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Creating signals...</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Calculating values for {selectedSignals.size} signal{selectedSignals.size !== 1 ? "s" : ""}
+                  Calculating {selectedSignals.size} signal{selectedSignals.size !== 1 ? "s" : ""} from {files.length} file{files.length !== 1 ? "s" : ""}
                 </p>
                 <Progress value={progress} className="h-2 max-w-xs mx-auto" />
               </div>
@@ -770,7 +956,7 @@ export function UploadPageClient({
                 </div>
                 <h3 className="text-lg font-semibold mb-1">Signals Created</h3>
                 <p className="text-sm text-muted-foreground mb-6">
-                  {result.signalsCreated} signal{result.signalsCreated !== 1 ? "s" : ""} ready to view
+                  {result.signalsCreated} signal{result.signalsCreated !== 1 ? "s" : ""} from {files.length} file{files.length !== 1 ? "s" : ""} ready to view
                 </p>
                 <div className="flex gap-3 justify-center">
                   <Button onClick={() => router.push("/signals")} size="lg">
