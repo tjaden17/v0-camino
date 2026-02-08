@@ -20,11 +20,18 @@ import {
   X,
   Sparkles,
   AlertTriangle,
-  Info
+  Info,
+  Target,
+  Lightbulb,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import type { SignalDiscoveryResult, DiscoveredSignal } from "@/lib/signal-discovery-service"
+import type { SignalContextResult, ContextualSignal, DataGuidance } from "@/lib/signal-context-service"
+import { SignalRow } from "@/components/signal-row" // Import SignalRow component
 
 interface UploadHistory {
   id: string
@@ -61,9 +68,11 @@ export function UploadPageClient({
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [discovery, setDiscovery] = useState<SignalDiscoveryResult | null>(null)
+  const [signalContext, setSignalContext] = useState<SignalContextResult | null>(null)
   const [selectedSignals, setSelectedSignals] = useState<Set<string>>(new Set())
   const [result, setResult] = useState<{ signalsCreated: number } | null>(null)
   const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(userOrgId)
+  const [expandedGuidance, setExpandedGuidance] = useState<Set<string>>(new Set())
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -143,10 +152,14 @@ export function UploadPageClient({
       }
 
       setDiscovery(data.discovery)
+      if (data.signalContext) {
+        setSignalContext(data.signalContext)
+      }
       
-      // Auto-select all available signals
+      // Auto-select all available signals + priority matches
       const availableIds = data.discovery.availableSignals.map((s: DiscoveredSignal) => s.signal.signalId)
-      setSelectedSignals(new Set(availableIds))
+      const priorityIds = (data.signalContext?.priorityMatch || []).map((s: ContextualSignal) => s.signal.signalId)
+      setSelectedSignals(new Set([...availableIds, ...priorityIds]))
       
       setUploadState("discovered")
 
@@ -225,13 +238,25 @@ export function UploadPageClient({
     setSelectedSignals(newSelected)
   }
 
+  const toggleGuidance = (signalId: string) => {
+    const next = new Set(expandedGuidance)
+    if (next.has(signalId)) {
+      next.delete(signalId)
+    } else {
+      next.add(signalId)
+    }
+    setExpandedGuidance(next)
+  }
+
   const resetUpload = () => {
     setFile(null)
     setUploadState("idle")
     setProgress(0)
     setError(null)
     setDiscovery(null)
+    setSignalContext(null)
     setSelectedSignals(new Set())
+    setExpandedGuidance(new Set())
     setResult(null)
   }
 
@@ -325,158 +350,148 @@ export function UploadPageClient({
               </div>
             )}
 
-            {/* Discovery Results */}
+            {/* Discovery Results - Four Category View */}
             {uploadState === "discovered" && discovery && (
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold">Signals Discovered</h3>
+                  <h3 className="font-semibold">Signal Analysis</h3>
                   <Badge variant="secondary" className="ml-auto">
                     {discovery.totalRowsAnalyzed} rows analyzed
                   </Badge>
                 </div>
 
-                {/* Signal Categories Summary */}
-                {(discovery as any).categorized && (
-                  <div className="grid grid-cols-3 gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
-                      <div className="text-2xl font-bold text-blue-600">{(discovery as any).categorized.new.length}</div>
-                      <div className="text-xs text-blue-600 font-medium">NEW signals</div>
+                {/* Data Completeness Bar (if context available) */}
+                {signalContext && (
+                  <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Data Completeness</span>
+                      <span className="text-sm font-bold">{signalContext.dataCompleteness}%</span>
                     </div>
-                    <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
-                      <div className="text-2xl font-bold text-purple-600">{(discovery as any).categorized.updated.length}</div>
-                      <div className="text-xs text-purple-600 font-medium">UPDATED</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                      <div className="text-2xl font-bold text-amber-600">{(discovery as any).categorized.partial.length}</div>
-                      <div className="text-xs text-amber-600 font-medium">PARTIAL</div>
+                    <Progress value={signalContext.dataCompleteness} className="h-2 mb-3" />
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      <div>
+                        <div className="text-lg font-bold text-emerald-600">{signalContext.priorityMatch.length}</div>
+                        <div className="text-[10px] text-muted-foreground leading-tight">Priority Match</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-blue-600">{signalContext.available.length}</div>
+                        <div className="text-[10px] text-muted-foreground leading-tight">Available</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-amber-600">{signalContext.recommended.length}</div>
+                        <div className="text-[10px] text-muted-foreground leading-tight">Recommended</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-muted-foreground">{signalContext.requestedMissing.length}</div>
+                        <div className="text-[10px] text-muted-foreground leading-tight">Missing Data</div>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* NEW Signals */}
-                {(discovery as any).categorized?.new?.length > 0 && (
+                {/* PRIORITY MATCH - User asked for it AND data supports it */}
+                {signalContext && signalContext.priorityMatch.length > 0 && (
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target className="h-4 w-4 text-emerald-500" />
+                      <span className="text-sm font-medium">Priority Match ({signalContext.priorityMatch.length})</span>
+                      <span className="text-xs text-muted-foreground ml-auto">Matches your goals and data</span>
+                    </div>
+                    <div className="space-y-2">
+                      {signalContext.priorityMatch.map((cs) => (
+                        <SignalRow
+                          key={cs.signal.signalId}
+                          cs={cs}
+                          colorClass="emerald"
+                          selected={selectedSignals.has(cs.signal.signalId)}
+                          onToggle={() => toggleSignal(cs.signal.signalId)}
+                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
+                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* AVAILABLE - Data supports it, user didn't explicitly ask */}
+                {signalContext && signalContext.available.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm font-medium">New Signals ({(discovery as any).categorized.new.length})</span>
-                      <span className="text-xs text-muted-foreground ml-auto">Ready to calculate immediately</span>
+                      <span className="text-sm font-medium">Available ({signalContext.available.length})</span>
+                      <span className="text-xs text-muted-foreground ml-auto">Your data supports these</span>
                     </div>
                     <div className="space-y-2">
-                      {(discovery as any).categorized.new.map((ds: any) => (
-                        <label
-                          key={ds.signal.signalId}
-                          className={cn(
-                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-                            selectedSignals.has(ds.signal.signalId)
-                              ? "bg-blue-500/10 border border-blue-500/30"
-                              : "bg-muted/50 hover:bg-muted"
-                          )}
-                        >
-                          <Checkbox
-                            checked={selectedSignals.has(ds.signal.signalId)}
-                            onCheckedChange={() => toggleSignal(ds.signal.signalId)}
-                            className="mt-0.5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{ds.signal.signalName}</span>
-                              <Badge variant="outline" className="text-xs">{ds.signal.category}</Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">{ds.signal.description}</p>
-                            <p className="text-xs text-blue-600 mt-1">
-                              Matched: {ds.matchedFields.join(", ")}
-                            </p>
-                          </div>
-                        </label>
+                      {signalContext.available.map((cs) => (
+                        <SignalRow
+                          key={cs.signal.signalId}
+                          cs={cs}
+                          colorClass="blue"
+                          selected={selectedSignals.has(cs.signal.signalId)}
+                          onToggle={() => toggleSignal(cs.signal.signalId)}
+                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
+                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
+                        />
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* UPDATED Signals */}
-                {(discovery as any).categorized?.updated?.length > 0 && (
+                {/* RECOMMENDED - Best practice for profile, data may be missing */}
+                {signalContext && signalContext.recommended.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="h-4 w-4 text-purple-500" />
-                      <span className="text-sm font-medium">Updated Signals ({(discovery as any).categorized.updated.length})</span>
-                      <span className="text-xs text-muted-foreground ml-auto">Will refresh existing data</span>
+                      <Lightbulb className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm font-medium">Recommended ({signalContext.recommended.length})</span>
+                      <span className="text-xs text-muted-foreground ml-auto">Best practice for your profile</span>
                     </div>
                     <div className="space-y-2">
-                      {(discovery as any).categorized.updated.map((ds: any) => (
-                        <label
-                          key={ds.signal.signalId}
-                          className={cn(
-                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-                            selectedSignals.has(ds.signal.signalId)
-                              ? "bg-purple-500/10 border border-purple-500/30"
-                              : "bg-muted/50 hover:bg-muted"
-                          )}
-                        >
-                          <Checkbox
-                            checked={selectedSignals.has(ds.signal.signalId)}
-                            onCheckedChange={() => toggleSignal(ds.signal.signalId)}
-                            className="mt-0.5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{ds.signal.signalName}</span>
-                              <Badge variant="outline" className="text-xs">{ds.signal.category}</Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">{ds.signal.description}</p>
-                            <p className="text-xs text-purple-600 mt-1">
-                              Matched: {ds.matchedFields.join(", ")}
-                            </p>
-                          </div>
-                        </label>
+                      {signalContext.recommended.map((cs) => (
+                        <SignalRow
+                          key={cs.signal.signalId}
+                          cs={cs}
+                          colorClass="amber"
+                          selected={false}
+                          disabled
+                          onToggle={() => {}}
+                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
+                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
+                          showGuidanceByDefault
+                        />
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* PARTIAL Signals */}
-                {(discovery as any).categorized?.partial?.length > 0 && (
+                {/* REQUESTED BUT MISSING - User asked, data doesn't have it */}
+                {signalContext && signalContext.requestedMissing.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm font-medium">Partial Match ({(discovery as any).categorized.partial.length})</span>
-                      <span className="text-xs text-muted-foreground ml-auto">Missing field(s), available later</span>
+                      <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Missing Data ({signalContext.requestedMissing.length})</span>
+                      <span className="text-xs text-muted-foreground ml-auto">You asked for these - here's how to get the data</span>
                     </div>
                     <div className="space-y-2">
-                      {(discovery as any).categorized.partial.map((ds: any) => (
-                        <label
-                          key={ds.signal.signalId}
-                          className={cn(
-                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors opacity-60",
-                            selectedSignals.has(ds.signal.signalId)
-                              ? "bg-amber-500/10 border border-amber-500/30"
-                              : "bg-muted/30 hover:bg-muted/50"
-                          )}
-                        >
-                          <Checkbox
-                            checked={selectedSignals.has(ds.signal.signalId)}
-                            onCheckedChange={() => toggleSignal(ds.signal.signalId)}
-                            className="mt-0.5"
-                            disabled
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{ds.signal.signalName}</span>
-                              <Badge variant="outline" className="text-xs">{ds.signal.category}</Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">{ds.signal.description}</p>
-                            <p className="text-xs text-amber-600 mt-1">
-                              Missing: {ds.missingFields.join(", ")}
-                            </p>
-                          </div>
-                        </label>
+                      {signalContext.requestedMissing.map((cs) => (
+                        <SignalRow
+                          key={cs.signal.signalId}
+                          cs={cs}
+                          colorClass="gray"
+                          selected={false}
+                          disabled
+                          onToggle={() => {}}
+                          guidanceExpanded={expandedGuidance.has(cs.signal.signalId)}
+                          onToggleGuidance={() => toggleGuidance(cs.signal.signalId)}
+                          showGuidanceByDefault
+                        />
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Fallback: All Available Signals (if no categorization) */}
-                {!((discovery as any).categorized) && discovery.availableSignals.length > 0 && (
+                {/* Fallback: basic discovery when no signal context */}
+                {!signalContext && discovery.availableSignals.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle className="h-4 w-4 text-emerald-500" />
@@ -505,46 +520,7 @@ export function UploadPageClient({
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">{ds.signal.description}</p>
                             <p className="text-xs text-emerald-600 mt-1">
-                              Matched: {ds.matchedFields.join(", ")}
-                            </p>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Fallback Partial Signals */}
-                {!((discovery as any).categorized) && discovery.partialSignals.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm font-medium">Partial Match ({discovery.partialSignals.length})</span>
-                    </div>
-                    <div className="space-y-2">
-                      {discovery.partialSignals.slice(0, 3).map((ds) => (
-                        <label
-                          key={ds.signal.signalId}
-                          className={cn(
-                            "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-                            selectedSignals.has(ds.signal.signalId)
-                              ? "bg-amber-500/10 border border-amber-500/30"
-                              : "bg-muted/30 hover:bg-muted/50"
-                          )}
-                        >
-                          <Checkbox
-                            checked={selectedSignals.has(ds.signal.signalId)}
-                            onCheckedChange={() => toggleSignal(ds.signal.signalId)}
-                            className="mt-0.5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{ds.signal.signalName}</span>
-                              <Badge variant="outline" className="text-xs">{ds.signal.category}</Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">{ds.signal.description}</p>
-                            <p className="text-xs text-amber-600 mt-1">
-                              Missing: {ds.missingFields.join(", ")}
+                              {'Matched: ' + ds.matchedFields.join(", ")}
                             </p>
                           </div>
                         </label>
@@ -554,7 +530,7 @@ export function UploadPageClient({
                 )}
 
                 {/* No signals found */}
-                {discovery.availableSignals.length === 0 && discovery.partialSignals.length === 0 && (
+                {discovery.availableSignals.length === 0 && discovery.partialSignals.length === 0 && !signalContext && (
                   <div className="text-center py-6">
                     <Info className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
                     <p className="text-sm text-muted-foreground">
@@ -563,16 +539,6 @@ export function UploadPageClient({
                     <p className="text-xs text-muted-foreground mt-2">
                       Try uploading data with metrics like revenue, tickets, leads, or user activity.
                     </p>
-                  </div>
-                )}
-
-                {/* Recommendations */}
-                {discovery.recommendations.length > 0 && (
-                  <div className="mt-4 p-3 bg-muted/30 rounded-lg">
-                    <p className="text-xs font-medium mb-2">Recommendations</p>
-                    {discovery.recommendations.slice(0, 2).map((rec, i) => (
-                      <p key={i} className="text-xs text-muted-foreground">{rec}</p>
-                    ))}
                   </div>
                 )}
 

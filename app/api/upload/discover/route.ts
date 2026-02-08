@@ -4,6 +4,7 @@ import { sql } from "@/lib/db/neon"
 import * as XLSX from "xlsx"
 import { parseCSV } from "@/lib/csv-parser"
 import { discoverSignals, type SignalDiscoveryResult } from "@/lib/signal-discovery-service"
+import { buildSignalContext, type UserProfile, type DiscoveredSignalInput } from "@/lib/signal-context-service"
 
 // Parse XLSX file to row format
 function parseXLSX(buffer: ArrayBuffer): { headers: string[]; rows: Record<string, string>[] } {
@@ -101,14 +102,60 @@ export async function POST(request: NextRequest) {
       partial: discovery.partialSignals,
     }
 
+    // Fetch user profile context from onboarding
+    let signalContext = null
+    try {
+      const userContextResult = await sql`
+        SELECT role, department, seniority_level, business_stage, company_size, industry, goals
+        FROM user_context WHERE user_id = ${user.id}
+      `
+      
+      if (userContextResult.length > 0) {
+        const ctx = userContextResult[0]
+        const profile: UserProfile = {
+          industry: ctx.industry || "",
+          role: ctx.role || "",
+          seniorityLevel: ctx.seniority_level || "",
+          department: ctx.department || "",
+          businessStage: ctx.business_stage || "",
+          companySize: ctx.company_size || "",
+          goals: typeof ctx.goals === "string" ? JSON.parse(ctx.goals) : (ctx.goals || []),
+        }
+
+        // Convert discovery results to DiscoveredSignalInput format
+        const discoveredInputs: DiscoveredSignalInput[] = [
+          ...discovery.availableSignals.map(s => ({
+            signal: s.signal,
+            availability: "available" as const,
+            matchScore: s.matchScore,
+            matchedFields: s.matchedFields,
+            missingFields: s.missingFields || [],
+          })),
+          ...discovery.partialSignals.map(s => ({
+            signal: s.signal,
+            availability: "partial" as const,
+            matchScore: s.matchScore,
+            matchedFields: s.matchedFields,
+            missingFields: s.missingFields || [],
+          })),
+        ]
+
+        signalContext = buildSignalContext(profile, discoveredInputs)
+      }
+    } catch (err) {
+      console.error("[v0] Error building signal context:", err)
+      // Non-fatal - still return basic discovery results
+    }
+
     return NextResponse.json({
       success: true,
       fileName: file.name,
       rowCount: rows.length,
       discovery: {
         ...discovery,
-        categorized, // Add categorization: { new, updated, partial }
+        categorized,
       },
+      signalContext,
     })
   } catch (error) {
     console.error("[v0] Discovery error:", error)

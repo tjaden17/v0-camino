@@ -11,11 +11,10 @@ import { calculateSignal } from "@/lib/signal-calculation-service"
 import type { SignalRequirement } from "@/lib/signal-discovery-service"
 import { parseFormattedNumber } from "@/lib/csv-parser"
 
-// Parse XLSX file to row format
-function parseXLSX(buffer: ArrayBuffer): Record<string, string>[] {
-  const workbook = XLSX.read(buffer, { type: "array" })
-  const sheetName = workbook.SheetNames[0]
+// Parse a single XLSX sheet to row format
+function parseXLSXSheet(workbook: XLSX.WorkBook, sheetName: string): Record<string, string>[] {
   const worksheet = workbook.Sheets[sheetName]
+  if (!worksheet) return []
   
   const jsonData = XLSX.utils.sheet_to_json<Record<string, any>>(worksheet, { defval: "" })
   
@@ -26,6 +25,25 @@ function parseXLSX(buffer: ArrayBuffer): Record<string, string>[] {
     }
     return stringRow
   })
+}
+
+// Parse ALL XLSX tabs into a map of { tabName: rows[] }
+function parseXLSXAllTabs(buffer: ArrayBuffer): { tabs: Map<string, Record<string, string>[]>; allRows: Record<string, string>[] } {
+  const workbook = XLSX.read(buffer, { type: "array" })
+  const tabs = new Map<string, Record<string, string>[]>()
+  const allRows: Record<string, string>[] = []
+  
+  for (const sheetName of workbook.SheetNames) {
+    const rows = parseXLSXSheet(workbook, sheetName)
+    if (rows.length > 0) {
+      // Add a __tab__ column so we know which tab each row came from
+      const taggedRows = rows.map(row => ({ ...row, __tab__: sheetName }))
+      tabs.set(sheetName, taggedRows)
+      allRows.push(...taggedRows)
+    }
+  }
+  
+  return { tabs, allRows }
 }
 
 // Helper to find the actual column name in rows that matches a canonical field name
@@ -325,6 +343,20 @@ function calculateDirectSignal(
   return null
 }
 
+function parseXLSX(buffer: ArrayBuffer): Record<string, string>[] {
+  const workbook = XLSX.read(buffer, { type: "array" })
+  const allRows: Record<string, string>[] = []
+  
+  for (const sheetName of workbook.SheetNames) {
+    const rows = parseXLSXSheet(workbook, sheetName)
+    if (rows.length > 0) {
+      allRows.push(...rows)
+    }
+  }
+  
+  return allRows
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -357,19 +389,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No signals selected" }, { status: 400 })
     }
 
-    // Parse file
+    // Parse file - handle multi-tab XLSX
     const fileName = file.name.toLowerCase()
     const isExcel = fileName.endsWith(".xlsx") || fileName.endsWith(".xls")
     
     let rows: Record<string, string>[]
+    let tabs: Map<string, Record<string, string>[]> | undefined
     
     if (isExcel) {
       const buffer = await file.arrayBuffer()
-      rows = parseXLSX(buffer)
+      const parsed = parseXLSXAllTabs(buffer)
+      rows = parsed.allRows
+      tabs = parsed.tabs
+      console.log(`[v0] Parsed XLSX: ${tabs.size} tabs, ${rows.length} total rows. Tabs: ${Array.from(tabs.keys()).join(", ")}`)
     } else {
       const text = await file.text()
       const result = parseCSV(text)
-      rows = result.rows
+      rows = result.rows as Record<string, string>[]
     }
 
     // Calculate and save each selected signal
@@ -380,8 +416,8 @@ export async function POST(request: NextRequest) {
       const signalDef = SIGNAL_DEFINITIONS.find(s => s.signalId === discovered.signal.signalId)
       if (!signalDef) continue
 
-      // Use the new calculation service
-      const calculated = calculateSignal(signalDef, rows, discovered.matchedFields)
+      // Use the v2 calculation service with tab-aware processing
+      const calculated = calculateSignal(signalDef, rows, discovered.matchedFields, tabs)
       
       if (!calculated) {
         errors.push(`Could not calculate ${signalDef.signalName}`)
@@ -394,8 +430,12 @@ export async function POST(request: NextRequest) {
           ? `${calculated.trendPercentage > 0 ? '+' : ''}${calculated.trendPercentage}%`
           : `${calculated.dataPoints} data points`
         
-        // Build summary with calculation metadata
-        const summaryText = `${calculated.calculationMethod}: ${calculated.formula}. Based on ${calculated.dataPoints} data points${calculated.usedColumn ? ` from "${calculated.usedColumn}" column` : ''}.`
+        // Build summary with calculation metadata (including tab info)
+        const tabInfo = calculated.metadata.tabName ? ` from "${calculated.metadata.tabName}" tab` : ''
+        const filterInfo = calculated.metadata.filteredRowCount !== null && calculated.metadata.totalRowCount !== null && calculated.metadata.filteredRowCount < calculated.metadata.totalRowCount
+          ? ` (filtered ${calculated.metadata.filteredRowCount} of ${calculated.metadata.totalRowCount} rows)`
+          : ''
+        const summaryText = `${calculated.calculationMethod}: ${calculated.formula}${tabInfo}${filterInfo}. Based on ${calculated.dataPoints} data points${calculated.usedColumn ? ` from "${calculated.usedColumn}" column` : ''}.`
         
         // Use upsert to prevent duplicates - update existing signal if same name+org
         const result = await sql`
