@@ -23,7 +23,8 @@ import {
   Star, 
   LayoutGrid, 
   Layers, 
-  ChevronRight 
+  ChevronRight,
+  Settings2,
 } from "lucide-react"
 import type { SignalWithData } from "@/lib/signals-service"
 import type { SignalInterpretation } from "@/lib/interpretation-service"
@@ -247,16 +248,24 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
 
   if (filteredSignals.length === 0) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <header className="sticky top-0 z-20 bg-gradient-to-r from-primary to-accent border-b border-border shadow-sm">
-          <div className="container max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-            <h1 className="text-xl font-bold text-primary-foreground">Signals</h1>
-            <AlertsBell onAlertClick={() => {}} />
-          </div>
-        </header>
-        <main className="container max-w-2xl mx-auto px-4 py-6">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No signals match your filters. Try adjusting your selection.</p>
+  <div className="min-h-screen bg-background pb-20">
+    <header className="sticky top-0 z-20 bg-gradient-to-r from-primary to-accent border-b border-border shadow-sm">
+      <div className="container max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <h1 className="text-xl font-bold text-primary-foreground">Signals</h1>
+        <div className="flex items-center gap-1">
+          <Link href="/signals/admin">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <Settings2 className="h-4 w-4" />
+              <span className="sr-only">Data Management</span>
+            </Button>
+          </Link>
+          <AlertsBell onAlertClick={() => {}} />
+        </div>
+      </div>
+    </header>
+    <main className="container max-w-2xl mx-auto px-4 py-6">
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No signals match your filters. Try adjusting your selection.</p>
             <Button asChild className="mt-4">
               <Link href="/upload">Upload Data</Link>
             </Button>
@@ -286,14 +295,22 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
         </div>
       )}
       
-      <header className="sticky top-0 z-20 bg-gradient-to-r from-primary to-accent border-b border-border shadow-sm">
-        <div className="container max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-primary-foreground">Signals</h1>
-          <AlertsBell onAlertClick={() => {}} />
-        </div>
-      </header>
-
-      <div className="sticky top-[57px] z-10 bg-card border-b border-border shadow-sm">
+  <header className="sticky top-0 z-20 bg-gradient-to-r from-primary to-accent border-b border-border shadow-sm">
+    <div className="container max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <h1 className="text-xl font-bold text-primary-foreground">Signals</h1>
+      <div className="flex items-center gap-1">
+        <Link href="/signals/admin">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+            <Settings2 className="h-4 w-4" />
+            <span className="sr-only">Data Management</span>
+          </Button>
+        </Link>
+        <AlertsBell onAlertClick={() => {}} />
+      </div>
+    </div>
+  </header>
+  
+  <div className="sticky top-[57px] z-10 bg-card border-b border-border shadow-sm">
         <div className="container max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
