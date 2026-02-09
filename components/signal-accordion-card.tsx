@@ -22,7 +22,8 @@ import {
   MoreHorizontal,
   Calculator,
   AlertTriangle,
-  X
+  X,
+  Sparkles
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -159,50 +160,63 @@ export function SignalAccordionCard({
   }
 
   return (
-    <Card className="overflow-hidden border border-border bg-card">
-      {/* L1: Main Content - Name, Value, Trend, Change % */}
+    <Card className="overflow-hidden border border-border bg-card hover:shadow-md transition-shadow">
+      {/* L1: Compact Card - Header, Value, Description, Actions */}
       <div className="p-4">
-        <div className="flex items-center justify-between gap-4">
-          {/* Left: Name + Category */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground truncate text-base">{signal.name}</h3>
+        {/* Header Row: Badges left, Trend icon right */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 flex-wrap">
             {signal.category && (
-              <Badge variant="secondary" className="text-xs font-normal mt-1">
+              <Badge variant="secondary" className="text-[10px] uppercase tracking-wide font-medium">
                 {signal.category}
               </Badge>
             )}
+            {signal.source_type === "rag" && (
+              <span className="flex items-center gap-1 text-primary text-[10px] font-medium">
+                <Sparkles className="h-3 w-3" />
+                Personalized
+              </span>
+            )}
           </div>
-          
-          {/* Right: Value + Trend + Change */}
-          <div className="flex items-center gap-4 shrink-0">
-            {/* Current Value */}
-            <div className="text-right">
-              <div className="text-2xl font-bold text-foreground tabular-nums">
-                {formatValue(signal.latest_value)}
-              </div>
-            </div>
-            
-            {/* Trend + Change % */}
-            <div className={cn(
-              "flex flex-col items-center justify-center px-3 py-1.5 rounded-lg min-w-[70px]",
-              getTrendBgColor()
-            )}>
-              <div className={cn("flex items-center gap-1", getTrendColor())}>
-                {getTrendIcon()}
-              </div>
-              {signal.change_percent !== null && (
-                <span className={cn("text-sm font-semibold tabular-nums", getTrendColor())}>
-                  {signal.change_percent > 0 ? '+' : ''}{signal.change_percent}%
-                </span>
-              )}
-            </div>
+          <div className={cn("flex items-center", getTrendColor())}>
+            {getTrendIcon()}
           </div>
         </div>
 
-        {/* Middle: View Details Button */}
+        {/* Title */}
+        <h3 className="font-semibold text-foreground text-base leading-tight mb-2">{signal.name}</h3>
+
+        {/* Value Row: Change value (hero) + timeframe */}
+        <div className="flex items-baseline gap-2 mb-2">
+          <span className={cn(
+            "text-xl font-bold tabular-nums",
+            signal.change_percent !== null && signal.change_percent > 0 ? "text-emerald-600" :
+            signal.change_percent !== null && signal.change_percent < 0 ? "text-red-600" :
+            "text-foreground"
+          )}>
+            {signal.change_percent !== null
+              ? `${signal.change_percent > 0 ? '+' : ''}${signal.change_percent}%`
+              : formatValue(signal.latest_value)
+            }
+          </span>
+          {signal.change_percent !== null && (
+            <span className="text-sm text-muted-foreground">
+              ({formatValue(signal.latest_value)})
+            </span>
+          )}
+        </div>
+
+        {/* Description */}
+        {signal.summary && (
+          <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+            {signal.summary}
+          </p>
+        )}
+
+        {/* View Details Button */}
         <button
           onClick={() => toggleLevel(1)}
-          className="w-full mt-4 py-2.5 border border-border rounded-lg flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-muted/30 transition-all"
+          className="w-full mt-1 py-2 border border-border rounded-lg flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-muted/30 transition-all"
         >
           <BarChart3 className="h-4 w-4" />
           <span>{expandedLevel >= 1 ? "Hide Details" : "View Details"}</span>
@@ -213,26 +227,29 @@ export function SignalAccordionCard({
           )}
         </button>
 
-        {/* Bottom: Actions Row */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-          <div className="flex items-center gap-1">
+        {/* Action Row: Icon buttons left, Source right */}
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-0.5">
             {/* Share */}
             <Button
               variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-muted-foreground hover:text-foreground"
-              onClick={handleShare}
+              size="icon"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleShare()
+              }}
             >
-              <Share2 className="h-4 w-4 mr-1.5" />
-              <span className="text-xs">Share</span>
+              <Share2 className="h-4 w-4" />
+              <span className="sr-only">Share</span>
             </Button>
             
-            {/* Save */}
+            {/* Save / Bookmark */}
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               className={cn(
-                "h-8 px-2",
+                "h-8 w-8 p-0",
                 isSaved ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}
               onClick={(e) => {
@@ -242,40 +259,48 @@ export function SignalAccordionCard({
               disabled={isSaving}
             >
               {isSaving ? (
-                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : isSaved ? (
-                <BookmarkCheck className="h-4 w-4 mr-1.5" />
+                <BookmarkCheck className="h-4 w-4 fill-current" />
               ) : (
-                <Bookmark className="h-4 w-4 mr-1.5" />
+                <Bookmark className="h-4 w-4" />
               )}
-              <span className="text-xs">{isSaved ? "Saved" : "Save"}</span>
+              <span className="sr-only">{isSaved ? "Saved" : "Save"}</span>
             </Button>
+
+            {/* More Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">More options</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setShowCalculation(true)}>
+                  <Calculator className="h-4 w-4 mr-2" />
+                  How is this calculated?
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLevel(2)}>
+                  <Lightbulb className="h-4 w-4 mr-2" />
+                  Get AI Insights
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  View History
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Set Alert
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          {/* More Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setShowCalculation(true)}>
-                <Calculator className="h-4 w-4 mr-2" />
-                How is this calculated?
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toggleLevel(2)}>
-                <Lightbulb className="h-4 w-4 mr-2" />
-                Get AI Insights
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                View History
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                Set Alert
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Source label */}
+          <span className="text-[10px] text-muted-foreground">
+            {signal.source_type === "upload" ? "File Upload" : 
+             signal.source_type === "api" ? "API" : 
+             signal.source_type || "Manual"}
+          </span>
         </div>
       </div>
 
