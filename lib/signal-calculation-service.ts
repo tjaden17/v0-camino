@@ -7,7 +7,8 @@
  */
 
 import { parseFormattedNumber } from "./csv-parser"
-import type { SignalRequirement } from "./signal-discovery-service"
+import type { SignalRequirement, CalculationSpec, RowFilter } from "./signal-discovery-service"
+import { normalizeFieldName } from "./signal-discovery-service"
 
 // ============================================
 // TYPES
@@ -551,14 +552,119 @@ export function formatSignalValue(
 // MAIN CALCULATION FUNCTION
 // ============================================
 
+// ============================================
+// SPEC-DRIVEN HELPERS
+// ============================================
+
 /**
- * Calculate a signal value from entity-based data (CRM rows)
+ * Resolve a normalized field name to an actual column name in the data.
+ * Uses FIELD_ALIASES from discovery service + flexible matching.
+ */
+function resolveFieldToColumn(
+  rows: Record<string, string>[],
+  normalizedField: string
+): string | null {
+  if (!rows[0] || !normalizedField) return null
+  const columns = Object.keys(rows[0])
+  
+  // Try direct name match first
+  const direct = findColumn(rows, [normalizedField])
+  if (direct) return direct
+  
+  // Try matching via normalization: normalize each column and see if it matches
+  for (const col of columns) {
+    const colNormalized = normalizeFieldName(col)
+    if (colNormalized === normalizedField) return col
+  }
+  
+  return null
+}
+
+/**
+ * Pick the best tab using explicit sourceTab hints from calcSpec.
+ */
+function resolveTabFromSpec(
+  tabs: Map<string, Record<string, string>[]>,
+  sourceTabHints: string[]
+): { tabName: string; rows: Record<string, string>[] } | null {
+  // Try each hint in priority order
+  for (const hint of sourceTabHints) {
+    const hintLower = hint.toLowerCase()
+    for (const [tabName, rows] of tabs) {
+      if (tabName.toLowerCase().includes(hintLower) || hintLower.includes(tabName.toLowerCase())) {
+        if (rows.length > 0) return { tabName, rows }
+      }
+    }
+  }
+  return null
+}
+
+/**
+ * Apply RowFilter conditions to rows.
+ */
+function applySpecFilters(
+  rows: Record<string, string>[],
+  filters: RowFilter[]
+): Record<string, string>[] {
+  if (filters.length === 0) return rows
+  
+  return rows.filter(row => {
+    return filters.every(filter => {
+      const col = resolveFieldToColumn([row], filter.field)
+      if (!col) return filter.op === "excludes" // If no column, excludes = pass
+      
+      const val = (row[col] || "").toLowerCase().trim()
+      
+      switch (filter.op) {
+        case "includes":
+          return filter.values.some(v => val.includes(v.toLowerCase()))
+        case "excludes":
+          return !filter.values.some(v => val.includes(v.toLowerCase()))
+        case "equals":
+          return filter.values.some(v => val === v.toLowerCase())
+        case "not_empty":
+          return val !== ""
+        default:
+          return true
+      }
+    })
+  })
+}
+
+/**
+ * Parse a date string into a Date object (handles multiple formats)
+ */
+function parseDateValue(value: string): Date | null {
+  if (!value || value.trim() === "") return null
+  const trimmed = value.trim()
+  const parsed = new Date(trimmed)
+  if (!isNaN(parsed.getTime()) && parsed.getFullYear() > 1990) return parsed
+  const dmyMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/)
+  if (dmyMatch) {
+    const day = parseInt(dmyMatch[1])
+    const month = parseInt(dmyMatch[2]) - 1
+    const year = parseInt(dmyMatch[3]) + (parseInt(dmyMatch[3]) < 100 ? 2000 : 0)
+    const d = new Date(year, month, day)
+    if (!isNaN(d.getTime())) return d
+  }
+  return null
+}
+
+// ============================================
+// MAIN CALCULATION FUNCTION
+// ============================================
+
+/**
+ * Calculate a signal value from entity-based data (CRM rows).
  * 
- * Key changes from v1:
- * 1. Tab-aware: picks the right tab for each signal
- * 2. Filters rows by status/stage before calculating
- * 3. Uses date columns for real trend analysis
- * 4. Smarter calc type detection using tab context
+ * If the signal has a `calcSpec`, the engine follows it precisely:
+ *   1. Resolve tab from spec.sourceTab
+ *   2. Resolve columns from spec fields (using FIELD_ALIASES)
+ *   3. Apply spec.filters
+ *   4. Verify required fields exist - skip if missing
+ *   5. Execute spec.operation
+ * 
+ * If no calcSpec, falls back to the original heuristic approach.
  */
 export function calculateSignal(
   signal: SignalRequirement,
@@ -568,6 +674,335 @@ export function calculateSignal(
 ): CalculationResult | null {
   if (rows.length === 0) return null
 
+  // ── SPEC-DRIVEN PATH ──
+  if (signal.calcSpec) {
+    return calculateSignalFromSpec(signal, signal.calcSpec, rows, matchedFields, tabs)
+  }
+
+  // ── LEGACY HEURISTIC PATH (for signals without calcSpec) ──
+  return calculateSignalLegacy(signal, rows, matchedFields, tabs)
+}
+
+/**
+ * Spec-driven calculation: follows the explicit calcSpec.
+ */
+function calculateSignalFromSpec(
+  signal: SignalRequirement,
+  spec: CalculationSpec,
+  rows: Record<string, string>[],
+  matchedFields: string[],
+  tabs?: Map<string, Record<string, string>[]>
+): CalculationResult | null {
+  // Step 1: Resolve tab
+  let workingRows = rows
+  let tabName: string | null = null
+  
+  if (tabs && tabs.size > 0) {
+    const resolved = resolveTabFromSpec(tabs, spec.sourceTab)
+    if (resolved) {
+      workingRows = resolved.rows
+      tabName = resolved.tabName
+    }
+  }
+  
+  if (workingRows.length === 0) return null
+  const totalRowCount = workingRows.length
+
+  // Step 2: Resolve columns from spec
+  const valueCol = spec.valueField ? resolveFieldToColumn(workingRows, spec.valueField) : null
+  const dateCol = spec.dateField ? resolveFieldToColumn(workingRows, spec.dateField) : null
+  const groupCol = spec.groupByField ? resolveFieldToColumn(workingRows, spec.groupByField) : null
+  
+  // Step 3: Validate required fields exist
+  // If the operation needs a value column and we can't find it, skip
+  if (spec.valueField && !valueCol && ["sum", "average", "latest"].includes(spec.operation)) {
+    return null // Required field missing - don't produce incorrect value
+  }
+  if (spec.groupByField && !groupCol && spec.operation === "group_by") {
+    return null
+  }
+  if (spec.dateField && !dateCol && ["monthly_rate", "duration_avg"].includes(spec.operation)) {
+    return null
+  }
+
+  // Step 4: Apply spec filters
+  const filteredRows = applySpecFilters(workingRows, spec.filters)
+  const filteredRowCount = filteredRows.length
+  
+  if (filteredRows.length === 0 && spec.filters.length > 0) {
+    // Filters produced zero rows - signal has no matching data
+    // Return 0 rather than null so we show "0" not "missing"
+  }
+
+  // Step 5: Execute operation
+  let value = 0
+  let formula = ""
+  let method = ""
+  let description = ""
+  let dataPointsUsed = 0
+  const allValues: number[] = []
+  const usedColumn = valueCol
+
+  switch (spec.operation) {
+    case "count": {
+      value = filteredRows.length
+      dataPointsUsed = filteredRows.length
+      formula = `COUNT(rows${tabName ? ` in "${tabName}"` : ""})`
+      method = "Count"
+      description = `Counts ${filteredRows.length} records${filteredRowCount < totalRowCount ? ` (filtered from ${totalRowCount})` : ""}`
+      break
+    }
+
+    case "sum": {
+      for (const row of filteredRows) {
+        const v = parseFormattedNumber(row[valueCol!])
+        if (v !== null) { allValues.push(v); value += v }
+      }
+      dataPointsUsed = allValues.length
+      formula = `SUM("${valueCol}")${filteredRowCount < totalRowCount ? ` [${filteredRowCount} of ${totalRowCount} rows]` : ""}`
+      method = "Sum"
+      description = `Sums ${dataPointsUsed} values from "${valueCol}"${filteredRowCount < totalRowCount ? `, filtered to ${filteredRowCount} relevant rows` : ""}`
+      break
+    }
+
+    case "average": {
+      for (const row of filteredRows) {
+        const v = parseFormattedNumber(row[valueCol!])
+        if (v !== null) allValues.push(v)
+      }
+      dataPointsUsed = allValues.length
+      value = allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : 0
+      formula = `AVG("${valueCol}")`
+      method = "Average"
+      description = `Average of ${dataPointsUsed} values from "${valueCol}"`
+      break
+    }
+
+    case "rate": {
+      // Use spec.positiveStatuses to determine what counts as positive
+      const statusCol = resolveFieldToColumn(filteredRows, "stage") || findStatusColumn(filteredRows)
+      if (!statusCol) {
+        value = 0
+        formula = "No status column found"
+        method = "Rate"
+        description = "Could not calculate rate without a status column"
+        break
+      }
+      const total = filteredRows.length
+      const positiveValues = spec.positiveStatuses || ["won", "closed won", "converted", "success"]
+      const positive = filteredRows.filter(r => {
+        const status = (r[statusCol] || "").toLowerCase().trim()
+        return positiveValues.some(p => status.includes(p.toLowerCase()))
+      }).length
+      value = total > 0 ? (positive / total) * 100 : 0
+      dataPointsUsed = total
+      formula = `(${positive} positive / ${total} total) x 100`
+      method = "Rate"
+      description = `${positive} positive outcomes out of ${total} total using "${statusCol}"`
+      break
+    }
+
+    case "monthly_rate": {
+      // Count entities, measure date range, divide by months
+      if (!dateCol) { value = 0; break }
+      const dates: Date[] = []
+      for (const row of filteredRows) {
+        const d = parseDateValue(row[dateCol])
+        if (d) dates.push(d)
+      }
+      if (dates.length < 2) {
+        value = filteredRows.length
+        formula = `COUNT(rows) [insufficient date range]`
+        method = "Monthly Rate"
+        description = `Only ${dates.length} dated rows - returning total count`
+        dataPointsUsed = filteredRows.length
+        break
+      }
+      dates.sort((a, b) => a.getTime() - b.getTime())
+      const oldest = dates[0]
+      const newest = dates[dates.length - 1]
+      const monthSpan = Math.max(1,
+        (newest.getFullYear() - oldest.getFullYear()) * 12 + 
+        (newest.getMonth() - oldest.getMonth()) + 1
+      )
+      value = Math.round((dates.length / monthSpan) * 10) / 10
+      dataPointsUsed = dates.length
+      formula = `${dates.length} entities / ${monthSpan} months`
+      method = "Monthly Rate"
+      description = `${dates.length} records over ${monthSpan} months (${oldest.toISOString().slice(0,10)} to ${newest.toISOString().slice(0,10)})`
+      break
+    }
+
+    case "duration_avg": {
+      // Average days between dateField (start) and valueField (end)
+      if (!dateCol || !valueCol) { value = 0; break }
+      const durations: number[] = []
+      for (const row of filteredRows) {
+        const startDate = parseDateValue(row[dateCol])
+        const endDate = parseDateValue(row[valueCol])
+        if (startDate && endDate) {
+          const days = Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+          durations.push(days)
+        }
+      }
+      if (durations.length === 0) { value = 0; break }
+      value = Math.round((durations.reduce((a, b) => a + b, 0) / durations.length) * 10) / 10
+      dataPointsUsed = durations.length
+      formula = `AVG(days between "${dateCol}" and "${valueCol}")`
+      method = "Duration Average"
+      description = `Average of ${durations.length} durations: ${value} days`
+      break
+    }
+
+    case "group_by": {
+      // Group by a field, return count per group. Value = total groups, detail in metadata.
+      if (!groupCol) { value = 0; break }
+      const groups: Record<string, number> = {}
+      for (const row of filteredRows) {
+        const key = (row[groupCol] || "").trim()
+        if (key) groups[key] = (groups[key] || 0) + 1
+      }
+      const entries = Object.entries(groups).sort((a, b) => b[1] - a[1])
+      value = entries.length // Number of distinct groups
+      dataPointsUsed = filteredRows.length
+      const topEntries = entries.slice(0, 5).map(([k, v]) => `${k}: ${v}`).join(", ")
+      formula = `GROUP_BY("${groupCol}") -> ${entries.length} groups`
+      method = "Group By"
+      description = `${entries.length} groups from ${filteredRows.length} rows. Top: ${topEntries}`
+      break
+    }
+
+    case "count_unique": {
+      const targetCol = valueCol || groupCol
+      if (!targetCol) { value = filteredRows.length; break }
+      const uniques = new Set<string>()
+      for (const row of filteredRows) {
+        const v = (row[targetCol] || "").trim()
+        if (v) uniques.add(v.toLowerCase())
+      }
+      value = uniques.size
+      dataPointsUsed = filteredRows.length
+      formula = `COUNT_UNIQUE("${targetCol}")`
+      method = "Count Unique"
+      description = `${uniques.size} unique values in "${targetCol}"`
+      break
+    }
+
+    case "latest": {
+      if (!valueCol) { value = 0; break }
+      let latestRow = filteredRows[filteredRows.length - 1]
+      if (dateCol) {
+        const sorted = [...filteredRows].sort((a, b) => {
+          const dA = parseDateValue(a[dateCol])
+          const dB = parseDateValue(b[dateCol])
+          if (!dA || !dB) return 0
+          return dA.getTime() - dB.getTime()
+        })
+        latestRow = sorted[sorted.length - 1]
+      }
+      const latestVal = parseFormattedNumber(latestRow?.[valueCol])
+      value = latestVal ?? 0
+      dataPointsUsed = 1
+      formula = `LATEST("${valueCol}")`
+      method = "Latest Value"
+      description = `Most recent value from "${valueCol}"`
+      break
+    }
+
+    default: {
+      value = filteredRows.length
+      dataPointsUsed = filteredRows.length
+      formula = "COUNT(rows)"
+      method = "Default Count"
+      description = "Defaulted to counting rows"
+    }
+  }
+
+  // Step 6: Map spec operation to our CalculationType for trend + formatting
+  const calcTypeMap: Record<string, CalculationType> = {
+    count: "count", sum: "sum", average: "average", rate: "rate",
+    latest: "latest", count_unique: "count", monthly_rate: "count",
+    duration_avg: "average", group_by: "count",
+  }
+  const calcType = calcTypeMap[spec.operation] || "count"
+
+  // Step 7: Format value using spec.displayUnit
+  const formattedValue = formatValueFromSpec(value, spec.displayUnit, signal.signalName)
+
+  // Step 8: Calculate trend
+  const trendCol = valueCol || dateCol
+  const trendResult = trendCol
+    ? calculateDateBasedTrend(filteredRows, trendCol, calcType)
+    : { trend: "stable" as const, percentage: null }
+
+  // Step 9: Build metadata
+  const metadata: CalculationMetadata = {
+    method,
+    description,
+    formula,
+    example: `${method} applied to ${dataPointsUsed} data points${tabName ? ` from "${tabName}" tab` : ""}`,
+    sourceColumn: usedColumn,
+    dataPointsUsed,
+    minValue: allValues.length > 0 ? Math.min(...allValues) : null,
+    maxValue: allValues.length > 0 ? Math.max(...allValues) : null,
+    sumValue: allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) : null,
+    avgValue: allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : null,
+    tabName,
+    filteredRowCount,
+    totalRowCount,
+  }
+
+  return {
+    value: Math.round(value * 100) / 100,
+    formattedValue,
+    dataPoints: dataPointsUsed || filteredRows.length,
+    trend: trendResult.trend,
+    trendPercentage: trendResult.percentage,
+    calculationType: calcType,
+    calculationMethod: method,
+    formula,
+    usedColumn,
+    metadata,
+  }
+}
+
+/**
+ * Format value based on explicit displayUnit from calcSpec.
+ */
+function formatValueFromSpec(value: number, displayUnit: string, signalName: string): string {
+  switch (displayUnit) {
+    case "currency":
+      if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`
+      if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`
+      return `$${Math.round(value).toLocaleString()}`
+    case "percent":
+      return `${Math.round(value * 10) / 10}%`
+    case "days":
+      return `${Math.round(value * 10) / 10} days`
+    case "hours":
+      return `${Math.round(value * 10) / 10} hrs`
+    case "score":
+      return `${Math.round(value * 10) / 10}`
+    case "ratio":
+      return `${(value).toFixed(2)}x`
+    case "count":
+    default:
+      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
+      if (value >= 1000) return `${(value / 1000).toFixed(1)}K`
+      return `${Math.round(value * 100) / 100}`
+  }
+}
+
+/**
+ * Legacy heuristic calculation (for signals without calcSpec).
+ * Preserved to avoid breaking signals that haven't been updated yet.
+ */
+function calculateSignalLegacy(
+  signal: SignalRequirement,
+  rows: Record<string, string>[],
+  matchedFields: string[],
+  tabs?: Map<string, Record<string, string>[]>
+): CalculationResult | null {
   // Step 1: Pick the best tab if multi-tab data
   let workingRows = rows
   let tabName: string | null = null
@@ -594,7 +1029,6 @@ export function calculateSignal(
   const statusCol = findStatusColumn(filteredRows)
   const numericCol = findNumericColumn(filteredRows)
   
-  // Resolve the column to use based on matched fields first
   let usedColumn: string | null = null
   for (const field of matchedFields) {
     const resolved = findColumn(filteredRows, [field])
@@ -603,8 +1037,6 @@ export function calculateSignal(
       break
     }
   }
-  
-  // Fallback to discovered columns
   if (!usedColumn) {
     usedColumn = valueCol || numericCol
   }
@@ -629,19 +1061,12 @@ export function calculateSignal(
 
     case "sum": {
       if (!usedColumn) {
-        value = 0
-        formula = "No numeric column found"
-        method = "Sum"
-        description = "Could not find a numeric column to sum"
-        break
+        value = 0; formula = "No numeric column found"; method = "Sum"
+        description = "Could not find a numeric column to sum"; break
       }
-      
       for (const row of filteredRows) {
         const v = parseFormattedNumber(row[usedColumn])
-        if (v !== null) {
-          allValues.push(v)
-          value += v
-        }
+        if (v !== null) { allValues.push(v); value += v }
       }
       dataPointsUsed = allValues.length
       formula = `SUM("${usedColumn}")${filteredRowCount < totalRowCount ? ` [${filteredRowCount} of ${totalRowCount} rows]` : ""}`
@@ -652,18 +1077,12 @@ export function calculateSignal(
 
     case "average": {
       if (!usedColumn) {
-        value = 0
-        formula = "No numeric column found"
-        method = "Average"
-        description = "Could not find a numeric column to average"
-        break
+        value = 0; formula = "No numeric column found"; method = "Average"
+        description = "Could not find a numeric column to average"; break
       }
-      
       for (const row of filteredRows) {
         const v = parseFormattedNumber(row[usedColumn])
-        if (v !== null) {
-          allValues.push(v)
-        }
+        if (v !== null) allValues.push(v)
       }
       dataPointsUsed = allValues.length
       value = allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : 0
@@ -675,7 +1094,6 @@ export function calculateSignal(
 
     case "rate": {
       if (!statusCol) {
-        // No status column - try to find a percentage column
         if (usedColumn) {
           for (const row of filteredRows) {
             const v = parseFormattedNumber(row[usedColumn])
@@ -683,19 +1101,14 @@ export function calculateSignal(
           }
           value = allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : 0
           dataPointsUsed = allValues.length
-          formula = `AVG("${usedColumn}")`
-          method = "Rate (from percentage column)"
+          formula = `AVG("${usedColumn}")`;  method = "Rate (from percentage column)"
           description = `Average of percentage values in "${usedColumn}"`
         } else {
-          value = 0
-          formula = "No status or percentage column found"
-          method = "Rate"
-          description = "Could not calculate rate without a status column"
+          value = 0; formula = "No status or percentage column found"
+          method = "Rate"; description = "Could not calculate rate without a status column"
         }
         break
       }
-      
-      // Calculate rate from status column
       const total = filteredRows.length
       const positive = filteredRows.filter(r => {
         const status = (r[statusCol] || "").toLowerCase()
@@ -704,7 +1117,6 @@ export function calculateSignal(
                status.includes("complete") || status.includes("yes") ||
                status.includes("active") || status.includes("resolved")
       }).length
-      
       value = total > 0 ? (positive / total) * 100 : 0
       dataPointsUsed = total
       formula = `(${positive} positive / ${total} total) x 100`
@@ -715,79 +1127,55 @@ export function calculateSignal(
 
     case "latest": {
       if (!usedColumn) {
-        value = 0
-        formula = "No numeric column found"
-        method = "Latest"
-        description = "Could not find a column for latest value"
-        break
+        value = 0; formula = "No numeric column found"; method = "Latest"
+        description = "Could not find a column for latest value"; break
       }
-      
-      // Try to get the most recent value using date column
       const dateCol = findDateColumn(filteredRows)
       let latestRow = filteredRows[filteredRows.length - 1]
-      
       if (dateCol) {
         const sortedByDate = [...filteredRows].sort((a, b) => {
-          const dateA = parseDate(a[dateCol])
-          const dateB = parseDate(b[dateCol])
-          if (!dateA || !dateB) return 0
-          return dateA.getTime() - dateB.getTime()
+          const dateA = parseDate(a[dateCol]); const dateB = parseDate(b[dateCol])
+          if (!dateA || !dateB) return 0; return dateA.getTime() - dateB.getTime()
         })
         latestRow = sortedByDate[sortedByDate.length - 1]
       }
-      
       const latestVal = parseFormattedNumber(latestRow?.[usedColumn])
       value = latestVal ?? 0
       dataPointsUsed = 1
-      formula = `LATEST("${usedColumn}")`
-      method = "Latest Value"
+      formula = `LATEST("${usedColumn}")`;  method = "Latest Value"
       description = `Most recent value from "${usedColumn}"`
       break
     }
 
     default: {
-      // Default to count for entity data
-      value = filteredRows.length
-      dataPointsUsed = filteredRows.length
-      formula = "COUNT(rows)"
-      method = "Default Count"
+      value = filteredRows.length; dataPointsUsed = filteredRows.length
+      formula = "COUNT(rows)"; method = "Default Count"
       description = "Defaulted to counting rows"
     }
   }
 
-  // Step 6: Calculate trend using date-based comparison
   const trendResult = usedColumn 
     ? calculateDateBasedTrend(filteredRows, usedColumn, calcType)
     : { trend: "stable" as const, percentage: null }
 
-  // Step 7: Build metadata
   const metadata: CalculationMetadata = {
-    method,
-    description,
-    formula,
+    method, description, formula,
     example: `${method} applied to ${dataPointsUsed} data points${tabName ? ` from "${tabName}" tab` : ""}`,
-    sourceColumn: usedColumn,
-    dataPointsUsed,
+    sourceColumn: usedColumn, dataPointsUsed,
     minValue: allValues.length > 0 ? Math.min(...allValues) : null,
     maxValue: allValues.length > 0 ? Math.max(...allValues) : null,
     sumValue: allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) : null,
     avgValue: allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : null,
-    tabName,
-    filteredRowCount,
-    totalRowCount,
+    tabName, filteredRowCount, totalRowCount,
   }
 
   return {
     value: Math.round(value * 100) / 100,
     formattedValue: formatSignalValue(value, calcType, signal.signalName),
     dataPoints: dataPointsUsed || filteredRows.length,
-    trend: trendResult.trend,
-    trendPercentage: trendResult.percentage,
-    calculationType: calcType,
-    calculationMethod: method,
-    formula,
-    usedColumn,
-    metadata,
+    trend: trendResult.trend, trendPercentage: trendResult.percentage,
+    calculationType: calcType, calculationMethod: method,
+    formula, usedColumn, metadata,
   }
 }
 

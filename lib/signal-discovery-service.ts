@@ -2,6 +2,49 @@
 
 import type { ParsedCSVRow } from "./csv-parser"
 
+/**
+ * Explicit calculation specification - tells the calc engine
+ * exactly how to compute this signal from the raw data.
+ */
+export interface CalculationSpec {
+  /** Which tab(s) to source data from (in priority order). Matched case-insensitively. */
+  sourceTab: string[]
+  
+  /** The aggregation to perform: count rows, sum a column, average a column, etc. */
+  operation: "count" | "sum" | "average" | "rate" | "latest" | "count_unique" | "duration_avg" | "monthly_rate" | "group_by"
+  
+  /** Which normalized field to aggregate (e.g. "deal_value"). Null for count operations. */
+  valueField: string | null
+  
+  /** Which normalized field to use for date-range / time-series / trend. */
+  dateField: string | null
+  
+  /** 
+   * Row filter: only include rows matching these conditions (AND logic).
+   * Each filter is { field, operator, values }.
+   * Example: { field: "stage", op: "includes", values: ["closed won"] }
+   */
+  filters: RowFilter[]
+  
+  /** For rate calculations: what counts as "positive" in the status column. */
+  positiveStatuses?: string[]
+  
+  /** For group_by: which field to group on. */
+  groupByField?: string
+  
+  /** For monthly_rate: divide total count by number of months in date range. */
+  rateUnit?: "month" | "week" | "day"
+  
+  /** Unit for display formatting: "currency", "percent", "days", "count", "score" */
+  displayUnit: "currency" | "percent" | "days" | "hours" | "count" | "score" | "ratio"
+}
+
+export interface RowFilter {
+  field: string
+  op: "includes" | "excludes" | "equals" | "not_empty"
+  values: string[]
+}
+
 export interface SignalRequirement {
   signalId: string
   signalName: string
@@ -12,6 +55,9 @@ export interface SignalRequirement {
   requiredFields: DataField[]
   optionalFields: DataField[]
   calculationType: "direct" | "calculated" | "aggregated" | "time-series"
+  /** Explicit calculation instructions. When present, the calc engine follows this spec
+   *  instead of guessing from signal name heuristics. */
+  calcSpec?: CalculationSpec
 }
 
 export interface DataField {
@@ -180,6 +226,14 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "customer_id", type: "string", description: "Customer identifier", examples: ["CUST-001"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["revenue", "subscriptions", "invoices", "deals"],
+      operation: "sum",
+      valueField: "revenue_amount",
+      dateField: "date",
+      filters: [],
+      displayUnit: "currency",
+    },
   },
   {
     signalId: "arr",
@@ -316,6 +370,16 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "probability", type: "number", description: "Win probability", examples: ["0.5", "0.8"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities", "pipeline"],
+      operation: "sum",
+      valueField: "deal_value",
+      dateField: "close_date",
+      filters: [
+        { field: "stage", op: "excludes", values: ["closed lost", "lost", "disqualified", "cancelled"] },
+      ],
+      displayUnit: "currency",
+    },
   },
   {
     signalId: "weighted_pipeline",
@@ -362,6 +426,17 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "close_date", type: "date", description: "Close date", examples: ["2025-01-01"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities"],
+      operation: "rate",
+      valueField: null,
+      dateField: "close_date",
+      filters: [
+        { field: "stage", op: "includes", values: ["closed won", "won", "closed lost", "lost"] },
+      ],
+      positiveStatuses: ["closed won", "won"],
+      displayUnit: "percent",
+    },
   },
   {
     signalId: "average_deal_size",
@@ -377,6 +452,16 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "stage", type: "string", description: "Deal status", examples: ["won", "closed-won"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities"],
+      operation: "average",
+      valueField: "deal_value",
+      dateField: "close_date",
+      filters: [
+        { field: "stage", op: "includes", values: ["closed won", "won"] },
+      ],
+      displayUnit: "currency",
+    },
   },
   {
     signalId: "sales_cycle_length",
@@ -393,6 +478,16 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "stage", type: "string", description: "Deal status", examples: ["won", "closed-won"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities"],
+      operation: "duration_avg",
+      valueField: "close_date",
+      dateField: "created_date",
+      filters: [
+        { field: "stage", op: "includes", values: ["closed won", "won"] },
+      ],
+      displayUnit: "days",
+    },
   },
   {
     signalId: "deal_count_by_owner",
@@ -409,6 +504,15 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "stage", type: "string", description: "Deal stage", examples: ["qualified", "won"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities"],
+      operation: "group_by",
+      valueField: null,
+      dateField: "close_date",
+      filters: [],
+      groupByField: "owner",
+      displayUnit: "count",
+    },
   },
   {
     signalId: "deal_value_by_owner",
@@ -454,11 +558,20 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "deal_value", type: "number", description: "Deal amount", examples: ["5000"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities"],
+      operation: "group_by",
+      valueField: null,
+      dateField: null,
+      filters: [],
+      groupByField: "stage",
+      displayUnit: "count",
+    },
   },
   {
     signalId: "deals_closing_this_month",
     signalName: "Deals Closing This Month",
-    description: "Opportunities with close dates in current month",
+    description: "Total value of closed-won deals",
     category: "Sales",
     valuableFor: ["VP Sales", "Sales Team", "CEO"],
     businessStage: ["Post-PMF", "Scaling"],
@@ -470,6 +583,16 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "stage", type: "string", description: "Deal stage", examples: ["negotiation", "proposal"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["deals", "opportunities"],
+      operation: "sum",
+      valueField: "deal_value",
+      dateField: "close_date",
+      filters: [
+        { field: "stage", op: "includes", values: ["closed won", "won"] },
+      ],
+      displayUnit: "currency",
+    },
   },
   {
     signalId: "quota_attainment",
@@ -535,6 +658,14 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "status", type: "string", description: "Lead status", examples: ["new", "contacted", "qualified"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["leads", "contacts"],
+      operation: "count",
+      valueField: null,
+      dateField: "created_date",
+      filters: [],
+      displayUnit: "count",
+    },
   },
   {
     signalId: "new_leads",
@@ -581,6 +712,15 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "status", type: "string", description: "Lead status", examples: ["new", "contacted"] },
     ],
     calculationType: "aggregated",
+    calcSpec: {
+      sourceTab: ["leads", "contacts", "deals"],
+      operation: "group_by",
+      valueField: null,
+      dateField: "created_date",
+      filters: [],
+      groupByField: "owner",
+      displayUnit: "count",
+    },
   },
   {
     signalId: "leads_by_status",
@@ -612,6 +752,15 @@ export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
       { name: "owner", type: "string", description: "Lead owner", examples: ["John Smith"] },
     ],
     calculationType: "time-series",
+    calcSpec: {
+      sourceTab: ["leads", "contacts"],
+      operation: "monthly_rate",
+      valueField: null,
+      dateField: "created_date",
+      filters: [],
+      rateUnit: "month",
+      displayUnit: "count",
+    },
   },
   {
     signalId: "lead_to_opportunity_rate",
