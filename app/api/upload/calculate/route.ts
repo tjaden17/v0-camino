@@ -7,9 +7,162 @@ import {
   SIGNAL_DEFINITIONS,
   type DiscoveredSignal,
 } from "@/lib/signal-discovery-service"
-import { calculateSignal } from "@/lib/signal-calculation-service"
+import { calculateSignal, findDateColumn, findValueColumn } from "@/lib/signal-calculation-service"
 import type { SignalRequirement } from "@/lib/signal-discovery-service"
 import { parseFormattedNumber } from "@/lib/csv-parser"
+
+// ============================================
+// TIME-SERIES EXTRACTION
+// Extracts date-keyed data points from uploaded rows
+// for AI analysis services (trend, correlation, interpretation)
+// ============================================
+
+interface ExtractedDataPoint {
+  date: Date
+  value: number
+  metadata: Record<string, any>
+}
+
+/**
+ * Extract time-series data points from uploaded rows for a given signal.
+ * Groups rows by date period (day/week/month) and aggregates per the signal's calc type.
+ */
+function extractTimeSeriesFromRows(
+  rows: Record<string, string>[],
+  signalDef: SignalRequirement,
+  matchedFields: string[],
+  calculated: { value: number; calculationType: string },
+  tabs?: Map<string, Record<string, string>[]>
+): ExtractedDataPoint[] {
+  const dateCol = findDateColumn(rows)
+  
+  if (!dateCol) {
+    // No date column - store a single data point with today's date
+    return [{
+      date: new Date(),
+      value: calculated.value,
+      metadata: { source: "upload_aggregate", matchedFields }
+    }]
+  }
+
+  // Find the value column for this signal
+  const valueCol = matchedFields.find(f => {
+    const lower = f.toLowerCase()
+    return lower.includes("amount") || lower.includes("value") || lower.includes("revenue") ||
+      lower.includes("price") || lower.includes("score") || lower.includes("rating") ||
+      lower.includes("total") || lower.includes("count") || lower.includes("days") ||
+      lower.includes("hours") || lower.includes("time") || lower.includes("nps") ||
+      lower.includes("csat") || lower.includes("mrr") || lower.includes("arr")
+  }) || findValueColumn(rows)
+
+  // Parse all rows with dates
+  const datedRows: { date: Date; value: number; row: Record<string, string> }[] = []
+  
+  for (const row of rows) {
+    const dateStr = row[dateCol]
+    if (!dateStr || dateStr.trim() === "") continue
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime()) || date.getFullYear() < 1990) continue
+
+    if (calculated.calculationType === "count" || calculated.calculationType === "rate") {
+      datedRows.push({ date, value: 1, row })
+    } else if (valueCol && row[valueCol]) {
+      const val = parseFormattedNumber(row[valueCol])
+      if (val !== null) {
+        datedRows.push({ date, value: val, row })
+      }
+    } else {
+      datedRows.push({ date, value: 1, row })
+    }
+  }
+
+  if (datedRows.length === 0) {
+    return [{
+      date: new Date(),
+      value: calculated.value,
+      metadata: { source: "upload_aggregate", matchedFields }
+    }]
+  }
+
+  // Sort by date
+  datedRows.sort((a, b) => a.date.getTime() - b.date.getTime())
+
+  // Determine grouping period based on date range
+  const oldest = datedRows[0].date
+  const newest = datedRows[datedRows.length - 1].date
+  const rangeDays = (newest.getTime() - oldest.getTime()) / (1000 * 60 * 60 * 24)
+  
+  let periodKey: (d: Date) => string
+  if (rangeDays <= 31) {
+    // Daily grouping
+    periodKey = (d) => d.toISOString().split("T")[0]
+  } else if (rangeDays <= 180) {
+    // Weekly grouping (ISO week start)
+    periodKey = (d) => {
+      const start = new Date(d)
+      start.setDate(start.getDate() - start.getDay())
+      return start.toISOString().split("T")[0]
+    }
+  } else {
+    // Monthly grouping
+    periodKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`
+  }
+
+  // Group by period
+  const groups = new Map<string, { values: number[]; count: number; date: Date }>()
+  for (const { date, value } of datedRows) {
+    const key = periodKey(date)
+    const existing = groups.get(key)
+    if (existing) {
+      existing.values.push(value)
+      existing.count++
+    } else {
+      groups.set(key, { values: [value], count: 1, date: new Date(key) })
+    }
+  }
+
+  // Aggregate each period based on calculation type
+  const dataPoints: ExtractedDataPoint[] = []
+  for (const [key, group] of groups) {
+    let periodValue: number
+    
+    switch (calculated.calculationType) {
+      case "count":
+        periodValue = group.count
+        break
+      case "sum":
+        periodValue = group.values.reduce((a, b) => a + b, 0)
+        break
+      case "average":
+      case "median":
+        periodValue = group.values.reduce((a, b) => a + b, 0) / group.values.length
+        break
+      case "rate": {
+        // For rates, we need the ratio - use value as-is since count rows were marked as 1
+        periodValue = group.values.reduce((a, b) => a + b, 0) / group.count * 100
+        break
+      }
+      case "latest":
+        periodValue = group.values[group.values.length - 1]
+        break
+      default:
+        periodValue = group.values.reduce((a, b) => a + b, 0) / group.values.length
+    }
+
+    dataPoints.push({
+      date: group.date,
+      value: Math.round(periodValue * 100) / 100,
+      metadata: { 
+        source: "upload",
+        period: key,
+        rowCount: group.count,
+        calcType: calculated.calculationType,
+      }
+    })
+  }
+
+  return dataPoints
+}
 
 // Parse a single XLSX sheet to row format
 function parseXLSXSheet(workbook: XLSX.WorkBook, sheetName: string): Record<string, string>[] {
@@ -478,7 +631,41 @@ export async function POST(request: NextRequest) {
         `
         
         if (result && result.length > 0) {
-          createdSignals.push(result[0])
+          const signalRecord = result[0]
+          createdSignals.push(signalRecord)
+
+          // ---- WRITE TIME-SERIES DATA POINTS ----
+          // This is what powers AI analysis (trends, correlations, interpretations)
+          try {
+            const timeSeries = extractTimeSeriesFromRows(
+              rows, signalDef, discovered.matchedFields,
+              { value: calculated.value, calculationType: calculated.calculationType },
+              tabs
+            )
+
+            if (timeSeries.length > 0) {
+              // Upsert each data point (unique on signal_id + date)
+              for (const dp of timeSeries) {
+                await sql`
+                  INSERT INTO signal_data_points (signal_id, date, value, metadata)
+                  VALUES (
+                    ${signalRecord.id}::uuid,
+                    ${dp.date.toISOString()},
+                    ${dp.value},
+                    ${JSON.stringify(dp.metadata)}
+                  )
+                  ON CONFLICT (signal_id, date) 
+                  DO UPDATE SET 
+                    value = EXCLUDED.value,
+                    metadata = EXCLUDED.metadata
+                `
+              }
+            }
+          } catch (dpErr) {
+            console.error("[v0] Failed to write data points for", signalDef.signalName, dpErr)
+            // Non-fatal - signal still created, just missing time-series
+          }
+
           // Record signal opportunity linked to this upload
           if (uploadId) {
             try {
@@ -524,9 +711,104 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // ---- PERSIST FIELD METADATA ----
+    // Store column definitions and stats for each upload so the system knows
+    // what data fields are available across all uploads for this org
+    if (uploadId) {
+      try {
+        const columns = rows[0] ? Object.keys(rows[0]) : []
+        
+        for (const colName of columns) {
+          // Determine field type from sample values
+          const samples = rows.slice(0, 20).map(r => r[colName]).filter(Boolean)
+          const numericCount = samples.filter(s => parseFormattedNumber(s) !== null).length
+          const dateCount = samples.filter(s => {
+            const d = new Date(s)
+            return !isNaN(d.getTime()) && d.getFullYear() > 1990
+          }).length
+          
+          let fieldType = "text"
+          if (numericCount > samples.length * 0.7) fieldType = "numeric"
+          else if (dateCount > samples.length * 0.7) fieldType = "date"
+
+          // Compute basic stats
+          const stats: Record<string, any> = {
+            sampleSize: samples.length,
+            uniqueValues: new Set(samples).size,
+            nullCount: rows.filter(r => !r[colName] || r[colName].trim() === "").length,
+          }
+
+          if (fieldType === "numeric") {
+            const vals = samples.map(s => parseFormattedNumber(s)).filter((v): v is number => v !== null)
+            if (vals.length > 0) {
+              stats.min = Math.min(...vals)
+              stats.max = Math.max(...vals)
+              stats.avg = Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100
+            }
+          }
+
+          const normalizedName = colName.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
+
+          // staged_fields: column metadata per upload
+          await sql`
+            INSERT INTO staged_fields (upload_id, original_column_name, normalized_field_name, field_type, sample_values, stats)
+            VALUES (
+              ${uploadId}::uuid,
+              ${colName},
+              ${normalizedName},
+              ${fieldType},
+              ${JSON.stringify(samples.slice(0, 5))},
+              ${JSON.stringify(stats)}
+            )
+            ON CONFLICT DO NOTHING
+          `
+
+          // field_availability: cross-upload field index for the org
+          const existingField = await sql`
+            SELECT id, upload_ids, total_data_points 
+            FROM field_availability 
+            WHERE normalized_field_name = ${normalizedName} 
+              AND organization_id = ${organizationId}
+            LIMIT 1
+          `
+
+          if (existingField && existingField.length > 0) {
+            const currentUploads = existingField[0].upload_ids || []
+            const newUploads = Array.isArray(currentUploads) ? [...currentUploads, uploadId] : [uploadId]
+            const totalPoints = (existingField[0].total_data_points || 0) + rows.length
+
+            await sql`
+              UPDATE field_availability SET
+                upload_ids = ${JSON.stringify(newUploads)},
+                total_data_points = ${totalPoints},
+                latest_upload_at = NOW()
+              WHERE id = ${existingField[0].id}
+            `
+          } else {
+            await sql`
+              INSERT INTO field_availability (user_id, organization_id, normalized_field_name, field_type, upload_ids, total_data_points, latest_upload_at)
+              VALUES (
+                ${user.id},
+                ${organizationId},
+                ${normalizedName},
+                ${fieldType},
+                ${JSON.stringify([uploadId])},
+                ${rows.length},
+                NOW()
+              )
+            `
+          }
+        }
+      } catch (fieldErr) {
+        console.error("[v0] Failed to persist field metadata:", fieldErr)
+        // Non-fatal
+      }
+    }
+
     return NextResponse.json({
       success: true,
       signalsCreated: createdSignals.length,
+      signalDataPointsWritten: createdSignals.length > 0,
       createdSignalIds: createdSignals.map(s => s.id),
       errors: errors.length > 0 ? errors : undefined,
     })

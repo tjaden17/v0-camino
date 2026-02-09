@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface DecisionWithDetails {
   id: string
@@ -61,17 +62,11 @@ export async function getAllDecisions(): Promise<DecisionWithDetails[]> {
 
       const signals: DecisionSignal[] = await Promise.all(
         (signalLinks || []).map(async (link: any) => {
-          const { data: latestPoint } = await supabase
-            .from("data_points")
-            .select("value")
-            .eq("signal_id", link.signal_id)
-            .order("date", { ascending: false })
-            .limit(1)
-            .single()
-
-          const current_value = latestPoint?.value || null
-          const change =
-            current_value !== null && link.snapshot_value !== null ? current_value - link.snapshot_value : null
+  const latestPoints = await getSignalDataPoints(link.signal_id, { limit: 1 })
+  
+  const current_value = latestPoints[0]?.value || null
+  const change =
+  current_value !== null && link.snapshot_value !== null ? current_value - link.snapshot_value : null
 
           return {
             id: link.id,
@@ -132,15 +127,9 @@ export async function getDecisionById(decisionId: string): Promise<DecisionWithD
 
   const signals: DecisionSignal[] = await Promise.all(
     (signalLinks || []).map(async (link: any) => {
-      const { data: latestPoint } = await supabase
-        .from("data_points")
-        .select("value")
-        .eq("signal_id", link.signal_id)
-        .order("date", { ascending: false })
-        .limit(1)
-        .single()
+      const latestPoints = await getSignalDataPoints(link.signal_id, { limit: 1 })
 
-      const current_value = latestPoint?.value || null
+      const current_value = latestPoints[0]?.value || null
       const change = current_value !== null && link.snapshot_value !== null ? current_value - link.snapshot_value : null
 
       return {
@@ -200,17 +189,11 @@ export async function getUserDecisions(userId: string): Promise<DecisionWithDeta
 
       const signals: DecisionSignal[] = await Promise.all(
         (signalLinks || []).map(async (link: any) => {
-          const { data: latestPoint } = await supabase
-            .from("data_points")
-            .select("value")
-            .eq("signal_id", link.signal_id)
-            .order("date", { ascending: false })
-            .limit(1)
-            .single()
-
-          const current_value = latestPoint?.value || null
-          const change =
-            current_value !== null && link.snapshot_value !== null ? current_value - link.snapshot_value : null
+  const latestPoints = await getSignalDataPoints(link.signal_id, { limit: 1 })
+  
+  const current_value = latestPoints[0]?.value || null
+  const change =
+  current_value !== null && link.snapshot_value !== null ? current_value - link.snapshot_value : null
 
           return {
             id: link.id,

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { generateText } from "ai"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface AIAnalysisResult {
   signalId: string
@@ -38,15 +39,10 @@ export class AIAnalysisService {
 
     if (!signal) return null
 
-    // Get recent data points
-    const { data: dataPoints } = await supabase
-      .from("data_points")
-      .select("date, value")
-      .eq("signal_id", signalId)
-      .order("date", { ascending: false })
-      .limit(30)
+    // Get recent data points from Neon signal_data_points
+    const dataPoints = await getSignalDataPoints(signalId, { limit: 30 })
 
-    if (!dataPoints || dataPoints.length < 3) {
+    if (dataPoints.length < 3) {
       return null
     }
 
@@ -98,14 +94,9 @@ export class AIAnalysisService {
 
     if (!signal) return null
 
-    const { data: dataPoints } = await supabase
-      .from("data_points")
-      .select("date, value")
-      .eq("signal_id", signalId)
-      .order("date", { ascending: false })
-      .limit(60)
+    const dataPoints = await getSignalDataPoints(signalId, { limit: 60 })
 
-    if (!dataPoints || dataPoints.length < 5) return null
+    if (dataPoints.length < 5) return null
 
     const prompt = this.buildTrendExplanationPrompt(signal, dataPoints)
 

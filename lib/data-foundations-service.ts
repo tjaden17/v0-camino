@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface BenchmarkHistory {
   id: string
@@ -79,15 +80,11 @@ export async function getDataQualityReport(): Promise<DataQualityMetrics[]> {
         }
       }
 
-      // Calculate on the fly if not cached
-      const { data: dataPoints } = await supabase
-        .from("data_points")
-        .select("date")
-        .eq("signal_id", signal.id)
-        .order("date", { ascending: false })
+      // Calculate on the fly if not cached - use Neon signal_data_points
+      const dataPoints = await getSignalDataPoints(signal.id, { limit: 500 })
 
-      const count = dataPoints?.length || 0
-      const lastUpdate = dataPoints?.[0]?.date || null
+      const count = dataPoints.length
+      const lastUpdate = dataPoints[0]?.date || null
 
       // Simple quality calculation
       const daysSinceUpdate = lastUpdate ? Math.floor((Date.now() - new Date(lastUpdate).getTime()) / 86400000) : 999

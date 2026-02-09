@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { sql } from "@/lib/db/neon"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface Signal {
   id: string
@@ -266,14 +267,7 @@ export async function getSignalsWithSavedStatus(userId: string, savedOnly: boole
         owner_name = profile?.full_name || null
       }
 
-      const { data: dataPoints } = await supabase
-        .from("data_points")
-        .select("*")
-        .eq("signal_id", signal.id)
-        .order("date", { ascending: false })
-        .limit(90)
-
-      const points = dataPoints || []
+  const points = await getSignalDataPoints(signal.id, { limit: 90 })
       const latest = points[0]
       const previous = points[1]
 
@@ -329,20 +323,17 @@ export function groupSignalsByStatus(signals: SignalWithData[]): Record<string, 
   return groups
 }
 
-export async function calculate90DayAverage(signalId: string): Promise<number | null> {
-  const supabase = await createClient()
-
+  export async function calculate90DayAverage(signalId: string): Promise<number | null> {
   const ninetyDaysAgo = new Date()
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
-
-  const { data: dataPoints } = await supabase
-    .from("data_points")
-    .select("value")
-    .eq("signal_id", signalId)
-    .gte("date", ninetyDaysAgo.toISOString().split("T")[0])
-
-  if (!dataPoints || dataPoints.length === 0) return null
-
+  
+  const dataPoints = await getSignalDataPoints(signalId, { 
+    limit: 90, 
+    sinceDate: ninetyDaysAgo.toISOString() 
+  })
+  
+  if (dataPoints.length === 0) return null
+  
   const sum = dataPoints.reduce((acc, point) => acc + point.value, 0)
   return sum / dataPoints.length
 }

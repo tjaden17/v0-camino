@@ -6,6 +6,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin"
 import { getInterpretation, type SignalInterpretation } from "@/lib/interpretation-service"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface ShareOptions {
   include_metric?: boolean
@@ -53,16 +54,11 @@ export async function generateShareSummary(
     return null
   }
 
-  // Get latest data points
-  const { data: dataPoints } = await supabase
-    .from("data_points")
-    .select("value, date")
-    .eq("signal_id", signalId)
-    .order("date", { ascending: false })
-    .limit(2)
+  // Get latest data points from Neon signal_data_points
+  const dataPoints = await getSignalDataPoints(signalId, { limit: 2 })
 
-  const latestValue = dataPoints?.[0]?.value ?? 0
-  const previousValue = dataPoints?.[1]?.value ?? 0
+  const latestValue = dataPoints[0]?.value ?? 0
+  const previousValue = dataPoints[1]?.value ?? 0
   const changePercent = previousValue !== 0 
     ? ((latestValue - previousValue) / previousValue) * 100 
     : 0

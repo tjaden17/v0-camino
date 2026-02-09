@@ -12,6 +12,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin"
 import { generateText } from "ai"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 // Interpretation structure matching the new 5-section spec
 export interface SignalInterpretation {
@@ -125,15 +126,10 @@ export async function generateInterpretation(
     return null
   }
 
-  // Fetch recent data points
-  const { data: dataPoints } = await supabase
-    .from("data_points")
-    .select("value, date")
-    .eq("signal_id", signalId)
-    .order("date", { ascending: false })
-    .limit(90)
+  // Fetch recent data points from Neon signal_data_points
+  const dataPoints = await getSignalDataPoints(signalId, { limit: 90 })
 
-  if (!dataPoints || dataPoints.length < 2) {
+  if (dataPoints.length < 2) {
     console.error("[v0] Insufficient data points for signal:", signalId)
     return null
   }

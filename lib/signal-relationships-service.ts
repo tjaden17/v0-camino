@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface SignalRelationship {
   id: string
@@ -55,20 +56,11 @@ export class SignalRelationshipsService {
         const signalA = signals[i]
         const signalB = signals[j]
 
-        // Get data points for both signals
-        const { data: dataA } = await supabase
-          .from("data_points")
-          .select("date, value")
-          .eq("signal_id", signalA.id)
-          .order("date", { ascending: true })
-
-        const { data: dataB } = await supabase
-          .from("data_points")
-          .select("date, value")
-          .eq("signal_id", signalB.id)
-          .order("date", { ascending: true })
-
-        if (!dataA || !dataB || dataA.length < 3 || dataB.length < 3) continue
+  // Get data points for both signals from Neon signal_data_points
+  const dataA = await getSignalDataPoints(signalA.id, { limit: 200, ascending: true })
+  const dataB = await getSignalDataPoints(signalB.id, { limit: 200, ascending: true })
+  
+  if (dataA.length < 3 || dataB.length < 3) continue
 
         // Check for correlation
         const correlation = this.calculateCorrelation(dataA, dataB)
