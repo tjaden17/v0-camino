@@ -312,19 +312,7 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
   
   <div className="sticky top-[57px] z-10 bg-card border-b border-border shadow-sm">
         <div className="container max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Button
-                variant={savedOnly ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSavedOnly(!savedOnly)}
-                className="h-9 px-3 shrink-0"
-                title="My Signals"
-              >
-                {savedOnly ? <BookmarkCheck className="h-4 w-4 mr-1" /> : <Bookmark className="h-4 w-4 mr-1" />}
-                <span className="text-xs">My Signals</span>
-              </Button>
-
+          <div className="flex items-center justify-end">
               <Button
                 variant="ghost"
                 size="icon"
@@ -335,111 +323,6 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
                 {viewMode === "card" ? <Layers className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
                 <span className="sr-only">{viewMode === "card" ? "Grouped view" : "Card view"}</span>
               </Button>
-
-              <Select value={sortBy} onValueChange={(value) => setSortBy(value as "rank" | "trend" | "recent")}>
-                <SelectTrigger className="w-[90px] h-9 text-xs border-border shrink-0">
-                  <SelectValue placeholder="Sort" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rank">By Rank</SelectItem>
-                  <SelectItem value="trend">By Trend</SelectItem>
-                  <SelectItem value="recent">Recent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[130px] h-9 text-xs border-border shrink-0">
-                  <div className="flex items-center gap-1.5">
-                    {statusFilter === 'needs_attention' && <AlertTriangle className="h-3.5 w-3.5 text-destructive" />}
-                    {statusFilter === 'opportunity' && <Star className="h-3.5 w-3.5 text-amber-500" />}
-                    {statusFilter === 'improved' && <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />}
-                    {statusFilter === 'all' && <Filter className="h-3.5 w-3.5 text-muted-foreground" />}
-                    <SelectValue />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="needs_attention">
-                    <span className="flex items-center gap-2">
-                      <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-                      Needs Attention
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="opportunity">
-                    <span className="flex items-center gap-2">
-                      <Star className="h-3.5 w-3.5 text-amber-500" />
-                      Opportunity
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="improved">
-                    <span className="flex items-center gap-2">
-                      <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
-                      Improved
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="steady">
-                    <span className="flex items-center gap-2">
-                      <Minus className="h-3.5 w-3.5 text-muted-foreground" />
-                      Steady
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={functionFilter} onValueChange={setFunctionFilter}>
-                <SelectTrigger className="w-[110px] h-9 text-xs border-border shrink-0">
-                  <SelectValue placeholder="Function" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Functions</SelectItem>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="marketing">Marketing</SelectItem>
-                  <SelectItem value="sales">Sales</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="product">Product</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-[110px] h-9 text-xs border-border shrink-0">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="opportunities">Opportunities</SelectItem>
-                  <SelectItem value="risks">Risks</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[100px] h-9 text-xs border-border shrink-0">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat || "uncategorized"}>
-                      {cat || "Uncategorized"}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={trendFilter} onValueChange={setTrendFilter}>
-                <SelectTrigger className="w-[85px] h-9 text-xs border-border shrink-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Trend</SelectItem>
-                  <SelectItem value="increasing">Up</SelectItem>
-                  <SelectItem value="decreasing">Down</SelectItem>
-                  <SelectItem value="stable">Stable</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </div>
       </div>
