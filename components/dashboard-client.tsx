@@ -106,13 +106,19 @@ export default function DashboardClient() {
   }
 
   return (
-    <main className="container max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-balance">
-          Welcome back{profile?.full_name ? `, ${profile.full_name}` : ""}
-        </h2>
-        <p className="mt-2 text-muted-foreground">Focus on what matters most to your business</p>
-      </div>
+  <div>
+  <header className="sticky top-0 z-20 bg-gradient-to-r from-primary to-accent border-b border-border shadow-sm">
+    <div className="container max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <h1 className="text-xl font-bold text-primary-foreground">Dashboard</h1>
+    </div>
+  </header>
+  <main className="container max-w-6xl mx-auto px-4 py-8">
+  <div className="mb-8">
+  <h2 className="text-3xl font-bold text-balance">
+  Welcome back{profile?.full_name ? `, ${profile.full_name}` : ""}
+  </h2>
+  <p className="mt-2 text-muted-foreground">Focus on what matters most to your business</p>
+  </div>
 
       <div className="grid gap-4 md:grid-cols-3 mb-8">
         <Card>
@@ -226,5 +232,6 @@ export default function DashboardClient() {
         </Card>
       )}
     </main>
+  </div>
   )
 }

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { BottomNav } from "@/components/bottom-nav"
-import Link from "next/link"
 import { ChangePasswordModal } from "@/components/change-password-modal"
 
 export default function ProtectedLayout({
@@ -109,13 +108,6 @@ export default function ProtectedLayout({
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-30 bg-gradient-to-r from-primary to-accent border-b border-border shadow-sm">
-        <div className="container max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/dashboard" className="text-xl font-bold text-primary-foreground">
-            Camino
-          </Link>
-        </div>
-      </header>
       {children}
       <BottomNav />
 
