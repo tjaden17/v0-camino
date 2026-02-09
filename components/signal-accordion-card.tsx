@@ -22,8 +22,7 @@ import {
   MoreHorizontal,
   Calculator,
   AlertTriangle,
-  X,
-  Sparkles
+  X
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -171,12 +170,7 @@ export function SignalAccordionCard({
                 {signal.category}
               </Badge>
             )}
-            {signal.source_type === "rag" && (
-              <span className="flex items-center gap-1 text-primary text-[10px] font-medium">
-                <Sparkles className="h-3 w-3" />
-                Personalized
-              </span>
-            )}
+
           </div>
           <div className={cn("flex items-center", getTrendColor())}>
             {getTrendIcon()}
