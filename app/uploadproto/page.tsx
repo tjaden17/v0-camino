@@ -1,10 +1,5 @@
-import { UploadProtoClient } from "@/components/upload-proto-client"
-
-export const metadata = {
-  title: "Upload Data - Prototype",
-  description: "Upload and classify your data files",
-}
+import { redirect } from "next/navigation"
 
 export default function UploadProtoPage() {
-  return <UploadProtoClient />
+  redirect("/upload")
 }

@@ -295,11 +295,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get organization
-    const userContextResult = await sql`
-      SELECT organization_id FROM user_context WHERE user_id = ${user.id} LIMIT 1
+    // Get organization from profiles (same source as signals page)
+    const profileResult = await sql`
+      SELECT organization_id FROM profiles WHERE id = ${user.id} LIMIT 1
     `
-    const organizationId = userContextResult?.[0]?.organization_id || null
+    const organizationId = profileResult?.[0]?.organization_id || null
 
     // Parse body
     const body = await request.json()
@@ -365,41 +365,63 @@ export async function POST(request: Request) {
 
         const summary = `${signalDef.operation}: ${result.formula}. ${signalDef.description}`
 
-        // Upsert signal
-        const dbResult = await sql`
-          INSERT INTO signals (name, category, organization_id, absolute_value, trend, trend_value, source_type, summary, source_metadata, created_at, updated_at)
-          VALUES (
-            ${signalDef.name},
-            ${result.category},
-            ${organizationId},
-            ${result.formattedValue},
-            ${result.trend},
-            ${trendText},
-            'upload',
-            ${summary},
-            ${JSON.stringify({
-              tabName: signalDef.tabName,
-              fileName: tab.fileName,
-              operation: signalDef.operation,
-              valueColumn: signalDef.valueColumn,
-              dateColumn: signalDef.dateColumn,
-              groupByColumn: signalDef.groupByColumn,
-              rowType: tab.answers.rowType,
-              rowCount: tab.rowCount,
-            })},
-            NOW(),
-            NOW()
-          )
-          ON CONFLICT (name, organization_id)
-          DO UPDATE SET
-            absolute_value = EXCLUDED.absolute_value,
-            trend = EXCLUDED.trend,
-            trend_value = EXCLUDED.trend_value,
-            summary = EXCLUDED.summary,
-            source_metadata = EXCLUDED.source_metadata,
-            updated_at = NOW()
-          RETURNING id, name, category, absolute_value
-        `
+        // Store raw numeric value (parseFloat-safe) in absolute_value
+        // Keep formatted string in source_metadata for optional display use
+        const rawValue = String(result.value)
+
+        // Upsert signal: try update first, then insert if not found
+        const metadata = JSON.stringify({
+          tabName: signalDef.tabName,
+          fileName: tab.fileName,
+          operation: signalDef.operation,
+          valueColumn: signalDef.valueColumn,
+          dateColumn: signalDef.dateColumn,
+          groupByColumn: signalDef.groupByColumn,
+          rowType: tab.answers.rowType,
+          rowCount: tab.rowCount,
+          formattedValue: result.formattedValue,
+        })
+
+        // Try to find existing signal first
+        const existingSignal = organizationId
+          ? await sql`SELECT id, name, category, absolute_value FROM signals WHERE name = ${signalDef.name} AND organization_id = ${organizationId} LIMIT 1`
+          : await sql`SELECT id, name, category, absolute_value FROM signals WHERE name = ${signalDef.name} AND organization_id IS NULL LIMIT 1`
+
+        let dbResult
+        if (existingSignal?.[0]) {
+          // Update existing
+          dbResult = await sql`
+            UPDATE signals SET
+              absolute_value = ${rawValue},
+              trend = ${result.trend},
+              trend_value = ${trendText},
+              summary = ${summary},
+              source_metadata = ${metadata}::jsonb,
+              category = ${result.category},
+              updated_at = NOW()
+            WHERE id = ${existingSignal[0].id}
+            RETURNING id, name, category, absolute_value
+          `
+        } else {
+          // Insert new
+          dbResult = await sql`
+            INSERT INTO signals (name, category, organization_id, absolute_value, trend, trend_value, source_type, summary, source_metadata, created_at, updated_at)
+            VALUES (
+              ${signalDef.name},
+              ${result.category},
+              ${organizationId},
+              ${rawValue},
+              ${result.trend},
+              ${trendText},
+              'upload',
+              ${summary},
+              ${metadata}::jsonb,
+              NOW(),
+              NOW()
+            )
+            RETURNING id, name, category, absolute_value
+          `
+        }
 
         if (dbResult?.[0]) {
           const signalRecord = dbResult[0]
@@ -412,6 +434,11 @@ export async function POST(request: Request) {
 
           // Write time-series data points
           if (result.timeSeries.length > 0) {
+            // First, clear old data points for this signal to avoid duplicates
+            try {
+              await sql`DELETE FROM signal_data_points WHERE signal_id = ${signalRecord.id}::uuid`
+            } catch (_) { /* table may not exist */ }
+
             for (const dp of result.timeSeries) {
               try {
                 await sql`
@@ -422,10 +449,6 @@ export async function POST(request: Request) {
                     ${dp.value},
                     ${JSON.stringify({ operation: signalDef.operation, tabName: signalDef.tabName })}
                   )
-                  ON CONFLICT (signal_id, date)
-                  DO UPDATE SET
-                    value = EXCLUDED.value,
-                    metadata = EXCLUDED.metadata
                 `
               } catch (dpErr) {
                 // Non-fatal

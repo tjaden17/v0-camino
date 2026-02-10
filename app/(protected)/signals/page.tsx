@@ -24,14 +24,10 @@ export default async function SignalsPage() {
   const organizationId = profile?.organization_id || null
   const userRole = profile?.role || "manager"
 
-  console.log("[v0] Signals page - user:", user.id, "org:", organizationId, "role:", userRole)
-
   const [signals, savedSignalIds] = await Promise.all([
     getSignals(organizationId),
     getSavedSignalIds(user.id)
   ])
-
-  console.log("[v0] Signals page - found", signals.length, "signals")
 
   return <SignalsPageClient signals={signals} userId={user.id} savedSignalIds={savedSignalIds} userRole={userRole} />
 }

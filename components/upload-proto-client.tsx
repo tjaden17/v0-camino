@@ -670,7 +670,7 @@ export function UploadProtoClient() {
         tabName: sig.tabName,
       }))
 
-      const res = await fetch("/api/uploadproto/generate", {
+      const res = await fetch("/api/upload/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tabs: tabPayloads, signals }),
