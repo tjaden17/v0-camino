@@ -287,10 +287,10 @@ Key Changes This Week:
 - Partial signal identification: system tells user what data is missing for signals it could compute if more data were uploaded. Example: "Upload deals data to unlock Win Rate and Pipeline Value."
 
 Stories:
-  MSS-18  Signal relevance scoring (role + priorities)
-  MSS-19  Category filter bar on signals page
-  MSS-20  Partial signal identification (what data is missing)
-  MSS-21  Sort signals by relevance score as default
+  MSS-21  Signal relevance scoring (role + priorities)              [US12]
+  MSS-22  Category filter bar on signals page                       [US12]
+  MSS-23  Partial signal identification (what data is missing)      [US13]
+  MSS-24  Sort signals by relevance score as default                [US12]
 
 Exit Criteria:
 - User with role "Head of Support" sees support signals ranked higher than sales signals.

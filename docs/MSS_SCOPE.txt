@@ -250,6 +250,210 @@ Current State:
 
 
 ========================================
+TIER 2 / BACKLOG USER STORIES
+========================================
+
+These stories are NOT required for billing. They increase retention, depth, and
+scalability. Recommended order is based on customer retention risk and value.
+
+
+US10: PERSISTING ORG DATA LAYER (Multi-Upload Accumulation)
+-------------------------------------------------------------
+
+Purpose: The system remembers what data it has seen before for each org. Uploading a
+second file adds to the org's data, it doesn't replace it. Cross-file signals become
+possible.
+
+Acceptance Criteria:
+- org_data_sources table persists metadata per tab: org_id, source_name, data_type,
+  columns (JSON), row_count, date_range_start, date_range_end, last_uploaded_at.
+- On upload, system persists tab metadata. On subsequent uploads, system knows all
+  datasets that exist for the org.
+- Returning upload recognition: when uploading a "Deals" file and the org already has
+  deals data, show "Comparing to previous Deals data..." and compute delta.
+- Cross-file signal discovery: if org has both Leads and Deals data, system can
+  compute lead-to-deal conversion rate.
+- Upload history visible to user: list of past uploads with date, file name, tab count,
+  signal count.
+
+Why Tier 2: Important for retention (users expect their data to accumulate over time)
+but not needed for the first billing gate. First billing gate only requires 3 signals
+from a single upload or API pull.
+
+
+US11: API AUTO-REFRESH (Scheduled Sync)
+-----------------------------------------
+
+Purpose: Once an API integration is connected, data refreshes automatically without
+admin manually triggering a sync each time.
+
+Acceptance Criteria:
+- Admin can configure sync frequency per integration (daily, weekly).
+- System automatically pulls latest data from connected APIs on schedule.
+- New data flows through the generate pipeline, updating existing signals or creating
+  new ones.
+- Admin receives a notification if a sync fails.
+
+Why Tier 2: Manual sync is sufficient for billing. Auto-refresh reduces admin workload
+and makes the product feel "alive" to the customer.
+
+
+US12: SIGNAL RELEVANCE SCORING
+---------------------------------
+
+Purpose: Signals are ranked by what matters to the user, not just by trend strength.
+A Head of Support sees support signals first. A CEO sees revenue signals first.
+
+Acceptance Criteria:
+- Each signal gets a relevance score based on user role, upcoming_priorities, and
+  signal_preferences.
+- Default sort on /signals is by relevance score (not rank or trend).
+- User can still switch to other sorts (trend, category, date).
+- Category filter bar: when multiple data types exist, user can filter by category
+  (sales, support, leads, custom).
+
+Why Tier 2: First billing gate only requires the user can "browse" signals. Relevance
+ranking makes browsing better but isn't blocking billing.
+
+
+US13: PARTIAL SIGNAL IDENTIFICATION (What Data Is Missing)
+------------------------------------------------------------
+
+Purpose: System tells the user what data they're missing and what signals they'd unlock
+by uploading it. Creates a pull mechanism for more data.
+
+Acceptance Criteria:
+- System identifies signals it could compute if additional data were uploaded.
+- UI shows prompts like: "Upload deals data to unlock Win Rate and Pipeline Value."
+- Partial signals are greyed out or shown in a separate "Unlock" section.
+
+Why Tier 2: Drives engagement and data completeness. Not needed for first billing but
+important for retention after Week 3.
+
+
+US14: TREND VISUALISATION (Signal Charts)
+-------------------------------------------
+
+Purpose: User can see how a signal has changed over time via a line chart on the
+signal detail view.
+
+Acceptance Criteria:
+- Signal detail/expanded view shows a line chart of value over time.
+- Requires 4+ data points (weeks/months) to show a meaningful chart.
+- If insufficient data, show a note: "More data needed for trend chart."
+- Chart is interactive (hover to see values).
+
+Why Tier 2: Rich visualisation deepens engagement. First billing gate only needs the
+signal value and trend direction, not a full chart.
+
+
+US15: CROSS-SIGNAL AI REFERENCES
+-----------------------------------
+
+Purpose: AI analysis references other signals in the same org, enabling correlation
+insights (e.g. "Ticket volume up 23%, which correlates with your 3 new hires").
+
+Acceptance Criteria:
+- AI prompt includes a summary of all active signals for the org (not just the one
+  being analysed).
+- AI can identify correlations, causations, or contradictions across signals.
+- Analysis includes a "Related Signals" section.
+
+Why Tier 2: Significantly deepens insight quality. First billing gate only needs
+personalised analysis per signal, not cross-signal correlation.
+
+
+US16: KPI IMPLICATION SECTION IN AI ANALYSIS
+-----------------------------------------------
+
+Purpose: AI connects each signal to the user's stated KPIs, making the "so what"
+immediately actionable.
+
+Acceptance Criteria:
+- AI analysis includes a 6th section: "KPI Impact" connecting the signal to the
+  user's KPIs.
+- Example: "This signal impacts your KPI: Customer Retention."
+- If no KPIs are set, this section is omitted.
+
+Why Tier 2: Adds depth to AI analysis. First billing gate uses 5-section analysis.
+This is an enhancement.
+
+
+US17: ADMIN AI REVIEW PANEL
+------------------------------
+
+Purpose: Admin can QA all AI-generated interpretations before users see them.
+
+Acceptance Criteria:
+- Admin panel shows all AI interpretations with status: pending review, approved,
+  edited.
+- Admin can approve, edit text, or regenerate an interpretation.
+- Optionally: only approved interpretations are shown to users (gating).
+
+Why Tier 2: Quality control. During MSS, admin can eyeball the AI output. A formal
+review panel is a safety net for when there are multiple customers.
+
+
+US18: PROGRESSIVE CONTEXT (Refine Preferences Over Time)
+-----------------------------------------------------------
+
+Purpose: Each session, the system asks one new question to refine understanding of
+what the user cares about. Reduces onboarding burden over time.
+
+Acceptance Criteria:
+- System tracks which questions have been asked.
+- After login, shows one contextual question: "Last week you looked at ticket data
+  most. Would you like support signals prioritised?"
+- User answer updates their signal_preferences.
+
+Why Tier 2: Engagement mechanic. First billing gate uses admin-set preferences. This
+self-service refinement is a retention feature.
+
+
+US19: UPLOAD REMINDERS
+------------------------
+
+Purpose: Nudge users to upload fresh data if no new data has arrived in 7+ days.
+
+Acceptance Criteria:
+- System tracks last upload date per org.
+- If 7+ days since last upload and no API integration is connected, show in-app
+  nudge: "Your data is 7 days old. Upload fresh data for updated signals."
+- Admin receives a notification if a customer's data is stale.
+
+Why Tier 2: Retention mechanic. Not needed for billing gate.
+
+
+US20: ADMIN QUALITY DASHBOARD
+--------------------------------
+
+Purpose: Admin has visibility into the health of each customer account.
+
+Acceptance Criteria:
+- Dashboard shows per org: signal count, AI interpretation count, user engagement
+  (last login, signals viewed), data freshness (last upload date).
+- Red/amber/green status indicators for data freshness and engagement.
+
+Why Tier 2: Operational tooling. Admin can manage without it during MSS but it becomes
+essential with 2+ customers.
+
+
+US21: ONBOARDING RUNBOOK
+---------------------------
+
+Purpose: Step-by-step document for onboarding a second customer without re-engineering.
+
+Acceptance Criteria:
+- Written document covering: discovery call template, data onboarding steps, admin
+  setup checklist, signal verification checklist, API integration setup, go-live
+  checklist.
+- Tested by onboarding a second customer.
+
+Why Tier 2: Scalability. First customer is hands-on. Second customer proves the
+process works.
+
+
+========================================
 KEY CHANGES TO MAKE
 ========================================
 
