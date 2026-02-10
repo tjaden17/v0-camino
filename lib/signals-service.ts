@@ -69,14 +69,19 @@ export async function getSignals(organizationId?: string | null): Promise<Signal
       return []
     }
 
+    // Normalize trend for UI: DB may store 'up'|'down'|'stable' or 'increasing'|'decreasing'|'stable'
+    const trendForUI = (t: string | null | undefined): string =>
+      t === "up" ? "increasing" : t === "down" ? "decreasing" : (t || "stable")
+
     // For now, return signals with basic data structure
     // Data points will be fetched separately if needed
     const signalsWithData: SignalWithData[] = signals.map((signal) => {
       // Parse absolute_value as the latest value
       const latestValue = signal.absolute_value ? parseFloat(signal.absolute_value) : null
-      
+
       return {
         ...signal,
+        trend: trendForUI(signal.trend),
         latest_value: latestValue,
         previous_value: null,
         change: null,
@@ -105,9 +110,12 @@ export async function getSignalById(signalId: string): Promise<SignalWithData | 
 
     const signal = signals[0] as Signal
     const latestValue = signal.absolute_value ? parseFloat(signal.absolute_value) : null
+    const trendForUI = (t: string | null | undefined): string =>
+      t === "up" ? "increasing" : t === "down" ? "decreasing" : (t || "stable")
 
     return {
       ...signal,
+      trend: trendForUI(signal.trend),
       latest_value: latestValue,
       previous_value: null,
       change: null,

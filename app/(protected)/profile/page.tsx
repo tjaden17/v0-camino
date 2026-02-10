@@ -15,6 +15,7 @@ import { type SubIssue, type Issue, issueTreeData } from "@/lib/issue-tree-data"
 import { demoProfiles } from "@/lib/demo-profiles"
 import { enableDemoMode, exitDemoMode, isDemoModeActive, getActiveDemoProfileId } from "@/lib/demo-mode"
 import { ChangePasswordModal } from "@/components/change-password-modal"
+import { useToast } from "@/hooks/use-toast"
 import { getKPIsForRole } from "@/lib/kpi-templates"
 import {
   createOrganization,
@@ -76,6 +77,9 @@ export default function ProfilePage() {
   const [orgMembers, setOrgMembers] = useState<any[]>([])
   const [userOrgRole, setUserOrgRole] = useState<string | null>(null)
   const [organizationName, setOrganizationName] = useState<string | null>(null)
+  const { toast } = useToast()
+  /** Signal names (and categories) from uploaded data – "what the data has" for KPI suggestions */
+  const [signalNamesFromData, setSignalNamesFromData] = useState<string[]>([])
 
   useEffect(() => {
     async function loadProfile() {
@@ -99,33 +103,55 @@ export default function ProfilePage() {
         }
       }
 
+      // Load from Neon first (source of truth for KPIs, role, full_name – used by Signals page)
+      const neonRes = await fetch("/api/user/profile")
+      if (neonRes.ok) {
+        const { profile: neonProfile } = await neonRes.json()
+        if (neonProfile) {
+          setProfile((prev) => ({
+            ...prev,
+            role: neonProfile.role || prev.role,
+            full_name: neonProfile.full_name || prev.full_name,
+            kpi_1: neonProfile.kpi_1 || "",
+            kpi_2: neonProfile.kpi_2 || "",
+            kpi_3: neonProfile.kpi_3 || "",
+            organization_id: neonProfile.organization_id ?? prev.organization_id,
+          }))
+          if (neonProfile.role) {
+            setAvailableKPIs(getKPIsForRole(neonProfile.role))
+          }
+          if (neonProfile.organization_id) {
+            loadOrganizationMembers(neonProfile.organization_id, user.id)
+          }
+        }
+      }
+
+      // Merge in Supabase profile if present (extra fields: organization name, industry, etc.)
       const { data: profileData, error } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
       if (profileData && !error) {
-        setProfile({
-          organization: profileData.organization || "",
-          industry: profileData.industry || "",
-          role: profileData.role || "",
-          business_context: profileData.business_context || "",
-          full_name: profileData.full_name || "",
-          company_stage: profileData.company_stage || "",
-          team_size: profileData.team_size || "",
-          market: profileData.market || "",
-          competitors: profileData.competitors || "",
-          business_model: profileData.business_model || "",
-          kpi_1: profileData.kpi_1 || "",
-          kpi_2: profileData.kpi_2 || "",
-          kpi_3: profileData.kpi_3 || "",
-          organization_id: profileData.organization_id || null,
-        })
-
+        setProfile((prev) => ({
+          ...prev,
+          organization: profileData.organization || prev.organization,
+          industry: profileData.industry || prev.industry,
+          role: profileData.role || prev.role,
+          business_context: profileData.business_context || prev.business_context,
+          full_name: profileData.full_name || prev.full_name,
+          company_stage: profileData.company_stage || prev.company_stage,
+          team_size: profileData.team_size || prev.team_size,
+          market: profileData.market || prev.market,
+          competitors: profileData.competitors || prev.competitors,
+          business_model: profileData.business_model || prev.business_model,
+          kpi_1: profileData.kpi_1 ?? prev.kpi_1,
+          kpi_2: profileData.kpi_2 ?? prev.kpi_2,
+          kpi_3: profileData.kpi_3 ?? prev.kpi_3,
+          organization_id: profileData.organization_id ?? prev.organization_id,
+        }))
         if (profileData.role) {
           setAvailableKPIs(getKPIsForRole(profileData.role))
         }
-
         if (profileData.organization_id) {
           loadOrganizationMembers(profileData.organization_id, user.id)
-          // Fetch organization name
           const { data: orgData } = await supabase
             .from("organizations")
             .select("name")
@@ -143,6 +169,28 @@ export default function ProfilePage() {
     const issues = getAllIssuesFromTree()
     setAllAvailableIssues(issues)
   }, [router, supabase])
+
+  // Load "what the data has" (signal names in this org) for KPI suggestions
+  useEffect(() => {
+    if (!profile.organization_id) {
+      setSignalNamesFromData([])
+      return
+    }
+    let cancelled = false
+    fetch("/api/signals/names")
+      .then((res) => (res.ok ? res.json() : { names: [], categories: [] }))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data.names)) {
+          const names = [...(data.names || [])]
+          if (Array.isArray(data.categories)) names.push(...(data.categories || []))
+          setSignalNamesFromData([...new Set(names)])
+        }
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [profile.organization_id])
 
   async function loadOrganizationMembers(orgId: string, currentUserId: string) {
     try {
@@ -163,6 +211,30 @@ export default function ProfilePage() {
 
     setIsSaving(true)
     try {
+      // Save to Neon first (source of truth for KPIs – used by Signals page for prioritisation)
+      const patchRes = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kpi_1: profile.kpi_1 || null,
+          kpi_2: profile.kpi_2 || null,
+          kpi_3: profile.kpi_3 || null,
+          full_name: profile.full_name || null,
+          role: profile.role || null,
+        }),
+      })
+
+      if (!patchRes.ok) {
+        const err = await patchRes.json().catch(() => ({}))
+        toast({
+          title: "Could not save profile",
+          description: err?.error ?? "Please try again.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Optionally sync to Supabase for backwards compatibility (don't block on it)
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -182,17 +254,26 @@ export default function ProfilePage() {
         })
         .eq("id", userId)
 
-      if (error) throw error
+      if (error) {
+        console.error("[v0] Supabase profile update failed (Neon save succeeded):", error)
+      }
+
+      toast({ title: "Profile saved", description: "Your KPIs and details are saved. Prioritised signals will update on the Signals page." })
       setIsEditing(false)
     } catch (error) {
       console.error("[v0] Error saving profile:", error)
+      toast({
+        title: "Could not save profile",
+        description: error instanceof Error ? error.message : "Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsSaving(false)
     }
   }
 
   const handleRoleChange = (newRole: string) => {
-    setProfile({ ...profile, role: newRole, kpi_1: "", kpi_2: "", kpi_3: "" })
+    setProfile({ ...profile, role: newRole })
     setAvailableKPIs(getKPIsForRole(newRole))
   }
 
@@ -532,75 +613,43 @@ const org = await createOrganization(newOrgName, userId)
           <div className="p-5 space-y-4">
             <h2 className="text-base font-semibold">Your KPIs</h2>
             <p className="text-sm text-muted-foreground">
-              Select up to 3 key performance indicators to track. KPIs are filtered based on your role.
+              Choose up to 3 metrics that matter most to you. Type your own (e.g. monthly pipeline value, win rate, CSAT) or pick from suggestions. Matching signals will be prioritised on the Signals page.
             </p>
+            {signalNamesFromData.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                In your data: {signalNamesFromData.slice(0, 12).join(", ")}
+                {signalNamesFromData.length > 12 ? ` +${signalNamesFromData.length - 12} more` : ""}
+              </p>
+            )}
 
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="kpi1">KPI 1</Label>
-                <Select
-                  value={profile.kpi_1}
-                  onValueChange={(value) => setProfile({ ...profile, kpi_1: value })}
-                  disabled={!isEditing || availableKPIs.length === 0}
-                >
-                  <SelectTrigger id="kpi1">
-                    <SelectValue placeholder="Select KPI" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableKPIs.map((kpi) => (
-                      <SelectItem key={kpi.value} value={kpi.value}>
-                        {kpi.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="kpi2">KPI 2</Label>
-                <Select
-                  value={profile.kpi_2}
-                  onValueChange={(value) => setProfile({ ...profile, kpi_2: value })}
-                  disabled={!isEditing || availableKPIs.length === 0}
-                >
-                  <SelectTrigger id="kpi2">
-                    <SelectValue placeholder="Select KPI" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableKPIs.map((kpi) => (
-                      <SelectItem key={kpi.value} value={kpi.value}>
-                        {kpi.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="kpi3">KPI 3</Label>
-                <Select
-                  value={profile.kpi_3}
-                  onValueChange={(value) => setProfile({ ...profile, kpi_3: value })}
-                  disabled={!isEditing || availableKPIs.length === 0}
-                >
-                  <SelectTrigger id="kpi3">
-                    <SelectValue placeholder="Select KPI" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableKPIs.map((kpi) => (
-                      <SelectItem key={kpi.value} value={kpi.value}>
-                        {kpi.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {!profile.role && (
-                <p className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-                  Please select your role above to see relevant KPIs.
-                </p>
-              )}
+              {[
+                { key: "kpi_1" as const, id: "kpi1", label: "KPI 1" },
+                { key: "kpi_2" as const, id: "kpi2", label: "KPI 2" },
+                { key: "kpi_3" as const, id: "kpi3", label: "KPI 3" },
+              ].map(({ key, id, label }) => {
+                const roleLabels = availableKPIs.map((k) => k.label)
+                const suggestions = [...new Set([...signalNamesFromData, ...roleLabels])].filter(Boolean).sort((a, b) => a.localeCompare(b))
+                return (
+                  <div key={key} className="space-y-2">
+                    <Label htmlFor={id}>{label}</Label>
+                    <Input
+                      id={id}
+                      list={`kpi-datalist-${id}`}
+                      value={profile[key]}
+                      onChange={(e) => setProfile({ ...profile, [key]: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder="e.g. Win rate, Pipeline value, CSAT"
+                      className="bg-background"
+                    />
+                    <datalist id={`kpi-datalist-${id}`}>
+                      {suggestions.map((s) => (
+                        <option key={s} value={s} />
+                      ))}
+                    </datalist>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </Card>

@@ -1,6 +1,6 @@
 "use client"
 
-import { TrendingUp, Target, User, Upload } from "lucide-react"
+import { TrendingUp, Target, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -37,19 +37,6 @@ export function BottomNav() {
             >
               <TrendingUp className="h-5 w-5" />
               <span className="text-xs">Signals</span>
-            </Button>
-          </Link>
-          <Link href="/upload">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "flex flex-col items-center gap-1 h-auto py-2",
-                pathname.startsWith("/upload") && "text-primary",
-              )}
-            >
-              <Upload className="h-5 w-5" />
-              <span className="text-xs">Upload</span>
             </Button>
           </Link>
           <Link href="/profile">
