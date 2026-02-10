@@ -597,6 +597,8 @@ export async function POST(request: NextRequest) {
         const trendValue = calculated.trendPercentage !== null 
           ? `${calculated.trendPercentage > 0 ? '+' : ''}${calculated.trendPercentage}%`
           : `${calculated.dataPoints} data points`
+        // DB constraint signals_trend_check allows only ('increasing', 'decreasing', 'stable')
+        const dbTrend = calculated.trend === 'up' ? 'increasing' : calculated.trend === 'down' ? 'decreasing' : 'stable'
         
         // Build summary with calculation metadata (including tab info)
         const tabInfo = calculated.metadata.tabName ? ` from "${calculated.metadata.tabName}" tab` : ''
@@ -613,7 +615,7 @@ export async function POST(request: NextRequest) {
             ${signalDef.category}, 
             ${organizationId}, 
             ${calculated.formattedValue}, 
-            ${calculated.trend}, 
+            ${dbTrend}, 
             ${trendValue}, 
             'upload', 
             ${summaryText},

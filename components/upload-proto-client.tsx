@@ -89,8 +89,11 @@ const ROW_TYPE_OPTIONS: { value: RowType; label: string; description: string; ic
 // Helpers
 // ============================================
 
-function detectColumnType(values: string[]): "text" | "number" | "date" | "id" {
-  const sample = values.filter(v => v && v.trim() !== "").slice(0, 20)
+/** Column names that typically hold a numeric value to sum/average (deal amount, revenue, etc.) */
+const VALUE_LIKE_COLUMN_PATTERN = /amount|value|revenue|deal|price|total|sum|quantity|mrr|arr|acv|tcv/i
+
+function detectColumnType(values: string[], columnName?: string): "text" | "number" | "date" | "id" {
+  const sample = values.filter(v => v && v.trim() !== "").slice(0, 30)
   if (sample.length === 0) return "text"
 
   const datePatterns = [
@@ -102,10 +105,13 @@ function detectColumnType(values: string[]): "text" | "number" | "date" | "id" {
   if (dateCount > sample.length * 0.6) return "date"
 
   const numCount = sample.filter(v => {
-    const cleaned = v.replace(/[$,\s%]/g, "")
-    return !isNaN(Number(cleaned)) && cleaned !== ""
+    const cleaned = v.replace(/[$,\s%]/g, "").trim()
+    return cleaned !== "" && !isNaN(Number(cleaned))
   }).length
-  if (numCount > sample.length * 0.7) {
+  const numericRatio = numCount / sample.length
+  // Use lower threshold (50%) for columns named like amount/value/revenue so we don't miss them
+  const numberThreshold = columnName && VALUE_LIKE_COLUMN_PATTERN.test(columnName) ? 0.5 : 0.7
+  if (numericRatio >= numberThreshold) {
     const allInts = sample.every(v => {
       const n = Number(v.replace(/[$,\s%]/g, ""))
       return Number.isInteger(n)
@@ -340,20 +346,25 @@ function TabQuestionnaire({
 
       {isActive && (
         <CardContent className="px-4 pb-4 pt-0 border-t border-border">
-          <div className="flex flex-wrap gap-1.5 py-3 mb-3 border-b border-border">
-            {tab.columns.slice(0, 12).map(col => (
-              <Badge key={col} variant="outline" className="text-[10px] font-mono gap-1">
-                {tab.columnTypes[col] === "number" && <Hash className="h-2.5 w-2.5" />}
-                {tab.columnTypes[col] === "date" && <Calendar className="h-2.5 w-2.5" />}
-                {tab.columnTypes[col] === "id" && <Hash className="h-2.5 w-2.5 text-muted-foreground" />}
-                {col}
-              </Badge>
-            ))}
-            {tab.columns.length > 12 && (
-              <Badge variant="outline" className="text-[10px] text-muted-foreground">
-                +{tab.columns.length - 12} more
-              </Badge>
-            )}
+          <div className="py-3 mb-3 border-b border-border">
+            <div className="flex flex-wrap gap-1.5">
+              {tab.columns.slice(0, 12).map(col => (
+                <Badge key={col} variant="outline" className="text-[10px] font-mono gap-1">
+                  {tab.columnTypes[col] === "number" && <Hash className="h-2.5 w-2.5" />}
+                  {tab.columnTypes[col] === "date" && <Calendar className="h-2.5 w-2.5" />}
+                  {tab.columnTypes[col] === "id" && <Hash className="h-2.5 w-2.5 text-muted-foreground" />}
+                  {col}
+                </Badge>
+              ))}
+              {tab.columns.length > 12 && (
+                <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                  +{tab.columns.length - 12} more
+                </Badge>
+              )}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              Columns: number = value to sum/average · date = for trends · text = for grouping (e.g. owner, stage).
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -420,6 +431,7 @@ function TabQuestionnaire({
                         <span className="flex items-center gap-2">
                           <BarChart3 className="h-3 w-3 text-primary" />
                           {col}
+                          <span className="text-[10px] text-muted-foreground font-normal">(number)</span>
                         </span>
                       </SelectItem>
                     ))}
@@ -428,7 +440,7 @@ function TabQuestionnaire({
                 <p className="text-[11px] text-muted-foreground mt-1">
                   {numericCols.length === 0
                     ? "No numeric columns found - signals will count rows."
-                    : `${numericCols.length} numeric column${numericCols.length > 1 ? "s" : ""} available.`}
+                    : "The value to sum or average (e.g. deal amount, revenue). Other columns (owner, stage, date) are used to group or filter."}
                 </p>
               </div>
             )}
@@ -532,8 +544,8 @@ export function UploadProtoClient() {
         const columns = Object.keys(json[0])
         const columnTypes: Record<string, "text" | "number" | "date" | "id"> = {}
         for (const col of columns) {
-          const values = json.slice(0, 30).map(r => String(r[col] || ""))
-          columnTypes[col] = detectColumnType(values)
+          const values = json.slice(0, 30).map(r => String(r[col] ?? ""))
+          columnTypes[col] = detectColumnType(values, col)
         }
 
         // Tab name: for CSVs with generic "Sheet1", use filename instead

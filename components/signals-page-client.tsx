@@ -25,6 +25,7 @@ import {
   Layers, 
   ChevronRight,
   Settings2,
+  Upload,
 } from "lucide-react"
 import type { SignalWithData } from "@/lib/signals-service"
 import type { SignalInterpretation } from "@/lib/interpretation-service"
@@ -299,6 +300,12 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
     <div className="container max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
       <h1 className="text-xl font-bold text-primary-foreground">Signals</h1>
       <div className="flex items-center gap-1">
+        <Link href="/upload">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10" title="Upload Data">
+            <Upload className="h-4 w-4" />
+            <span className="sr-only">Upload Data</span>
+          </Button>
+        </Link>
         <Link href="/signals/admin">
           <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
             <Settings2 className="h-4 w-4" />
