@@ -248,24 +248,25 @@ Exit Criteria:
 Demo: Friday 21 Feb. Show personalised AI analysis + Zoho integration. Close billing agreement.
 
 
-WEEK 3: MULTI-FILE DATA LAYER
--------------------------------
+WEEK 3: MULTI-FILE DATA LAYER + API AUTO-REFRESH  (Tier 2 starts)
+-------------------------------------------------------------------
 Dates: 24 Feb - 2 Mar 2026
-Goal: Org data persists across uploads. Returning uploads compare to previous data.
-Delivers: US3 (complete), US4 (enhanced)
+Goal: Org data persists across uploads. Returning uploads compare to previous data. API refreshes automatically.
+Delivers: US10, US11
 
 Key Changes This Week:
 - Create org_data_sources table: org_id, source_name, data_type, columns (JSON), row_count, date_range_start, date_range_end, last_uploaded_at. This stores what data the system knows about for each org.
 - On upload, persist tab metadata to org_data_sources. On subsequent uploads, the system knows both datasets exist and can compute cross-file signals (e.g. lead-to-deal conversion rate from Leads + Deals files).
 - Returning upload recognition: when a user uploads a "Deals" file and the org already has deals data, show "Comparing to previous Deals data..." and compute delta.
 - Upload history visible to user (list of past uploads with date, file name, tab count, signal count).
+- API auto-refresh: admin can configure sync frequency per Zoho integration. System pulls data on schedule.
 
 Stories:
-  MSS-16  Create org_data_sources table and persist tab metadata
-  MSS-17  Returning upload recognition and delta comparison
-  MSS-18  Upload history page for user and admin
-  MSS-19  Cross-file signal discovery (e.g. lead-to-deal conversion)
-  MSS-20  API auto-refresh (scheduled Zoho sync, not just manual trigger)
+  MSS-16  Create org_data_sources table and persist tab metadata     [US10]
+  MSS-17  Returning upload recognition and delta comparison          [US10]
+  MSS-18  Upload history page for user and admin                     [US10]
+  MSS-19  Cross-file signal discovery (e.g. lead-to-deal conversion) [US10]
+  MSS-20  API auto-refresh (scheduled Zoho sync)                     [US11]
 
 Exit Criteria:
 - Upload Deals CSV, then Leads CSV for same org. System shows signals from both.
@@ -303,7 +304,7 @@ WEEK 5: ANALYSIS DEPTH
 ------------------------
 Dates: 10 Mar - 16 Mar 2026
 Goal: Richer analysis per signal. Trend charts. Cross-signal references. Admin QA.
-Delivers: US5 (enhanced), US6 (enhanced)
+Delivers: US14, US15, US16, US17
 
 Key Changes This Week:
 - Trend visualisation: line chart on signal detail view showing value over time. Requires 4+ weeks of data points. If insufficient data, show a note instead of a chart.
@@ -312,10 +313,10 @@ Key Changes This Week:
 - Admin AI review panel: admin can view all AI interpretations, approve, edit text, or regenerate.
 
 Stories:
-  MSS-22  Trend visualisation on signal detail (line chart)
-  MSS-23  KPI implication section in AI analysis
-  MSS-24  Cross-signal references in AI prompt
-  MSS-25  Admin AI review panel (approve, edit, regenerate)
+  MSS-25  Trend visualisation on signal detail (line chart)          [US14]
+  MSS-26  KPI implication section in AI analysis                     [US16]
+  MSS-27  Cross-signal references in AI prompt                       [US15]
+  MSS-28  Admin AI review panel (approve, edit, regenerate)          [US17]
 
 Exit Criteria:
 - Signal detail shows a trend chart with 4+ weeks of data points.
@@ -330,7 +331,7 @@ WEEK 6: RETENTION AND POLISH
 ------------------------------
 Dates: 17 Mar - 23 Mar 2026
 Goal: The experience is polished. Customer is retained. Ready for second customer.
-Delivers: All user stories polished
+Delivers: US18, US19, US20, US21
 
 Key Changes This Week:
 - Progressive context: each session, system asks one new question to refine user preferences. Example: "Last week you looked at ticket data most. Would you like support signals prioritised?"
@@ -340,11 +341,11 @@ Key Changes This Week:
 - Onboarding runbook: step-by-step document for onboarding a second customer without re-engineering.
 
 Stories:
-  MSS-26  Progressive context (one question per session)
-  MSS-27  Upload reminder nudge (7 days without upload)
-  MSS-28  Admin quality dashboard
-  MSS-29  Full QA pass on all signals and AI for first customer
-  MSS-30  Onboarding runbook for second customer
+  MSS-29  Progressive context (one question per session)             [US18]
+  MSS-30  Upload reminder nudge (7 days without upload)              [US19]
+  MSS-31  Admin quality dashboard                                    [US20]
+  MSS-32  Full QA pass on all signals and AI for first customer
+  MSS-33  Onboarding runbook for second customer                     [US21]
 
 Exit Criteria:
 - Customer has been using the app for 4+ weeks. Signals are accurate. AI is relevant.
@@ -427,3 +428,131 @@ DECISIONS LOG
   Rationale: Previous billing gate was informal. New version has 8 explicit criteria aligned to
   the customer agreement draft. Key additions: API integration as a data source, data onboarding
   as an admin workflow, AI personalisation to org KPIs (not just user).
+
+11 Feb 2026 - Added Tier 2/Backlog user stories (US10-US21) and recommended roadmap
+  Rationale: Tier 2 captures post-billing features that drive retention, depth, and scalability.
+  Roadmap recommends sequence based on retention risk, value, and dependencies.
+
+
+========================================
+TIER 2 / BACKLOG USER STORY MAP
+========================================
+
+Stories are referenced inline in Weeks 3-6 above. Summary for traceability:
+
+ID    | Story                              | Week | MSS Stories   | Priority
+------|--------------------------------------|------|---------------|----------
+US10  | Persisting Org Data Layer            | 3    | MSS-16 to 19  | High (retention)
+US11  | API Auto-Refresh                     | 3    | MSS-20        | High (UX)
+US12  | Signal Relevance Scoring             | 4    | MSS-21,22,24  | Medium (UX)
+US13  | Partial Signal Identification        | 4    | MSS-23        | Medium (engagement)
+US14  | Trend Visualisation (Charts)         | 5    | MSS-25        | Medium (depth)
+US15  | Cross-Signal AI References           | 5    | MSS-27        | Medium (insight quality)
+US16  | KPI Implication in AI Analysis       | 5    | MSS-26        | Medium (personalisation)
+US17  | Admin AI Review Panel                | 5    | MSS-28        | Medium (quality control)
+US18  | Progressive Context                  | 6    | MSS-29        | Low (engagement)
+US19  | Upload Reminders                     | 6    | MSS-30        | Low (retention nudge)
+US20  | Admin Quality Dashboard              | 6    | MSS-31        | Low (ops tooling)
+US21  | Onboarding Runbook                   | 6    | MSS-33        | Low (scalability)
+
+
+========================================
+RECOMMENDED ROADMAP
+========================================
+
+Sequence is based on: retention risk (losing the paying customer), user value
+(features they'd notice), and technical dependencies (what enables what).
+
+
+PHASE 1: BILLING GATE (Weeks 1-2) -- "Get Paid"
+-------------------------------------------------
+Tier: 1 (all 8 billing criteria)
+User stories: US1-US9
+Goal: Customer agrees to pay.
+Why this order: Nothing else matters until the customer is paying.
+
+  Week 1: Accurate signals from upload (3-question flow, field aliases, generate pipeline)
+  Week 2: Personalised AI + admin ops + API integration (Zoho)
+
+
+PHASE 2: DATA DEPTH (Week 3) -- "Make It Sticky"
+--------------------------------------------------
+Tier: 2
+User stories: US10, US11
+Goal: Data accumulates. API auto-refreshes. Customer sees increasing value over time.
+Why this order: Highest retention risk. If the customer uploads once and sees the
+same signals forever, they'll churn. Accumulating data and auto-refresh make the
+product feel alive. Also a technical prerequisite for US12-US15 (relevance scoring
+and cross-signal analysis need multiple data sources to work).
+
+  Week 3: Org data layer + returning upload recognition + API auto-refresh
+
+
+PHASE 3: SIGNAL INTELLIGENCE (Week 4) -- "Show What Matters"
+--------------------------------------------------------------
+Tier: 2
+User stories: US12, US13
+Goal: Signals are ranked by relevance to the user. System tells users what data is missing.
+Why this order: With multiple data sources from Phase 2, the signals list grows.
+Relevance scoring prevents information overload. Partial signal identification
+creates a pull mechanism for more data (self-reinforcing loop). Depends on US10
+(needs multiple data sources to rank across).
+
+  Week 4: Relevance scoring + category filters + partial signal prompts
+
+
+PHASE 4: ANALYSIS DEPTH (Week 5) -- "Deepen Insight"
+------------------------------------------------------
+Tier: 2
+User stories: US14, US15, US16, US17
+Goal: Richer, more connected analysis. Trend charts. Cross-signal AI. Admin QA.
+Why this order: By Week 5, there's 4+ weeks of signal history -- enough data points
+for meaningful trend charts (US14). Cross-signal references (US15) need multiple
+signal types from Phase 2-3. KPI implication (US16) builds on the user context
+from Tier 1. Admin AI review (US17) is a quality gate before scaling to customer 2.
+
+  Week 5: Trend charts + KPI section + cross-signal AI + admin review panel
+
+
+PHASE 5: RETENTION + SCALE (Week 6) -- "Ready for Customer 2"
+---------------------------------------------------------------
+Tier: 2
+User stories: US18, US19, US20, US21
+Goal: Product retains customer 1 on autopilot. Process is documented for customer 2.
+Why this order: These are polish and scalability features. Progressive context (US18)
+and upload reminders (US19) reduce admin workload. Quality dashboard (US20) gives
+admin visibility. Onboarding runbook (US21) codifies everything learned from
+customer 1 so customer 2 doesn't require re-engineering.
+
+  Week 6: Progressive context + upload reminders + admin dashboard + runbook
+
+
+BEYOND WEEK 6: FUTURE BACKLOG (Not Scheduled)
+-----------------------------------------------
+
+These are ideas that have come up but are not in the 6-week plan. They are captured
+here for future prioritisation.
+
+  FB-01  HubSpot API integration (same pattern as Zoho, second tool connector)
+  FB-02  Salesforce API integration (third tool connector)
+  FB-03  Zendesk API integration (fourth tool connector)
+  FB-04  Self-service data onboarding (remove admin from the loop)
+  FB-05  Multi-org admin (admin manages multiple customers from one view)
+  FB-06  User-facing dashboard (not just signal list, but a dashboard with cards)
+  FB-07  Notification system (email/push for new signals or threshold breaches)
+  FB-08  Signal alerting (user sets thresholds, gets notified when breached)
+  FB-09  Data export (user can export signals and analysis to PDF/CSV)
+  FB-10  White-label / custom branding per org
+  FB-11  Billing system integration (Stripe, automated invoicing)
+  FB-12  User self-service profile editing (remove admin dependency)
+  FB-13  Mobile-optimised signal browsing
+  FB-14  Webhook support (push signals to Slack, Teams, etc.)
+
+
+STORY COUNT SUMMARY
+---------------------
+
+Tier 1 (Billing Gate):   US1-US9     | 15 MSS stories (MSS-01 to MSS-15)  | Weeks 1-2
+Tier 2 (Backlog):        US10-US21   | 18 MSS stories (MSS-16 to MSS-33)  | Weeks 3-6
+Future Backlog:          FB-01 to 14 | Not estimated                       | Post Week 6
+Total:                   21 user stories, 33 MSS stories, 14 future ideas
