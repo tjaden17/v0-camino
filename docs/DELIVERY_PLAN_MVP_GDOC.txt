@@ -1,15 +1,16 @@
-CAMINO MVP DELIVERY PLAN
-========================
+CAMINO MSS DELIVERY PLAN
+=========================
 
-Last Updated: 7 February 2026
+Last Updated: 10 Feb 2026
 Sprint Duration: 1 week
 Builder: Solo
-North Star: 1 upload (manager) + 1 view/week (any user)
-Customer Promise: 4-6 weeks from end of December 2025 (Week 6 = 7 Feb 2026)
+Model: Minimum Sellable Service (Admin-in-the-loop)
+North Star: Customer pays after Week 2. Customer retains after Week 6.
+First Customer: Uses Zoho CRM, Zoho Desk, and custom CSV data files.
 
 
 USER PROBLEMS WE'RE SOLVING
-----------------------------
+-----------------------------
 
 1. TOO SLOW
    Current company workflow is too slow to surface valuable information required for action.
@@ -28,462 +29,385 @@ USER PROBLEMS WE'RE SOLVING
    Desired Outcome: Decreased time to produce reports.
 
 
-TIER STRUCTURE
---------------
-
-TIER 1: "START CHARGING" (Sprints 1-2, weeks of 10 Feb - 23 Feb)
-The minimum pipeline: Manager uploads CSV, system stages data, discovers signals, calculates values, AI generates synthesis, exec sees signal cards.
-
-TIER 2: "KEEP DELIVERING VALUE" (Sprints 3-6, weeks of 24 Feb - 23 Mar)
-Progressive discovery, cross-correlation, market synthesis, ranking, status tracking, filters. One new capability per week so the customer always sees progress.
+MSS USER STORIES (SCOPE)
+==========================
 
 
-DEFINITION OF BILLABLE (TIER 1 EXIT CRITERIA)
+US1: COLLECT USER CONTEXT
+--------------------------
+
+As Camino Admin, I collect user context during a discovery call and store it in the system, so that AI analysis is personalised and relevant.
+
+Acceptance Criteria:
+- Admin can input discovery call notes into a user's profile via Admin CP.
+- Admin can update user profile fields at any time via Admin CP.
+- System saves: full_name, role, organization, industry, business_context, upcoming_priorities, signal_preferences, company_stage, team_size, market, competitors.
+- Profile data is used downstream by the AI analysis prompt (US6).
+
+
+US2: USER PROFILE PAGE
+------------------------
+
+As a user, I can see a profile page that reflects what the system knows about me, so I trust it understands my context.
+
+Acceptance Criteria:
+- User sees: Role, What's Upcoming, Signal Preferences, Org Details.
+- Profile is read-only. Only admin can edit.
+
+
+US3: DATA INPUT WITH 3-QUESTION FLOW
+--------------------------------------
+
+As a manager (or admin on behalf of a user), I upload data files and answer 3 questions per tab, so the system correctly understands what was uploaded.
+
+Acceptance Criteria:
+- User can upload one or more CSV/XLSX files.
+- For each tab, system prompts 3 questions:
+  1. What does each row represent? (leads, deals, tickets, customers, events, agents, other)
+  2. Which column is the main metric? (dropdown of numeric columns, or "just count rows")
+  3. Which column is the date? (dropdown of date columns)
+- Admin can upload on behalf of a user (selects org/user first).
+- System normalises fields and stores data in a persisting org data layer.
+- Multiple uploads accumulate, not replace.
+
+
+US4: GENERATE AT LEAST 3 ACCURATE SIGNALS
+-------------------------------------------
+
+As a user, I see at least 3 signals generated from my data, with correct and verifiable values.
+
+Acceptance Criteria:
+- System reads data fields and user answers from US3 to determine which signals to create.
+- Each signal has: name, value, trend direction, percentage change.
+- Every signal shown has an explicit calculation spec (calcSpec). No guessed or heuristic calculations.
+- Signals are saved to the database.
+
+
+US5: SIGNAL CARD AND EXPANDED VIEW
+------------------------------------
+
+As a user, I can see signal info on a compact card and expand it for deeper AI analysis.
+
+Acceptance Criteria:
+- Card shows: category badge, signal name, change value, trend icon.
+- Expanded accordion shows: data details (L2) and AI analysis (L3).
+
+
+US6: AI 5-SECTION ANALYSIS WITH USER CONTEXT
 ----------------------------------------------
+
+As a user, I see AI-generated analysis that is personalised to my role, priorities, and business context.
+
+Acceptance Criteria:
+- AI generates analysis with 5 sections:
+  1. What We Found (factual data)
+  2. What It Means (interpretation)
+  3. So What (business impact)
+  4. Opportunities
+  5. Risks
+- AI prompt includes user context: role, upcoming_priorities, signal_preferences, business_context, org industry, company_stage.
+- Analysis is triggered on upload. Admin can re-trigger manually.
+- Response is cached in signal_interpretations table.
+
+
+US7: BROWSE SIGNALS
+---------------------
+
+As a user, I can scroll through all my signals in a list, with single card focus or stacked view.
+
+Acceptance Criteria:
+- Signal list scrolls vertically with single card focus.
+- Toggle to grouped/stacked view for scanning breadth.
+
+
+US8: ADMIN MANAGES USERS AND ORGS
+-----------------------------------
+
+As Camino Admin, I can create users, create orgs, and assign users to orgs without engineering involvement.
+
+Acceptance Criteria:
+- Admin can create a user (email, name, role, password).
+- Admin can create an organisation.
+- Admin can assign users to organisations.
+- Admin can view what a user sees (view-as-user mode).
+
+
+US9: APP IS DEPLOYED
+---------------------
+
+As a user, I access the app via a production URL, not localhost.
+
+Acceptance Criteria:
+- App deployed on Vercel, accessible at a stable URL.
+- Database running on Supabase + Neon.
+
+
+DEFINITION OF BILLABLE (END OF WEEK 2)
+----------------------------------------
 
 The customer agrees to pay when ALL of these are true:
 
-[ ] Manager can upload a CSV and see it processed within 2 minutes
-[ ] System generates at least 3 signals from the upload
-[ ] Each signal has an AI-generated interpretation with the 5-section analysis
-[ ] Exec can browse signals and read the expanded view
-[ ] Master admin can create users and assign to organisations
-[ ] Analysis is accurate and relevant to the customer's business context
-[ ] App is deployed to production (not localhost)
-[ ] Customer has been demoed and agreed scope is billable
+[ ] Manager can upload a CSV/XLSX and see it processed (US3)
+[ ] System generates at least 3 signals with correct values (US4)
+[ ] Each signal has AI analysis personalised to the user (US6)
+[ ] Exec can browse signals and read expanded view (US5, US7)
+[ ] Admin can create users and upload on their behalf (US8, US3)
+[ ] App is deployed to production (US9)
 
 
-SPRINT PLAN
-============
+RELEASE PLAN (6 WEEKS)
+========================
 
 
-SPRINT 1: END-TO-END PIPELINE
-------------------------------
-Dates: 10 Feb - 16 Feb 2026
-Tier: 1 (Start Charging)
-Status: ACTIVE
-Goal: Full pipeline working - Upload CSV, Stage, Discover signals, Calculate, AI Synthesis, Display card. Demo to customer Friday.
+RELEASE 1: ACCURATE SIGNALS (End of Week 1)
+---------------------------------------------
 
-Stories:
-  T1-DI-1  Manager Uploads CSV/XLSX         Manager   Critical    In Progress
-  T1-DI-2  System Stages Data               System    Critical    In Progress
-  T1-DI-3  System Discovers Signals          System    Critical    In Progress
-  T1-SC-1  Calculate Signal Values           System    Critical    In Progress
-  T1-SC-2  Detect Trends Over Time           System    High        In Progress
-  T1-SY-1  AI Generates 5-Section Analysis   System    Critical    In Progress
-  T1-PR-1  Signal List Display               All       Critical    In Progress
-  T1-PR-2  Expanded Signal Card View         All       Critical    In Progress
+Goal: The core pipeline works correctly. Upload a file, answer 3 questions, get accurate signals. No guessing.
+
+What ships:
+- 3-question upload flow replaces old discovery flow (US3)
+- Signal definitions cut to ~20 core, all with calcSpecs (US4)
+- Legacy heuristic calculation path removed (US4)
+- Signal card displays correct values (US5)
+- App deployed (US9)
+
+Hypothesis to test: With user-clarified data and explicit calcSpecs, every signal value is correct and verifiable.
 
 
-SPRINT 2: POLISH + ADMIN + SHIP
----------------------------------
-Dates: 17 Feb - 23 Feb 2026
-Tier: 1 (Start Charging)
-Status: Planning
-Goal: AI interpretation quality, master admin user management, exec browse experience, deploy to production, start billing.
+RELEASE 2: BILLING-READY (End of Week 2)
+------------------------------------------
 
-Stories:
-  T1-SY-2  KPI Implication (Section 6)               System    High        Not Started
-  T1-PR-3  Exec Browse Experience                     Executive High        Not Started
-  T1-PR-4  Manager Sees Signals After Upload          Manager   High        Not Started
-  T1-AD-1  Create User Profiles & Passwords           Admin     High        In Progress
-  T1-AD-2  See User's Signal View                     Admin     High        Not Started
-  T1-AD-3  See User & Org Context                     Admin     Medium      Not Started
-  T1-UP-1  User Sign Up & Sign In                     All       Critical    Done
-  T1-UP-2  User Context (Lite Discovery)              All       High        In Progress
+Goal: AI analysis is personalised. Admin can operate. Customer agrees to pay.
 
+What ships:
+- User context fields added to profiles table (US1)
+- Admin CP form to input discovery notes into user profile (US1)
+- User context injected into AI prompt (US6)
+- AI analysis triggered on upload (US6)
+- Profile page shows upcoming priorities and signal preferences, read-only (US2)
+- Admin create user, create org, assign user to org confirmed working (US8)
+- Admin upload-on-behalf-of-user (US3)
 
-SPRINT 3: WEEKLY UPLOADS + STATUS
------------------------------------
-Dates: 24 Feb - 2 Mar 2026
-Tier: 2 (Keep Delivering)
-Status: Planning
-Goal: Returning upload recognition, upload status tracking, upload history.
-
-Stories:
-  T2-DI-1  Weekly Returning Upload                    Manager   High        Not Started
-  T2-DI-2  Upload Status Tracking                     All       Medium      Not Started
-  T2-PR-1  Upload Status View for All Users           All       Medium      Not Started
+Hypothesis to test: Personalised AI analysis is the reason the customer agrees to pay. Generic analysis is not enough.
 
 
-SPRINT 4: PROGRESSIVE DISCOVERY + RANKING
+RELEASE 3: MULTI-FILE AND RETURNING UPLOADS (End of Week 3)
+-------------------------------------------------------------
+
+Goal: Org data layer persists across uploads. Returning uploads compare to previous.
+
+What ships:
+- Org data layer persists across multiple file uploads (US3)
+- Returning upload recognition ("Comparing to previous...") (US3)
+- Upload history visible to user and admin
+- Cross-file signal discovery (e.g. conversion rate from Leads + Deals files)
+
+Hypothesis to test: Accumulating data over time makes signals more valuable. Cross-file signals are a surprise-and-delight moment.
+
+
+RELEASE 4: SIGNAL RELEVANCE (End of Week 4)
+---------------------------------------------
+
+Goal: Signals are ranked by what matters to the user. Filters help explore.
+
+What ships:
+- Signal ranking by user relevance (using role, upcoming_priorities, signal_preferences)
+- Category filters on signals page (user, market, tech, business - when data types expand)
+- Partial signal identification (system tells user what data is missing for signals it cannot compute)
+
+Hypothesis to test: Ranking signals by relevance reduces overwhelm. Users engage more when top signals match their priorities.
+
+
+RELEASE 5: ANALYSIS DEPTH (End of Week 5)
 -------------------------------------------
-Dates: 3 Mar - 9 Mar 2026
-Tier: 2 (Keep Delivering)
-Status: Planning
-Goal: Progressive user context, signal ranking by user relevance, category filters.
 
-Stories:
-  T2-UC-1  Progressive Discovery                     All       Medium      Not Started
-  T2-SC-1  Rank Signals by User Relevance             System    Medium      Not Started
-  T2-PR-2  Filter Signals by Category                 All       Medium      Not Started
-  T2-DI-3  Partial Signal Identification              System    Medium      Not Started
+Goal: Deeper analysis per signal. Trend visualisations. Benchmark framing.
 
+What ships:
+- Trend visualisation on signal detail (4+ weeks of data required)
+- Section 6: KPI implication (how does this signal affect the user's stated KPIs)
+- AI analysis references other signals for cross-correlation ("Ticket volume up 23%, which correlates with your 3 new hires")
+- Admin AI review panel (approve, edit, regenerate interpretations)
 
-SPRINT 5: CROSS-CORRELATION + DEPTH
---------------------------------------
-Dates: 10 Mar - 16 Mar 2026
-Tier: 2 (Keep Delivering)
-Status: Planning
-Goal: Cross-signal pattern detection, multi-source signal discovery, signal detail depth.
+Hypothesis to test: Cross-signal references and KPI framing make the analysis substantially more valuable than single-signal commentary.
 
-Stories:
-  T2-SC-2  Cross-Correlation Pattern Detection        System    Medium      Not Started
-  T2-SC-3  Multi-Source Signal Discovery              System    Medium      Not Started
-  T2-SY-1  Signal Detail Depth (Trends + Benchmarks)  System    Medium      Not Started
 
+RELEASE 6: RETENTION AND EXPANSION (End of Week 6)
+----------------------------------------------------
 
-SPRINT 6: MARKET SYNTHESIS + POLISH
---------------------------------------
-Dates: 17 Mar - 23 Mar 2026
-Tier: 2 (Keep Delivering)
-Status: Planning
-Goal: Public network synthesis, leading indicator detection, AI review admin, QA.
+Goal: The experience is polished and the customer is retained. Groundwork for second customer.
 
-Stories:
-  T2-SY-2  Market Synthesis (Public Networks)         System    Low         Not Started
-  T2-SY-3  Leading Indicator Detection                System    Low         Not Started
-  T2-AD-1  AI Review & QA Admin                       Admin     Medium      Not Started
+What ships:
+- Progressive user context (system asks one new question per session to refine relevance)
+- Upload reminders / nudges if no data uploaded in 7 days
+- Admin dashboard with quality metrics (how many signals, AI accuracy, user engagement)
+- QA pass on all signals and AI analysis for first customer
+- Onboarding documentation for second customer
 
+Hypothesis to test: The customer sees enough ongoing value to continue paying. The system is ready to onboard a second customer without re-engineering.
 
-RELEASE PLAN
-=============
 
+SPRINT PLAN (6 WEEKS)
+=======================
 
-RELEASE 1: PROFILES & ORGANISATION
-------------------------------------
-Target: 16 Feb 2026
-Status: In Progress
-Hypothesis to test: Knowing (Role, desired KPIs) + (business stage, product stage, target market) is enough to inform AI calls to produce valuable synthesis for each signal.
 
-Stories:
-  T1-UP-1 (Tier 1) User Sign Up & Sign In - DONE
-    - User can sign up with email/password
-    - User can sign in
-    - System connects user to org
-    - System saves name/email
-
-  T1-UP-2 (Tier 1) User Context (Lite) - IN PROGRESS
-    - System saves user role (Exec/Manager)
-    - System saves desired KPIs
-    - System saves business/product/market context
-    - Based on context, system suggests relevant signals
-
-
-RELEASE 2: DATA IN
---------------------
-Target: 16 Feb 2026
-Status: In Progress
-Hypothesis to test: Manager finds it easy to upload a file. Signals found are accurately based on columns from staging layer. User sees unexpected valuable signals from combining multiple columns/sources.
-
-Stories:
-  T1-DI-1 (Tier 1) Manager Uploads CSV/XLSX - IN PROGRESS
-    - Drag/drop or browse for file
-    - See upload progress
-    - File parsed, columns extracted
-    - System normalises columns (aliases)
-
-  T1-DI-2 (Tier 1) System Stages Data - IN PROGRESS
-    - Saves columns into staging layer
-    - Stores raw data with metadata
-    - Staging layer queryable for discovery
-
-  T1-DI-3 (Tier 1) System Discovers Signals - IN PROGRESS
-    - Discovers new signals from columns
-    - Discovers signals from combining columns
-    - Saves new signals
-    - Updates existing signals
-    - Categorises signals
-    - User sees detected signals within 30s
-
-  T2-DI-1 (Tier 2) Weekly Returning Upload - NOT STARTED
-    - Recognizes returning user/format
-    - Shows "Comparing to previous..."
-    - Results grouped by Opps/Risks, Improved, Steady
-    - Upload history
-
-  T2-DI-2 (Tier 2) Upload Status Tracking - NOT STARTED
-    - Status of uploaded data (new/updated/completed/partial)
-    - Real-time status updates
-
-  T2-DI-3 (Tier 2) Partial Signal Identification - NOT STARTED
-    - Identifies partial signals
-    - Identifies missing data points
-    - User sees what's missing
-
-
-RELEASE 3: SIGNAL CORE
-------------------------
-Target: 16 Feb 2026
-Status: In Progress
-Hypothesis to test: Signal value and trends are accurate. Default view shows most relevant signals. Cross-correlation detection is valuable and less costly than AI calls.
-
-Stories:
-  T1-SC-1 (Tier 1) Calculate Signal Values - IN PROGRESS
-    - Calculates from staging layer (sum, average)
-    - Saves to org signal DB
-    - Shows name, value, trend, change %
-
-  T1-SC-2 (Tier 1) Detect Trends Over Time - IN PROGRESS
-    - Detects trends over time
-    - Trends from date range in file
-    - Saves trend info
-
-  T2-SC-1 (Tier 2) Rank Signals by Relevance - NOT STARTED
-    - Ranks by relevance to org members
-    - Priority view shows most to least relevant
-
-  T2-SC-2 (Tier 2) Cross-Correlation Detection - NOT STARTED
-    - Finds cross-correlation patterns
-    - Saves cross-correlation data
-    - Relationships are valuable
-
-  T2-SC-3 (Tier 2) Multi-Source Discovery - NOT STARTED
-    - Discovers signals from multiple sources
-    - New multi-source signals surfaced
-
-
-RELEASE 4: SIGNAL SYNTHESIS
------------------------------
-Target: 16 Feb 2026
-Status: In Progress
-Hypothesis to test: The information the AI reads is enough to create accurate synthesis. The 6-section analysis is valuable and relevant. This is the most cost-effective way to create synthesis.
-
-Stories:
-  T1-SY-1 (Tier 1) AI 5-Section Analysis - IN PROGRESS
-    - 1. Executive summary
-    - 2. What informed it
-    - 3. Benchmark comparison
-    - 4. Why it happened / drivers
-    - 5. Relationships via causal chain
-    - System caches interpretations
-
-  T1-SY-2 (Tier 1) KPI Implication (Section 6) - NOT STARTED
-    - 6. Implication on company KPIs
-    - References upcoming decisions
-    - Auto-chases missing interpretations
-
-  T2-SY-1 (Tier 2) Signal Detail Depth - NOT STARTED
-    - Trend visualisation (4+ weeks)
-    - Benchmark comparison
-    - Leading indicators
-
-  T2-SY-2 (Tier 2) Market Synthesis (Public) - NOT STARTED
-    - Market category cards from AI
-    - General market news/trends
-    - Competitor news
-
-  T2-SY-3 (Tier 2) Leading Indicator Detection - NOT STARTED
-    - Detects leading indicators
-    - Surfaced in signal detail
-
-
-RELEASE 5: PRESENTATION
--------------------------
-Target: 16 Feb 2026
-Status: In Progress
-Hypothesis to test: Signal card is compelling way for users to browse signals quickly. Expanded view is right way to explore deeper. Filters help explore breadth.
-
-Stories:
-  T1-PR-1 (Tier 1) Signal List Display - IN PROGRESS
-    - Shows signal list by org
-    - Each shows name, value, trend
-    - Opps/risks highlighted
-
-  T1-PR-2 (Tier 1) Expanded Signal Card View - IN PROGRESS
-    - Shows full AI synthesis
-    - "What We Found" breakdown
-    - "What It Means" explanation
-    - Easy navigation back
-
-  T1-PR-3 (Tier 1) Exec Browse Experience - NOT STARTED
-    - Exec can browse signal list
-    - Exec can see expanded view
-    - Feels intuitive
-
-  T1-PR-4 (Tier 1) Manager Post-Upload View - NOT STARTED
-    - Manager sees available signals after upload
-    - Can tap to explore
-    - Clear upload-to-signal connection
-
-  T2-PR-1 (Tier 2) Upload Status View - NOT STARTED
-    - Status of uploaded data
-    - Browse with status indicators
-
-  T2-PR-2 (Tier 2) Filter by Category - NOT STARTED
-    - Filter by category (user/market/business)
-    - Filter by function (product/marketing/sales/tech)
-
-
-RELEASE 6: MASTER ADMIN
--------------------------
-Target: 23 Feb 2026
-Status: In Progress
-Hypothesis to test: Master admin can manage users and see what customers see, enabling effective onboarding and QA without engineering involvement.
-
-Stories:
-  T1-AD-1 (Tier 1) Create User Profiles & Passwords - IN PROGRESS
-    - Create user with email/name/role/password
-    - Assign to org
-    - Update user context
-
-  T1-AD-2 (Tier 1) See User's Signal View - NOT STARTED
-    - Admin sees user's signal screen
-    - Admin verifies signals display correctly
-
-  T1-AD-3 (Tier 1) See User & Org Context - NOT STARTED
-    - Admin sees user/org context
-    - Admin verifies context is correct
-
-  T2-AD-1 (Tier 2) AI Review & QA Admin - NOT STARTED
-    - Review AI interpretations
-    - Mark as Approved/Needs Edit/Regenerate
-    - Edit text
-    - Quality metrics
-
-
-RELEASE 7: PROGRESSIVE USER CONTEXT (TIER 2 ONLY)
----------------------------------------------------
-Target: 9 Mar 2026
-Status: Not Started
-Hypothesis to test: Progressive context collection makes signals increasingly relevant over time without overwhelming users upfront.
-
-Stories:
-  T2-UC-1 (Tier 2) Progressive Discovery - NOT STARTED
-    - Save business model/stage
-    - Save product stage
-    - Save target market
-    - Save upcoming decisions
-    - System refines suggestions
-
-
-CRITICAL PATH: TIER 1 PIPELINE
-================================
-
-This is the exact data flow that must work end-to-end for Tier 1:
-
-STEP 1: MANAGER UPLOADS CSV
-  Page:    /upload (upload-page-client.tsx)
-  API:     POST /api/upload/discover
-  Service: signal-discovery-service.ts, discoverSignals()
-  Action:  Parse file, detect columns, match against signal library
-
-STEP 2: SYSTEM STAGES DATA
-  API:     POST /api/upload/discover (same call)
-  Service: csv-parser.ts, parseCSV() / xlsx via XLSX lib
-  DB:      Neon staging tables (upload_history, staged rows)
-
-STEP 3: SYSTEM DISCOVERS SIGNALS
-  Service: signal-discovery-service.ts, SIGNAL_DEFINITIONS + FIELD_ALIASES
-  Action:  Match columns to signal definitions, categorise as new/updated/partial
-  Output:  List of DiscoveredSignal objects shown to user
-
-STEP 4: USER SELECTS SIGNALS, SYSTEM CALCULATES
-  Page:    /upload (user selects checkboxes)
-  API:     POST /api/upload/calculate
-  Service: signal-calculation-service.ts, calculateSignal()
-  DB:      INSERT/UPSERT into signals table (Neon)
-  Action:  Calculate value, trend, format, save
-
-STEP 5: AI GENERATES 5-SECTION SYNTHESIS
-  API:     POST /api/signals/[id]/interpretation
-  Service: interpretation-service.ts, generateInterpretation()
-  AI:      generateText() with 5-section prompt
-  DB:      Save interpretation to Supabase
-
-STEP 6: USER VIEWS SIGNAL LIST
-  Page:    /signals (signals-page-client.tsx)
-  Service: signals-service.ts, getSignals()
-  DB:      SELECT from signals (Neon) by organization_id
-
-STEP 7: USER EXPANDS SIGNAL CARD
-  Page:    /signals/[id] (signal-detail-client.tsx)
-  Service: Fetches interpretation from Supabase
-  Display: 5-section analysis in expandable sections
-
-
-KEY FILES IN CRITICAL PATH
+SPRINT 1: ACCURATE SIGNALS
 ----------------------------
+Dates: 10 Feb - 16 Feb 2026
+Goal: Core pipeline works with correct values. Upload, 3 questions, accurate signals, display.
+Release: Release 1
 
-Step 1:
-  components/upload-page-client.tsx       Drag/drop UI, file selection, progress
-  app/api/upload/discover/route.ts        Parse file, run discovery, categorise
-  lib/signal-discovery-service.ts         Signal definitions, field aliases, matching
+Stories:
+  MSS-01  Cut signal definitions to ~20 core with calcSpecs             System    Critical
+  MSS-02  Remove legacy heuristic calculation path                      System    Critical
+  MSS-03  Integrate 3-question upload flow into /upload                 Manager   Critical
+  MSS-04  Signal generation from user answers (not fuzzy matching)      System    Critical
+  MSS-05  Verify signal card displays correct values                    All       Critical
+  MSS-06  Deploy to production                                         Admin     Critical
 
-Step 2:
-  lib/csv-parser.ts                       CSV parsing, column detection
+Sprint Exit Criteria:
+- Upload a Zoho CRM Deals CSV. Answer 3 questions. See pipeline value, win rate, avg deal size with correct numbers.
+- Upload a Zoho Desk Tickets CSV. Answer 3 questions. See ticket volume, tickets by status, tickets by priority with correct numbers.
+- Values are manually verifiable against the CSV.
 
-Step 3:
-  lib/signal-discovery-service.ts         discoverSignals() function
-
-Step 4:
-  app/api/upload/calculate/route.ts       Calculate + save signals
-  lib/signal-calculation-service.ts       Calculation logic (sum, avg, rate, trend)
-
-Step 5:
-  app/api/signals/[id]/interpretation/route.ts    Trigger AI interpretation
-  lib/interpretation-service.ts                   AI prompt, 5-section framework
-
-Step 6:
-  app/(protected)/signals/page.tsx        Server component, fetches signals
-  lib/signals-service.ts                  getSignals() query
-  components/signals-page-client.tsx      Signal list UI
-
-Step 7:
-  app/(protected)/signals/[id]/page.tsx   Signal detail server component
-  components/signal-detail-client.tsx     Expanded card with interpretation
+Demo: Friday 14 Feb. Show customer the upload flow and resulting signals. Get feedback on accuracy.
 
 
-BLOCKERS FOR TIER 1 COMPLETION
--------------------------------
+SPRINT 2: PERSONALISED AI + ADMIN OPS
+---------------------------------------
+Dates: 17 Feb - 23 Feb 2026
+Goal: AI analysis is personalised. Admin tooling works. Customer agrees to pay.
+Release: Release 2
 
-1. Trend detection from date ranges not working
-   Impact: Trends show "stable" for everything
-   Fix: Fix time-series detection in signal-calculation-service.ts
+Stories:
+  MSS-07  Add upcoming_priorities and signal_preferences to profiles    System    Critical
+  MSS-08  Admin CP form to input discovery notes into user profile      Admin     Critical
+  MSS-09  Inject user/org context into AI interpretation prompt         System    Critical
+  MSS-10  Auto-trigger AI analysis on upload                            System    High
+  MSS-11  Profile page read-only, shows new fields                     All       High
+  MSS-12  Admin upload-on-behalf-of-user (org/user selector)           Admin     High
+  MSS-13  Verify admin create user + create org + assign flows          Admin     High
 
-2. Signal discovery doesn't combine columns
-   Impact: Missing cross-column signals
-   Fix: Low priority for Tier 1 - single column signals are enough
+Sprint Exit Criteria:
+- Admin inputs discovery notes for a user via Admin CP.
+- Admin uploads file on behalf of user.
+- AI analysis references user's role and priorities in its commentary.
+- Customer agrees scope is billable.
 
-3. No auto-interpretation after calculate
-   Impact: User must manually trigger AI
-   Fix: Wire up auto-interpretation call after /api/upload/calculate
-
-4. User context (desired KPIs) not saved in onboarding
-   Impact: AI synthesis can't reference user's KPIs
-   Fix: Add KPI selection step to onboarding flow
-
-5. Admin can't create users with passwords
-   Impact: Can't onboard customer team
-   Fix: Complete user creation in admin panel
-
-6. Admin can't see user's signal view
-   Impact: Can't QA what customer sees
-   Fix: Add "view as user" mode to admin
-
-7. Upload-to-signal connection unclear
-   Impact: Manager doesn't see cause/effect
-   Fix: Add post-upload redirect to signals page with highlight
+Demo: Friday 21 Feb. Show personalised AI analysis. Close billing agreement.
 
 
-MODULE STATUS
---------------
+SPRINT 3: MULTI-FILE DATA LAYER
+---------------------------------
+Dates: 24 Feb - 2 Mar 2026
+Goal: Org data persists across uploads. Returning uploads compare to previous.
+Release: Release 3
 
-Profiles & Org:     3 Built / 2 Partial / 1 Not Started   (Mostly ready - needs KPI save)
-Data In:            4 Built / 0 Partial / 3 Not Started   (Mostly ready - core pipeline works)
-Signal Core:        3 Built / 0 Partial / 2 Not Started   (Mostly ready - needs trend fix)
-Synthesis (AI):     2 Built / 0 Partial / 3 Not Started   (Mostly ready - needs auto-trigger + Section 6)
-Presentation:       2 Built / 0 Partial / 3 Not Started   (Mostly ready - needs post-upload UX)
-Master Admin:       1 Built / 1 Partial / 3 Not Started   (Needs work - user creation + view-as)
+Stories:
+  MSS-14  Create org_data_sources table (persist tab metadata per org)  System    High
+  MSS-15  Returning upload recognition and comparison                   System    High
+  MSS-16  Upload history page                                          All       Medium
+  MSS-17  Cross-file signal discovery (e.g. lead-to-deal conversion)   System    Medium
+
+Sprint Exit Criteria:
+- Upload Deals CSV, then Leads CSV for same org. System shows signals from both.
+- Re-upload Deals CSV a week later. System says "Comparing to previous..." and shows change.
+
+Demo: Friday 28 Feb. Show multi-file and returning upload experience.
+
+
+SPRINT 4: SIGNAL RELEVANCE
+----------------------------
+Dates: 3 Mar - 9 Mar 2026
+Goal: Signals ranked by relevance. Category filters. Partial signal identification.
+Release: Release 4
+
+Stories:
+  MSS-18  Signal ranking by user relevance (role + priorities)          System    Medium
+  MSS-19  Category filter bar on signals page                           All       Medium
+  MSS-20  Partial signal identification (what data is missing)          System    Medium
+  MSS-21  Sort signals by relevance score as default                    All       Medium
+
+Sprint Exit Criteria:
+- User with role "Head of Support" sees support signals ranked higher than sales signals.
+- System tells user "Upload deals data to unlock Win Rate and Pipeline Value".
+
+Demo: Friday 7 Mar. Show ranked signals and partial signal prompts.
+
+
+SPRINT 5: ANALYSIS DEPTH
+--------------------------
+Dates: 10 Mar - 16 Mar 2026
+Goal: Richer analysis. Trend charts. KPI implications. Admin QA.
+Release: Release 5
+
+Stories:
+  MSS-22  Trend visualisation on signal detail (line chart, 4+ weeks)  All       Medium
+  MSS-23  Section 6: KPI implication in AI analysis                    System    Medium
+  MSS-24  Cross-signal references in AI analysis                       System    Medium
+  MSS-25  Admin AI review panel (approve, edit, regenerate)            Admin     Medium
+
+Sprint Exit Criteria:
+- Signal detail shows a trend chart with 4+ weeks of data points.
+- AI analysis says "This impacts your KPI: Customer Retention" and "This correlates with the increase in ticket volume we detected."
+- Admin can review and edit AI interpretations.
+
+Demo: Friday 14 Mar. Show trend charts and cross-signal analysis.
+
+
+SPRINT 6: RETENTION AND POLISH
+--------------------------------
+Dates: 17 Mar - 23 Mar 2026
+Goal: Polish, retention mechanisms, ready for second customer.
+Release: Release 6
+
+Stories:
+  MSS-26  Progressive context (one new question per session)           All       Medium
+  MSS-27  Upload reminder nudge (7 days without upload)                System    Low
+  MSS-28  Admin quality dashboard (signal count, AI accuracy, usage)   Admin     Medium
+  MSS-29  Full QA pass on all signals and AI for first customer        Admin     High
+  MSS-30  Onboarding runbook for second customer                       Admin     Medium
+
+Sprint Exit Criteria:
+- Customer has been using the app for 4+ weeks. Signals are accurate. AI is relevant.
+- Admin dashboard shows quality metrics.
+- Onboarding runbook exists. Second customer can be onboarded without re-engineering.
+
+Demo: Friday 21 Mar. Review with customer. Collect testimonial.
 
 
 WEEKLY RHYTHM
 --------------
 
-Monday:     Sprint planning - pick stories, set priorities
-Tue-Thu:    Build - focus on critical path blockers first
-Friday:     Demo to customer + sprint review
-Saturday:   Update delivery plan, prep next sprint
+Monday:     Sprint planning. Pick stories, set priorities.
+Tue-Thu:    Build. Focus on critical path first.
+Friday:     Demo to customer + sprint review.
+Weekend:    Update delivery plan. Prep next sprint.
+
+
+KEY CHANGES TO MAKE (PRIORITY ORDER)
+======================================
+
+1. Cut signal definitions to ~20 core, all with calcSpecs. Remove legacy heuristic path.
+   Sprint: 1. Impact: Accuracy. Risk: Low.
+
+2. Integrate 3-question upload flow into main /upload page.
+   Sprint: 1. Impact: Correct signal generation. Risk: Medium.
+
+3. Add upcoming_priorities and signal_preferences to profiles table.
+   Sprint: 2. Impact: Enables personalised AI. Risk: Low.
+
+4. Inject user/org context into AI interpretation prompt.
+   Sprint: 2. Impact: Billing differentiator. Risk: Low.
+
+5. Admin upload-on-behalf-of-user with org/user selector.
+   Sprint: 2. Impact: MSS operating model. Risk: Low.
+
+6. Persist org data layer across uploads (org_data_sources table).
+   Sprint: 3. Impact: Multi-file intelligence. Risk: Medium.
+
+7. Make profile page read-only for non-admin users.
+   Sprint: 2. Impact: Small polish. Risk: None.
 
 
 RISK REGISTER
@@ -491,39 +415,50 @@ RISK REGISTER
 
 1. AI synthesis quality is poor with limited data
    Likelihood: Medium    Impact: High
-   Mitigation: Test with real customer CSV before demo. Tune prompt.
+   Mitigation: Test with real Zoho files before Sprint 2 demo. Tune prompt.
+   Sprint: 2
 
-2. Customer expects more than Tier 1 scope
+2. Customer expects more than MSS scope
    Likelihood: Medium    Impact: Medium
-   Mitigation: Set expectations in Friday demo. Show Tier 2 roadmap.
+   Mitigation: Set expectations in Sprint 1 demo. Show 6-week roadmap.
+   Sprint: 1
 
-3. Signal discovery misses signals from customer's data format
-   Likelihood: High      Impact: High
-   Mitigation: Get sample CSV from customer before Sprint 1 ends. Test discovery.
-
-4. Database schema inconsistencies (Neon + Supabase dual)
-   Likelihood: Low       Impact: Medium
-   Mitigation: Tier 1 uses Neon for signals, Supabase for auth. Keep separation clean.
-
-5. Solo builder bandwidth - can't finish Sprint 1 in 1 week
+3. Signal values are wrong for Zoho data format
    Likelihood: Medium    Impact: High
-   Mitigation: Cut T1-SC-2 (trend detection) from Sprint 1 if needed. Ship without trends.
+   Mitigation: Sprint 1 is entirely focused on accuracy. Test with all 4 sample files.
+   Sprint: 1
+
+4. Multi-file data layer introduces complexity
+   Likelihood: Medium    Impact: Medium
+   Mitigation: Keep it simple. Append-only data. No in-place updates for Sprint 3.
+   Sprint: 3
+
+5. Solo builder bandwidth cannot finish Sprint 1 + 2 in 2 weeks
+   Likelihood: Medium    Impact: High
+   Mitigation: Sprint 1 cuts scope aggressively (no AI, no admin, just accurate signals). Sprint 2 adds AI + admin.
+   Sprint: 1-2
 
 
 DECISIONS LOG
 --------------
 
-7 Feb 2026 - Split MVP into Tier 1 (billable) and Tier 2 (ongoing value)
-  Rationale: Solo builder can't ship everything at once. Need to start charging ASAP.
+10 Feb 2026 - Pivoted from full MVP to MSS (Minimum Sellable Service)
+  Rationale: Full productisation has blockers. Admin-in-the-loop bridges gaps while delivering enough value to bill.
 
-7 Feb 2026 - Cut market synthesis (public networks) from Tier 1
-  Rationale: Separate data source + AI pipeline. Customer gets more value from their own data analysis.
+10 Feb 2026 - 3-question upload flow replaces fuzzy signal discovery
+  Rationale: User clarifies data type, metric column, and date column. Eliminates guessing. Every signal is grounded in confirmed understanding.
 
-7 Feb 2026 - Cut cross-correlation from Tier 1
-  Rationale: Impressive but not required for first payment. Single-source signals are valuable enough.
+10 Feb 2026 - Cut from 93 signal definitions to ~20
+  Rationale: 82/93 used heuristic calculations that produced wrong values. Fewer correct signals are better than many wrong ones.
 
-7 Feb 2026 - Cut signal ranking from Tier 1
-  Rationale: Just show all signals sorted by recency. Ranking needs user context that isn't fully built.
+10 Feb 2026 - User context in AI prompt is the billing differentiator
+  Rationale: Generic AI analysis is not worth paying for. Personalised analysis based on role, priorities, and business context is.
+
+10 Feb 2026 - 6-week release cadence with weekly demos
+  Rationale: Tight feedback loops. Ship weekly, learn weekly. Customer sees progress every Friday.
 
 7 Feb 2026 - 1-week sprint cycles
-  Rationale: Tight feedback loops essential for solo builder. Ship weekly, learn weekly.
+  Rationale: Solo builder. Tight feedback loops essential.
+
+7 Feb 2026 - Dual database (Neon for signals, Supabase for auth)
+  Rationale: Keep separation clean. Auth is Supabase-native. Signal data is relational on Neon.
