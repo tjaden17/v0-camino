@@ -773,7 +773,7 @@ Signals can be sourced and calculated in multiple ways to support flexibility ac
 
 **Signal Definition Schema:**
 
-```
+\`\`\`
 signal_definitions {
     id: UUID
     organization_id: UUID
@@ -793,11 +793,11 @@ signal_definitions {
     created_at: timestamp
     updated_at: timestamp
 }
-```
+\`\`\`
 
 **Formula Components Structure:**
 
-```
+\`\`\`
 formula_components: {
     operation: 'sum' | 'avg' | 'count' | 'ratio' | 'custom',
     inputs: [
@@ -806,11 +806,11 @@ formula_components: {
     ],
     expression: 'inputs[0] / inputs[1] * 100'  // For custom operations
 }
-```
+\`\`\`
 
 **Source Mappings Structure:**
 
-```
+\`\`\`
 source_mappings: [
     { 
         source_id: 'zoho-desk-export',
@@ -825,7 +825,7 @@ source_mappings: [
         role: 'denominator'
     }
 ]
-```
+\`\`\`
 
 **Integration-Agnostic Data Source Model:**
 
@@ -841,7 +841,7 @@ The system should support any data source through a unified interface:
 
 **Data Source Registry:**
 
-```
+\`\`\`
 data_sources {
     id: UUID
     organization_id: UUID
@@ -862,11 +862,11 @@ data_sources {
     
     created_at: timestamp
 }
-```
+\`\`\`
 
 **Signal Calculation Flow:**
 
-```
+\`\`\`
 calculateSignalValue(signal, period)
     |
     ├── 1. GET DEFINITION
@@ -890,7 +890,7 @@ calculateSignalValue(signal, period)
     |   └── Upsert into signal_values with lineage metadata
     |
     └── Return: SignalValue { value, period, sources_used }
-```
+\`\`\`
 
 
 ### Signal Status Logic
@@ -1068,10 +1068,10 @@ Signals are categorized to help users quickly identify opportunities and risks:
 4. Return SignalWithData[] array
 
 **Debug Query:**
-```sql
+\`\`\`sql
 SELECT DISTINCT ON (name) * FROM signals 
 WHERE organization_id = 'your-org-id' ORDER BY name, updated_at DESC
-```
+\`\`\`
 
 
 #### signal-calculation-service.ts
@@ -1125,7 +1125,7 @@ The key challenge is that `matchedFields` contains canonical names (e.g., "deal_
 - Verify numeric values are being parsed with `parseFormattedNumber()`
 
 **Example Usage:**
-```typescript
+\`\`\`typescript
 import { calculateSignal } from "@/lib/signal-calculation-service"
 
 const result = calculateSignal(signalDef, rows, matchedFields)
@@ -1140,7 +1140,7 @@ const result = calculateSignal(signalDef, rows, matchedFields)
 //   formula: "Sum of all amount/value fields",
 //   usedColumn: "Deal Amount"
 // }
-```
+\`\`\`
 
 
 #### signal-discovery-service.ts
@@ -1196,9 +1196,9 @@ const result = calculateSignal(signalDef, rows, matchedFields)
 4. Return sorted by score descending
 
 **Debug Query:**
-```sql
+\`\`\`sql
 SELECT * FROM user_context WHERE user_id = 'your-user-id'
-```
+\`\`\`
 
 
 #### staging-service.ts
@@ -1229,13 +1229,13 @@ SELECT * FROM user_context WHERE user_id = 'your-user-id'
 - Staging layer tracks which fields exist and surfaces "unlockable" signals
 
 **Debug Queries:**
-```sql
+\`\`\`sql
 -- What fields are available for this user?
 SELECT * FROM field_availability WHERE user_id = 'your-user-id'
 
 -- What signal opportunities exist?
 SELECT * FROM signal_opportunities WHERE user_id = 'your-user-id' AND is_calculable = true
-```
+\`\`\`
 
 
 #### interpretation-service.ts
@@ -1290,9 +1290,9 @@ SELECT * FROM signal_opportunities WHERE user_id = 'your-user-id' AND is_calcula
 3. Intelligence service reads context to personalize signal ranking
 
 **Debug Query:**
-```sql
+\`\`\`sql
 SELECT * FROM user_context WHERE user_id = 'your-user-id'
-```
+\`\`\`
 
 
 #### upload-service.ts
@@ -1473,7 +1473,7 @@ SELECT * FROM user_context WHERE user_id = 'your-user-id'
 
 **Test Page Layout:**
 
-```
+\`\`\`
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  DEV TEST PAGE                                     [Org: Acme Corp ▼]        │
 ├──────────────────────────────────────────────────────────────────────────────┤
@@ -1510,7 +1510,7 @@ SELECT * FROM user_context WHERE user_id = 'your-user-id'
 │  └───────────────────────────────────────────────────────────────────────┘  │
 │                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Security:**
 - Route returns 404 in production (`NODE_ENV !== 'development'`)
@@ -1981,14 +1981,14 @@ Automated E2E tests to validate MVP user stories from an end-user perspective.
 ### Test Data Requirements
 
 **Sample CSV for Upload Tests:**
-```csv
+\`\`\`csv
 date,CSAT Score,Response Time (hrs),Resolution Rate (%)
 2026-01-01,85,4.2,78
 2026-01-08,87,3.9,80
 2026-01-15,84,4.5,76
 2026-01-22,89,3.6,82
 2026-01-29,91,3.2,85
-```
+\`\`\`
 
 **Test Users:**
 | Role | Email | Password | Purpose |

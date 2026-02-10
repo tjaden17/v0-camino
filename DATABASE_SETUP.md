@@ -79,7 +79,7 @@ Make sure you're using the Supabase SQL Editor as an authenticated project owner
 ### Need to reset everything?
 Run this to drop all tables (⚠️ WARNING: deletes all data):
 
-```sql
+\`\`\`sql
 DROP TABLE IF EXISTS sync_history CASCADE;
 DROP TABLE IF EXISTS integrations CASCADE;
 DROP TABLE IF EXISTS upload_history CASCADE;
@@ -90,7 +90,7 @@ DROP TABLE IF EXISTS kpi_ownership CASCADE;
 DROP TABLE IF EXISTS signal_data_points CASCADE;
 DROP TABLE IF EXISTS signals CASCADE;
 DROP TABLE IF EXISTS profiles CASCADE;
-```
+\`\`\`
 
 Then run the setup script again.
 

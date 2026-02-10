@@ -17,12 +17,12 @@
 ## Flow Overview
 
 ### The Complete Journey
-```
+\`\`\`
 Upload → Analyze → Discover → Map → Preview → Generate → View Signal
    ↓        ↓         ↓       ↓       ↓         ↓          ↓
   File    Parse   Identify  Connect  Validate  Create   Dashboard
          Columns  Signals   Data     Signal    KPIs     + Insights
-```
+\`\`\`
 
 ### Time Estimate
 - **First-time user**: 5-8 minutes (with onboarding)
@@ -43,7 +43,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 **Context**: User has a CSV/Excel file with raw data
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  📊 Signals Dashboard                          [+ Add]  │
 ├─────────────────────────────────────────────────────────┤
@@ -59,7 +59,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 │  💡 Tip: Upload support tickets, CRM deals, or         │
 │      product analytics to get started                   │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Actions**:
 - Click "Upload Data File" → Opens upload modal
@@ -76,7 +76,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 **Context**: User selects a file from their computer
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Upload Data                                    [✕ Close]│
 ├─────────────────────────────────────────────────────────┤
@@ -98,10 +98,10 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 │  • Custom data exports                                  │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **After File Selected**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Upload Data                                    [✕ Close]│
 ├─────────────────────────────────────────────────────────┤
@@ -116,7 +116,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 │                                                          │
 │  [Continue to Discovery →]                              │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Behind the Scenes**:
 - Parse CSV/Excel
@@ -137,7 +137,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 **Context**: System analyzes columns and discovers which signals are possible
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Upload Data                                    [✕ Close]│
 ├─────────────────────────────────────────────────────────┤
@@ -174,7 +174,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 │                                                          │
 │  [← Back]  [Skip for now]  [Continue with 6 signals →] │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Key Features**:
 - **Automatic Detection**: Shows which signals can be auto-tracked
@@ -183,7 +183,7 @@ Upload → Analyze → Discover → Map → Preview → Generate → View Signal
 - **Progressive Options**: User can proceed with what works now
 
 **Intelligence Behind the Scenes**:
-```typescript
+\`\`\`typescript
 // Example: How system determines "Ticket Volume" is trackable
 Columns found: ["Ticket Number", "Status", "Created Date", "Closed Date", ...]
 
@@ -193,7 +193,7 @@ Signal Requirements for "Ticket Volume":
 ✓ Need: Categorical data (found: "Status")
 
 Result: ✅ Can track "Ticket Volume" by counting unique "Ticket Number" per time period
-```
+\`\`\`
 
 **User Decisions**:
 1. **Proceed with available signals** (most common)
@@ -207,16 +207,16 @@ Result: ✅ Can track "Ticket Volume" by counting unique "Ticket Number" per tim
 **Context**: User wants to set up signals that need column mapping assistance
 
 **Problem Being Solved**:
-```
+\`\`\`
 User's Data:           Signal Needs:
 "Ticket #"      →      "Unique ID"
 "Date Created"  →      "Created At"
 "Rating"        →      "CSAT Score"
 "Agent Name"    →      "Assignee"
-```
+\`\`\`
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Upload Data                                    [✕ Close]│
 ├─────────────────────────────────────────────────────────┤
@@ -264,7 +264,7 @@ User's Data:           Signal Needs:
 │                                                          │
 │  [← Back]                      [Continue to Preview →]  │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Intelligent Mapping Logic**:
 
@@ -295,7 +295,7 @@ User's Data:           Signal Needs:
 **Context**: User reviews what will be created before committing
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Upload Data                                    [✕ Close]│
 ├─────────────────────────────────────────────────────────┤
@@ -352,7 +352,7 @@ User's Data:           Signal Needs:
 │                                                          │
 │  [← Back to edit]        [✨ Create These Signals →]   │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Validation Checks**:
 - ✓ Data quality sufficient (>80% complete)
@@ -373,7 +373,7 @@ User's Data:           Signal Needs:
 **Context**: System creates signals in background
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Creating Your Signals...                               │
 ├─────────────────────────────────────────────────────────┤
@@ -388,7 +388,7 @@ User's Data:           Signal Needs:
 │  This usually takes 10-15 seconds...                    │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Processing Steps**:
 1. Transform raw data → universal schema
@@ -410,7 +410,7 @@ User's Data:           Signal Needs:
 **Context**: User sees their newly created signals
 
 **UI Elements**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  📊 Signals Dashboard                          [+ Add]  │
 ├─────────────────────────────────────────────────────────┤
@@ -458,7 +458,7 @@ User's Data:           Signal Needs:
 │  • Set up alerts for critical changes                   │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Key Features**:
 - Signals sorted by priority (high → medium → low)
@@ -482,7 +482,7 @@ User's Data:           Signal Needs:
 
 ### Mapping Algorithm
 
-```typescript
+\`\`\`typescript
 interface ColumnMapping {
   userColumn: string      // "Ticket #"
   systemField: string     // "unique_id"
@@ -528,7 +528,7 @@ function mapColumns(
   
   return { confidence: 0.0, reason: "No match found" }
 }
-```
+\`\`\`
 
 ### Confidence Thresholds
 
@@ -547,7 +547,7 @@ function mapColumns(
 - Preserve user choices across similar uploads
 
 **Learn from User**:
-```typescript
+\`\`\`typescript
 // Store user's mapping preferences
 interface MappingPreference {
   organizationId: string
@@ -559,7 +559,7 @@ interface MappingPreference {
 
 // Next time user uploads with "Rating" column,
 // automatically suggest "csat_score" mapping
-```
+\`\`\`
 
 ---
 
@@ -572,7 +572,7 @@ interface MappingPreference {
 **Scenario**: Signal needs "Closed Date" but file only has "Created Date"
 
 **UX Solution**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  ⚠️ Cannot Calculate Resolution Time            │
 │                                                  │
@@ -587,14 +587,14 @@ interface MappingPreference {
 │                                                  │
 │  [Help me fix this] [Skip] [Choose different]  │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### 2. Data Quality Issues
 
 **Scenario**: 40% of "Rating" values are empty
 
 **UX Solution**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  ⚠️ Data Quality Warning                        │
 │                                                  │
@@ -611,14 +611,14 @@ interface MappingPreference {
 │                                                  │
 │  [Continue] [Filter] [Cancel]                   │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### 3. Ambiguous Mappings
 
 **Scenario**: File has "Date1", "Date2", "Date3" - unclear which is creation date
 
 **UX Solution**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  🤔 Help Us Understand Your Data                │
 │                                                  │
@@ -638,14 +638,14 @@ interface MappingPreference {
 │                                                  │
 │  [Confirm Selection]                            │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### 4. Wrong Data Type
 
 **Scenario**: "Rating" column has text values like "Good", "Bad" instead of numbers
 
 **UX Solution**:
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  ⚠️ Data Type Mismatch                          │
 │                                                  │
@@ -661,7 +661,7 @@ interface MappingPreference {
 │                                                  │
 │  [Auto Convert] [Choose Different] [Skip]       │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -673,7 +673,7 @@ interface MappingPreference {
 
 #### Onboarding Moment 1: First Upload
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  👋 Welcome to Signals!                         │
 │                                                  │
@@ -689,11 +689,11 @@ interface MappingPreference {
 │                                                  │
 │  [ ] Don't show this again                      │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### Onboarding Moment 2: Signal Discovery
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  💡 Quick Tip                          [✕ Close]│
 │                                                  │
@@ -705,11 +705,11 @@ interface MappingPreference {
 │                                                  │
 │  [Got it!]                                      │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### Onboarding Moment 3: Column Mapping
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  💡 About Column Mapping                        │
 │                                                  │
@@ -723,11 +723,11 @@ interface MappingPreference {
 │                                                  │
 │  [Got it!]                                      │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### Onboarding Moment 4: First Signal Created
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  🎉 Your First Signal!                          │
 │                                                  │
@@ -740,7 +740,7 @@ interface MappingPreference {
 │                                                  │
 │  [Explore My Signals]  [Add More Data]          │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ### Contextual Help
 
@@ -757,7 +757,7 @@ interface MappingPreference {
 ### For Experienced Users
 
 #### Bulk Upload
-```typescript
+\`\`\`typescript
 // Upload multiple files at once
 // System automatically detects file types and creates signals
 uploadFiles([
@@ -765,10 +765,10 @@ uploadFiles([
   "feb-tickets.csv",
   "mar-tickets.csv"
 ])
-```
+\`\`\`
 
 #### API Integration
-```typescript
+\`\`\`typescript
 // Skip UI entirely for automated uploads
 POST /api/upload
 {
@@ -776,10 +776,10 @@ POST /api/upload
   "autoMap": true,
   "createSignals": ["ticket_volume", "resolution_time"]
 }
-```
+\`\`\`
 
 #### Saved Mappings
-```
+\`\`\`
 ┌─────────────────────────────────────────────────┐
 │  📁 Upload Similar File                         │
 │                                                  │
@@ -794,7 +794,7 @@ POST /api/upload
 │                                                  │
 │  [✓ Yes, use these]  [No, let me map manually] │
 └─────────────────────────────────────────────────┘
-```
+\`\`\`
 
 #### Quick Actions
 - Drag & drop file directly on dashboard → Auto-create signals
@@ -824,7 +824,7 @@ POST /api/upload
 
 ### Color System
 
-```css
+\`\`\`css
 /* Success states */
 --signal-available: #10b981;    /* Green - ready to track */
 --signal-created: #059669;      /* Dark green - success */
@@ -840,11 +840,11 @@ POST /api/upload
 /* Neutral states */
 --signal-processing: #6b7280;   /* Gray - in progress */
 --signal-inactive: #9ca3af;     /* Light gray - disabled */
-```
+\`\`\`
 
 ### Typography
 
-```css
+\`\`\`css
 /* Headers */
 h1: 24px, 600 weight, tight leading    /* Modal titles */
 h2: 20px, 600 weight                   /* Section headers */
@@ -859,11 +859,11 @@ small: 12px, 400 weight                /* Helper text */
 .metric-value: 32px, 700 weight        /* "423 tickets" */
 .metric-label: 14px, 500 weight        /* "Ticket Volume" */
 .trend-indicator: 14px, 600 weight     /* "↑ 12%" */
-```
+\`\`\`
 
 ### Animations
 
-```css
+\`\`\`css
 /* Page transitions */
 .modal-enter: fade-in 200ms ease-out
 .modal-exit: fade-out 150ms ease-in
@@ -878,11 +878,11 @@ small: 12px, 400 weight                /* Helper text */
 
 /* Error states */
 .error-shake: shake 400ms ease-in-out
-```
+\`\`\`
 
 ### Responsive Breakpoints
 
-```css
+\`\`\`css
 /* Mobile first approach */
 .upload-modal {
   width: 100%;                    /* Mobile: full width */
@@ -896,7 +896,7 @@ small: 12px, 400 weight                /* Helper text */
     max-width: 800px;
   }
 }
-```
+\`\`\`
 
 ---
 

@@ -1,9 +1,9 @@
 CAMINO - MINIMUM SELLABLE SERVICE (MSS) SCOPE
 ================================================
 
-Date: 10 Feb 2026
+Date: 11 Feb 2026
 Status: Draft
-Version: 1.0
+Version: 1.1 (updated with Data Onboarding + API integration scope)
 
 
 CONTEXT
@@ -11,7 +11,30 @@ CONTEXT
 
 Developing a fully productised data pipeline has blockers. The MSS approach puts Camino Admin in the loop to bridge gaps while delivering enough value for the first customer to pay.
 
-Exit criteria: The customer agrees to pay when ALL user stories below are met.
+
+BILLING GATE (Tier 1)
+---------------------
+
+The customer agrees to pay when ALL of these are true:
+
+1. User onboarding - Exec and manager can tell Camino Admin what's important to them
+   (data types, signal needs, business context, upcoming decisions) when onboarding.
+2. Data onboarding - Manager can send CSV/XLSX sample from all tools to Camino Admin
+   during onboarding.
+3. Data onboarding - Camino Admin helps system understand shape of data, identify
+   signals, make correct calculations during onboarding.
+4. Signals - System generates at least 3 signals from data layer (whether uploaded
+   from user/Camino Admin, or via API integration) with correct values.
+5. AI analysis - Each pinned/saved signal has AI analysis personalised to the
+   organisation (what's important to exec/org KPIs) and user.
+6. Browse signals - Exec can browse signals and read expanded view.
+7. Admin - Admin can create users and upload on their behalf.
+8. Deployed - App is deployed to production.
+
+Note: "API integration" in item 4 refers to connecting to the customer's existing
+tools (Zoho CRM, Zoho Desk, HubSpot, etc.) via their APIs, so data flows in without
+manual CSV uploads. This is crucial for the billing case because manual uploads are
+a key user pain point (Problem 4: Easy Integrations).
 
 
 USER STORIES
@@ -68,12 +91,17 @@ Current State:
 - MISSING: upcoming_priorities and signal_preferences display on the profile page.
 
 
-US3: DATA INPUT
-----------------
+US3: DATA INPUT (Upload + API Integration)
+--------------------------------------------
 
-Purpose: Collect data from the user in order to generate signals and analysis. For MSS, this is not fully productised. Admin can assist.
+Purpose: Collect data from the user in order to generate signals and analysis. Two paths exist:
+  Path A: CSV/XLSX upload (manual, with admin assistance for data onboarding)
+  Path B: API integration (automated, connects to customer's existing tools)
 
-Acceptance Criteria:
+For MSS, Path A is not fully productised -- Admin assists with data classification.
+Path B is crucial for billing because it solves the customer's "easy integrations" pain point.
+
+Acceptance Criteria (Path A - Upload):
 - User can upload file(s) directly into platform, in CSV or XLSX format.
 - Camino Admin can upload files on behalf of the user.
 - System creates prompts (max 3 per tab) to help understand the data:
@@ -81,18 +109,32 @@ Acceptance Criteria:
   2. Which column is the main metric? (dropdown of numeric columns, or "just count rows")
   3. Which column is the date? (dropdown of date columns)
 - For XLSX files with multiple tabs, each tab is treated as a separate data type. User/admin answers the 3 prompts per tab.
-- Admin can answer the prompts on behalf of the user.
+- Admin can answer the prompts on behalf of the user during data onboarding.
 - System stores the data in a persisting org data layer, based on the answers.
 - System normalises and aliases fields so AI can understand them later and services can calculate trends.
 - System accounts for multiple uploads over time. The org data layer accumulates, not replaces.
 
+Acceptance Criteria (Path B - API Integration):
+- System can connect to the customer's existing tools via their APIs (Zoho CRM, Zoho Desk initially).
+- Once connected, system pulls data automatically (no manual CSV export needed).
+- API data feeds into the same signal generation pipeline as uploads.
+- Admin configures the integration during data onboarding.
+
+Data Onboarding (Admin-Assisted):
+- During onboarding, manager sends CSV/XLSX samples from all their tools to Camino Admin.
+- Admin uploads the samples and answers the 3 classification questions per tab.
+- Admin validates the generated signals are correct and meaningful.
+- If API integration is available for the tool, Admin sets it up so future data flows automatically.
+- This is not scalable long-term but overcomes signal flow challenges for MSS.
+
 Current State:
-- Upload page exists at /upload with CSV/XLSX parsing, multi-tab support.
-- Upload proto exists at /uploadproto with the 3-question flow per tab, multi-file support, and signal generation.
+- Upload page exists at /upload with the 3-question flow per tab, multi-file support, and signal generation.
 - FIELD_ALIASES system exists with ~500 aliases covering Zoho, HubSpot, Salesforce, Zendesk column names.
-- MISSING: The upload proto needs to replace the current upload flow (or be integrated into it).
+- Zoho integration code exists (lib/zoho-api-client.ts, lib/zoho-oauth-service.ts, lib/zoho-desk-processor.ts, lib/zoho-signal-discovery.ts) but is NOT yet connected to the new signal generation pipeline.
+- DONE: 3-question upload flow replaces old upload (Week 1).
 - MISSING: Admin-on-behalf-of-user upload (admin selects which user/org to upload for).
 - MISSING: Persisting org data layer that accumulates across uploads (currently each upload is independent).
+- MISSING: API integration path feeding into the generate pipeline (Zoho code exists but uses old discovery pipeline).
 
 
 US4: SYSTEM GENERATES AT LEAST 3 SIGNALS FROM THE DATA
@@ -101,7 +143,8 @@ US4: SYSTEM GENERATES AT LEAST 3 SIGNALS FROM THE DATA
 Purpose: The core value proposition. User sees meaningful metrics extracted from their data.
 
 Acceptance Criteria:
-- Signal discovery: System reads data fields from uploaded files and the persisting org data layer, to determine what signals can be created.
+- Signal discovery: System reads data fields from uploaded files, API integrations, and the persisting org data layer, to determine what signals can be created.
+- Data source is transparent: user can see whether a signal came from upload or API integration.
 - System calculates signals to produce basic info:
   - Signal name
   - Value
@@ -287,13 +330,33 @@ Why: US3 specifies the system accounts for multiple uploads over time with a per
 Scope: Add an org_data_sources table (org_id, source_name, data_type, columns, row_count, date_range, last_uploaded). Update signal generation to query all org data sources, not just the current upload.
 
 
+CHANGE 8: API INTEGRATION FOR AUTOMATED DATA FLOW
+-----------------------------------------------------
+
+What: Connect the existing Zoho integration code (zoho-api-client.ts, zoho-oauth-service.ts, zoho-desk-processor.ts) to the new signal generation pipeline (POST /api/upload/generate). Once an admin connects a customer's Zoho account, data flows automatically into the same pipeline as manual uploads.
+
+Why: Billing gate item 4 says "whether uploaded from user/Camino Admin, or via API integration." Manual CSV uploads are a pain point. API integration removes the friction of exporting data from tools. This is essential for the "easy integrations" problem.
+
+How it works:
+1. Admin connects Zoho OAuth via existing /api/integrations/oauth/zoho-crm and /api/integrations/oauth/zoho-desk routes.
+2. System pulls data from Zoho API (deals, leads, tickets) via the existing zoho-api-client.ts.
+3. Pulled data is formatted as "virtual tabs" with column names and rows -- same shape as a CSV upload.
+4. Virtual tabs are sent through the same /api/upload/generate pipeline.
+5. Because the Zoho data shape is known (unlike arbitrary CSVs), the 3-question answers can be pre-filled automatically: row type = "deals", metric column = "Amount", date column = "Closing_Date".
+6. Signals generated from API data are tagged with source_type = "api-zoho-crm" or "api-zoho-desk" (instead of "upload").
+7. Admin triggers sync manually for MSS. Auto-refresh is Week 3+.
+
+Scope: Wire existing Zoho code to the generate pipeline. Pre-fill classification answers for known data types. Tag signals with API source.
+
+
 PRIORITY ORDER
 --------------
 
-1. Change 4 (cut signal definitions) - highest impact on accuracy, lowest risk
-2. Change 3 (3-question upload flow) - unblocks correct signal generation
+1. Change 4 (cut signal definitions) - highest impact on accuracy, lowest risk -- DONE Week 1
+2. Change 3 (3-question upload flow) - unblocks correct signal generation -- DONE Week 1
 3. Change 5 (user context in AI prompt) - the billing differentiator
 4. Change 1 (profile fields) - required by Change 5
-5. Change 6 (admin upload for user) - required for MSS operating model
-6. Change 7 (persisting org data layer) - enables multi-file intelligence
-7. Change 2 (read-only profile) - small polish
+5. Change 8 (API integration) - crucial for billing, solves key user pain point
+6. Change 6 (admin upload for user) - required for MSS operating model
+7. Change 7 (persisting org data layer) - enables multi-file intelligence
+8. Change 2 (read-only profile) - small polish

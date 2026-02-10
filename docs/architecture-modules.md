@@ -6,7 +6,7 @@ This document defines the module boundaries within the Camino monolith. Each mod
 
 ## Module Map
 
-```
+\`\`\`
 lib/
 ├── modules/
 │   ├── import/           # File upload, parsing, validation
@@ -18,7 +18,7 @@ lib/
 │   └── integration/      # External system connections
 ├── shared/               # Cross-module utilities
 └── core/                 # Auth, database, config
-```
+\`\`\`
 
 ## Module Definitions
 
@@ -39,14 +39,14 @@ lib/
 - `app/api/admin/import/*`
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/import/index.ts
 export { uploadFile } from './upload'
 export { parseCSV, parseXLSX } from './parsers'
 export { detectFileType, detectSheetType } from './detection'
 export { validateImport } from './validation'
 export type { ImportResult, ParsedFile, FileType } from './types'
-```
+\`\`\`
 
 ---
 
@@ -66,13 +66,13 @@ export type { ImportResult, ParsedFile, FileType } from './types'
 - `app/api/admin/import/stage/route.ts`
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/staging/index.ts
 export { stageRecords, getStagedData } from './storage'
 export { normalizeToSchema } from './normalize'
 export { getDataSources, trackDataSource } from './sources'
 export type { StagedRecord, DataSource, ImportBatch } from './types'
-```
+\`\`\`
 
 ---
 
@@ -97,14 +97,14 @@ export type { StagedRecord, DataSource, ImportBatch } from './types'
 - `app/api/admin/signals/*`
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/signals/index.ts
 export { discoverSignals, getAvailableSignals } from './discovery'
 export { calculateSignal, calculateMultiSource } from './calculation'
 export { scoreQuality, getQualityGaps } from './quality'
 export { getSignalDefinitions } from './definitions'
 export type { Signal, SignalValue, QualityScore, SignalDefinition } from './types'
-```
+\`\`\`
 
 ---
 
@@ -126,14 +126,14 @@ export type { Signal, SignalValue, QualityScore, SignalDefinition } from './type
 - `app/api/signals/detect-relationships/route.ts`
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/analysis/index.ts
 export { calculateTrend } from './trends'
 export { analyzeRootCause } from './root-cause'
 export { identifySegments } from './segments'
 export { detectAnomalies } from './anomalies'
 export type { Trend, RootCause, Segment, Anomaly } from './types'
-```
+\`\`\`
 
 ---
 
@@ -153,14 +153,14 @@ export type { Trend, RootCause, Segment, Anomaly } from './types'
 - `app/api/signals/predict-impact/route.ts`
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/impact/index.ts
 export { mapToGoals, getRelatedGoals } from './goals'
 export { calculateImpact } from './scoring'
 export { projectTrend } from './projections'
 export { assessDirection } from './direction'
 export type { Goal, Impact, Projection, Direction } from './types'
-```
+\`\`\`
 
 ---
 
@@ -179,13 +179,13 @@ export type { Goal, Impact, Projection, Direction } from './types'
 - Various dashboard components
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/dashboard/index.ts
 export { getSignalCards, composeCard } from './cards'
 export { getFoundView, getMeansView, getSoWhatView } from './views'
 export { getUserPreferences, savePreferences } from './preferences'
 export type { SignalCard, CardView, UserPreferences } from './types'
-```
+\`\`\`
 
 ---
 
@@ -207,13 +207,13 @@ export type { SignalCard, CardView, UserPreferences } from './types'
 - `app/api/integrations/*`
 
 **Public Interface:**
-```typescript
+\`\`\`typescript
 // lib/modules/integration/index.ts
 export { connectZoho, syncZohoData } from './zoho'
 export { connectHubSpot, syncHubSpotData } from './hubspot'
 export { getConnections, disconnectIntegration } from './connections'
 export type { Integration, Connection, SyncResult } from './types'
-```
+\`\`\`
 
 ---
 
@@ -221,13 +221,13 @@ export type { Integration, Connection, SyncResult } from './types'
 
 Cross-cutting concerns used by multiple modules:
 
-```typescript
+\`\`\`typescript
 // lib/shared/index.ts
 export { formatCurrency, formatPercentage, formatNumber } from './formatters'
 export { parseDate, formatDateRange } from './dates'
 export { cn } from './classnames'
 export { createClient } from './supabase'
-```
+\`\`\`
 
 ---
 

@@ -31,9 +31,9 @@ Camino is a production-ready business intelligence platform that helps executive
 ### Local Development
 
 1. **Clone and Install**
-   ```bash
+   \`\`\`bash
    npm install
-   ```
+   \`\`\`
 
 2. **Setup Supabase**
    - Create a new Supabase project at https://supabase.com
@@ -48,9 +48,9 @@ Camino is a production-ready business intelligence platform that helps executive
    - `scripts/004_data_foundations_and_benchmarks.sql` - Benchmarks and alerts
 
 4. **Start Development Server**
-   ```bash
+   \`\`\`bash
    npm run dev
-   ```
+   \`\`\`
 
 5. **Open the App**
    Navigate to `http://localhost:3000`
@@ -73,7 +73,7 @@ Camino is a production-ready business intelligence platform that helps executive
    - Environment variables are carried over
 
 2. **From GitHub**
-   ```bash
+   \`\`\`bash
    # Push to GitHub
    git init
    git add .
@@ -85,7 +85,7 @@ Camino is a production-ready business intelligence platform that helps executive
    - Import GitHub repository
    - Environment variables auto-imported
    - Deploy
-   ```
+   \`\`\`
 
 3. **Custom Domain**
    - Buy domain (e.g., camino.com)

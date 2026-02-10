@@ -370,7 +370,7 @@ Date: _________________________
 
 ### Data Flow
 
-```
+\`\`\`
 Customer Upload → Secure Upload (TLS 1.3)
                       ↓
                File Processing (Vercel Edge)
@@ -380,7 +380,7 @@ Customer Upload → Secure Upload (TLS 1.3)
                Encrypted Storage (Neon PostgreSQL)
                       ↓
                Dashboard Display (Client)
-```
+\`\`\`
 
 ### Security Practices
 

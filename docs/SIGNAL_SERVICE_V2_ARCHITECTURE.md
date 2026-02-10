@@ -10,7 +10,7 @@ This document explains how the Signal Service v2 will work and how we'll build i
 
 ### High-Level Architecture
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                         USER UPLOADS DATA                        │
 │                    (CSV, API Integration, etc.)                  │
@@ -59,7 +59,7 @@ This document explains how the Signal Service v2 will work and how we'll build i
 │  Level 2: Why & Who (AI analysis, scope)                        │
 │  Level 3: So What? (impact, expectations)                       │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -71,7 +71,7 @@ This document explains how the Signal Service v2 will work and how we'll build i
 
 **Our Solution: Dual-Path Storage Strategy**
 
-```typescript
+\`\`\`typescript
 // When user uploads a CSV
 {
   // Path 1: IMMEDIATE SIGNALS (for instant gratification)
@@ -127,7 +127,7 @@ This document explains how the Signal Service v2 will work and how we'll build i
     ]
   }
 }
-```
+\`\`\`
 
 **Why This Works:**
 - **Immediate Signals:** User sees value instantly (no waiting for AI processing)
@@ -152,7 +152,7 @@ This document explains how the Signal Service v2 will work and how we'll build i
 
 **Our Solution: Intelligent 3-Tier Mapping System**
 
-```typescript
+\`\`\`typescript
 // Tier 1: Exact Match (Auto-map with 100% confidence)
 {
   csvColumn: "ticket_id",
@@ -185,11 +185,11 @@ This document explains how the Signal Service v2 will work and how we'll build i
     { field: "custom_metric", confidence: 50 }
   ]
 }
-```
+\`\`\`
 
 **Smart Mapping Algorithm:**
 
-```typescript
+\`\`\`typescript
 function intelligentMapping(csvColumns, availableSignals) {
   const mappings = []
   
@@ -214,11 +214,11 @@ function intelligentMapping(csvColumns, availableSignals) {
   
   return mappings
 }
-```
+\`\`\`
 
 **User Experience Flow:**
 
-```
+\`\`\`
 1. Upload CSV
    ↓
 2. System analyzes columns
@@ -233,7 +233,7 @@ function intelligentMapping(csvColumns, availableSignals) {
 5. Save mapping template: "Zoho Desk Tickets Mapping"
    ↓
 6. Next upload: "Use saved mapping? [Zoho Desk Tickets Mapping ▼]"
-```
+\`\`\`
 
 **Scalability Features:**
 - **Saved Mappings:** User maps once, reuse forever
@@ -249,7 +249,7 @@ function intelligentMapping(csvColumns, availableSignals) {
 
 **Our Solution: Multi-Factor Signal Ranking Algorithm**
 
-```typescript
+\`\`\`typescript
 function calculateSignalRank(signal, userContext, organizationData) {
   // Factor 1: USER RELEVANCE (40% weight)
   const userRelevance = {
@@ -290,7 +290,7 @@ function calculateSignalRank(signal, userContext, organizationData) {
   // FINAL RANK (0-100 scale, like PageRank)
   return userScore + strengthScore + qualityScore + urgencyScore
 }
-```
+\`\`\`
 
 **Example Signal Ranking:**
 
@@ -313,7 +313,7 @@ function calculateSignalRank(signal, userContext, organizationData) {
 ### Level 1: WHAT (Front of Card)
 
 **Immediately Visible (No Click Required):**
-```
+\`\`\`
 ┌─────────────────────────────────────────┐
 │ 🔴 Churn Rate                      93★  │ ← Signal Rank Badge
 │                                          │
@@ -322,10 +322,10 @@ function calculateSignalRank(signal, userContext, organizationData) {
 │  vs benchmark: 2.1% higher           │ ← Comparison
 │  📊 Medium confidence                   │ ← Quality indicator
 └─────────────────────────────────────────┘
-```
+\`\`\`
 
 **Expanded WHAT (Click to see details):**
-```
+\`\`\`
 DATA SOURCES
 ✓ Zoho CRM (connected, synced 2h ago)
 ✓ Product Analytics (connected, synced 1d ago)
@@ -340,20 +340,20 @@ Completeness: ████████░░ 85%
 Freshness: ██████████ 100% (2h old)
 Consistency: ███████░░░ 70% (some gaps)
 Corroboration: ✓ Matches across 2 sources
-```
+\`\`\`
 
 ### Level 2: WHY & WHO (Swipe/Click)
 
 **Why Analysis - Event Timeline:**
-```
+\`\`\`
 Jan 5: Marketing campaign ended (-30% new signups)
 Jan 7: Price increase announced (+15% cancellations)
 Jan 10: Support response time increased to 48h
 Jan 12: Competitor launched similar product
-```
+\`\`\`
 
 **Why Analysis - AI-Powered (Cached):**
-```
+\`\`\`
 💡 AI Insight (generated 2d ago):
 "Churn increased primarily among SMB customers ($500-2k MRR) 
 who joined in Q3 2024. Contributing factors:
@@ -363,10 +363,10 @@ who joined in Q3 2024. Contributing factors:
 
 Correlation detected: Users who didn't complete onboarding 
 are 3.2x more likely to churn within 60 days."
-```
+\`\`\`
 
 **Who Analysis - Scope:**
-```
+\`\`\`
 CUSTOMER SEGMENTS AFFECTED
 🔴 High impact: SMB customers ($500-2k MRR)
    - 45 customers churned
@@ -379,20 +379,20 @@ CUSTOMER SEGMENTS AFFECTED
 GEOGRAPHY
 Highest churn: US West Coast (8%), EU (6%)
 Lowest churn: APAC (2%)
-```
+\`\`\`
 
 ### Level 3: SO WHAT? (Swipe/Click)
 
 **Direction Assessment:**
-```
+\`\`\`
 🔴 NEGATIVE & UNEXPECTED
 Expected churn: 8-10% (industry benchmark)
 Actual churn: 15.2%
 This is 5.2 percentage points above expectation
-```
+\`\`\`
 
 **KPI Impact Prediction:**
-```
+\`\`\`
 IMPACT ON YOUR KEY KPIs
 
 📉 Annual Recurring Revenue (Your #1 KPI)
@@ -404,10 +404,10 @@ IMPACT ON YOUR KEY KPIs
    
 📊 Net Revenue Retention (Your #3 KPI)
    Dropped from 110% to 92% (danger zone)
-```
+\`\`\`
 
 **Recommended Actions:**
-```
+\`\`\`
 SUGGESTED NEXT STEPS
 1. 🎯 Focus on onboarding completion
    - 58% of churned users never completed setup
@@ -422,7 +422,7 @@ SUGGESTED NEXT STEPS
    - Offer: 2 months at old pricing + dedicated onboarding
 
 [Create Decision Card from this Signal] ← CTA
-```
+\`\`\`
 
 ---
 
@@ -439,7 +439,7 @@ SUGGESTED NEXT STEPS
 - ✓ High reliability
 
 **Example Flow:**
-```
+\`\`\`
 User connects Zoho Desk
   ↓
 System calls Zoho API: GET /desk/reports/metrics
@@ -455,10 +455,10 @@ System creates signals:
   Signal 3: "CSAT Score" = 4.2/5
   ↓
 Show on dashboard (within 2 seconds)
-```
+\`\`\`
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 // Adapter pattern for each tool
 class ZohoDeskAdapter {
   async getPreExistingSignals() {
@@ -477,7 +477,7 @@ class ZohoDeskAdapter {
     ]
   }
 }
-```
+\`\`\`
 
 ### Type 2: Calculated Signals
 
@@ -489,7 +489,7 @@ class ZohoDeskAdapter {
 - Cross-dataset calculations
 
 **Example Flow:**
-```
+\`\`\`
 User uploads Zoho Desk tickets CSV
   ↓
 System stores in universal_data_points
@@ -499,7 +499,7 @@ System runs aggregation queries:
   - AVG(resolution_time) WHERE status = 'closed'
   ↓
 Create calculated signals (within 5 seconds)
-```
+\`\`\`
 
 **Cost:** Low (database queries only, no AI)
 
@@ -514,7 +514,7 @@ Create calculated signals (within 5 seconds)
 - Monthly synthesis reports
 
 **Example Flow:**
-```
+\`\`\`
 User clicks "Why did churn increase?"
   ↓
 Check cache: Has this been analyzed in last 7 days?
@@ -536,10 +536,10 @@ Cache result for 7 days
 Cost: $0.02 per analysis
   ↓
 Show in "Why & Who" section
-```
+\`\`\`
 
 **Cost Optimization:**
-```typescript
+\`\`\`typescript
 // Only use AI when:
 1. User explicitly requests it (click "Explain")
 2. Weekly synthesis for top 10 signals
@@ -555,7 +555,7 @@ async function getAIAnalysis(signalId) {
   await saveToCache(signalId, analysis, ttl: 7days)
   return analysis
 }
-```
+\`\`\`
 
 ---
 
@@ -566,7 +566,7 @@ async function getAIAnalysis(signalId) {
 **4 Quality Dimensions:**
 
 1. **Completeness (0-100%)**
-   ```typescript
+   \`\`\`typescript
    completeness = (fields_with_data / total_required_fields) * 100
    
    Example:
@@ -574,10 +574,10 @@ async function getAIAnalysis(signalId) {
    Present: ticket_id, status, created_at, closed_at
    Missing: csat (20% missing)
    Score: 80%
-   ```
+   \`\`\`
 
 2. **Freshness (0-100%)**
-   ```typescript
+   \`\`\`typescript
    freshness = Math.max(0, 100 - (hours_since_update / 24) * 10)
    
    Example:
@@ -585,19 +585,19 @@ async function getAIAnalysis(signalId) {
    Updated 12 hours ago: 95% (good)
    Updated 3 days ago: 70% (ok, getting stale)
    Updated 10 days ago: 0% (too old)
-   ```
+   \`\`\`
 
 3. **Consistency (0-100%)**
-   ```typescript
+   \`\`\`typescript
    consistency = (data_points_in_expected_range / total_data_points) * 100
    
    Example:
    100 tickets, 15 have missing dates, 10 have future dates (invalid)
    Valid: 75/100 = 75% consistent
-   ```
+   \`\`\`
 
 4. **Corroboration (boolean + sources count)**
-   ```typescript
+   \`\`\`typescript
    corroboration = {
      hasMultipleSources: true,
      sourceCount: 2,
@@ -609,10 +609,10 @@ async function getAIAnalysis(signalId) {
    - Zoho CRM: 15.2%
    - Stripe: 15.8%
    Corroboration: ✓ (within 5%)
-   ```
+   \`\`\`
 
 **Overall Signal Strength:**
-```typescript
+\`\`\`typescript
 signalStrength = (
   completeness * 0.30 +
   freshness * 0.25 +
@@ -625,7 +625,7 @@ Display:
 80-94: 🟡 Medium confidence
 60-79: 🟠 Low confidence
 <60: 🔴 Weak signal (show warning)
-```
+\`\`\`
 
 ---
 
@@ -634,7 +634,7 @@ Display:
 ### State 1: Zero Data (New User)
 
 **What User Sees:**
-```
+\`\`\`
 ┌─────────────────────────────────────────┐
 │ 📊 Recommended Signals for Product Lead │
 │                                          │
@@ -655,10 +655,10 @@ Display:
 │                                          │
 │ Or [Upload CSV] to get started           │
 └─────────────────────────────────────────┘
-```
+\`\`\`
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 // Show role-based templates
 const recommendedSignals = getSignalTemplates({
   role: userContext.role, // "Product Lead"
@@ -671,12 +671,12 @@ const recommendedSignals = getSignalTemplates({
 // - What it measures
 // - Recommended data sources
 // - How to connect
-```
+\`\`\`
 
 ### State 2: Low Data (Some Uploads)
 
 **What User Sees:**
-```
+\`\`\`
 ┌─────────────────────────────────────────┐
 │ 🟡 Ticket Volume                   65★  │
 │                                          │
@@ -688,7 +688,7 @@ const recommendedSignals = getSignalTemplates({
 │                                          │
 │  [Connect Zoho Desk] ← CTA              │
 └─────────────────────────────────────────┘
-```
+\`\`\`
 
 **Strategy:**
 - Show partial signals with quality warnings
@@ -699,7 +699,7 @@ const recommendedSignals = getSignalTemplates({
 ### State 3: Rich Data (Multiple Sources Connected)
 
 **What User Sees:**
-```
+\`\`\`
 ┌─────────────────────────────────────────┐
 │ 🟢 Customer Churn Rate             93★  │
 │                                          │
@@ -711,7 +711,7 @@ const recommendedSignals = getSignalTemplates({
 │  💡 AI insight available                │
 │  [See Why & Who] ← CTA                  │
 └─────────────────────────────────────────┘
-```
+\`\`\`
 
 **Features Unlocked:**
 - Full signal analysis (What, Why & Who, So What?)
@@ -780,7 +780,7 @@ const recommendedSignals = getSignalTemplates({
 
 ### Database Schema (Enhanced)
 
-```sql
+\`\`\`sql
 -- Signals table (enhanced)
 CREATE TABLE signals (
   id UUID PRIMARY KEY,
@@ -854,11 +854,11 @@ CREATE TABLE signal_templates (
   calculation_method TEXT,
   is_public BOOLEAN DEFAULT true
 );
-```
+\`\`\`
 
 ### API Endpoints
 
-```typescript
+\`\`\`typescript
 // Signal CRUD
 GET    /api/signals                    // List signals (ranked)
 GET    /api/signals/:id                // Get signal details
@@ -886,7 +886,7 @@ GET    /api/mappings/templates         // Get saved templates
 GET    /api/integrations/zoho-desk/signals
 GET    /api/integrations/zoho-crm/signals
 GET    /api/integrations/hubspot/signals
-```
+\`\`\`
 
 ---
 

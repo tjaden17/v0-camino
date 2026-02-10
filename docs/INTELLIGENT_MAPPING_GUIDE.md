@@ -46,7 +46,7 @@ The system uses 7 factors to calculate confidence:
 
 Users can save successful mappings as templates for future uploads:
 
-```typescript
+\`\`\`typescript
 // Save template after successful mapping
 const template = {
   name: "Zoho Desk Standard",
@@ -58,7 +58,7 @@ const template = {
     "Closed Time": "closed_at"
   }
 }
-```
+\`\`\`
 
 Next time they upload Zoho Desk data, the system automatically applies the saved template (100% confidence).
 
@@ -66,7 +66,7 @@ Next time they upload Zoho Desk data, the system automatically applies the saved
 
 When users correct a mapping, the system learns:
 
-```typescript
+\`\`\`typescript
 // User corrected: "Rating" from "nps_score" to "satisfaction_rating"
 learnFromUserCorrections({
   csvColumn: "Rating",
@@ -75,7 +75,7 @@ learnFromUserCorrections({
 })
 
 // Future uploads: "Rating" will have higher confidence for "satisfaction_rating"
-```
+\`\`\`
 
 ## Benefits
 

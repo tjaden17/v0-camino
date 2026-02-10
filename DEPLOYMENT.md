@@ -12,7 +12,7 @@
 
 Run these SQL scripts in order in your Supabase SQL Editor:
 
-```sql
+\`\`\`sql
 -- 1. Create profiles table
 -- Copy content from scripts/001_create_profiles.sql
 
@@ -24,17 +24,17 @@ Run these SQL scripts in order in your Supabase SQL Editor:
 
 -- 4. Create benchmarks and data foundations
 -- Copy content from scripts/004_data_foundations_and_benchmarks.sql
-```
+\`\`\`
 
 ### 3. Verify RLS Policies
 
 Test that users can only see their organization's data:
 
-```sql
+\`\`\`sql
 -- Test as different users
 SELECT * FROM signals; -- Should only show own org
 SELECT * FROM profiles; -- Should only show own org
-```
+\`\`\`
 
 ## Deployment Steps
 
@@ -51,34 +51,34 @@ SELECT * FROM profiles; -- Should only show own org
 ### Option 2: Deploy via GitHub
 
 1. **Export code from v0**
-   ```bash
+   \`\`\`bash
    # Download ZIP from v0
    # Extract to local folder
-   ```
+   \`\`\`
 
 2. **Initialize Git**
-   ```bash
+   \`\`\`bash
    git init
    git add .
    git commit -m "Initial Camino deployment"
-   ```
+   \`\`\`
 
 3. **Push to GitHub**
-   ```bash
+   \`\`\`bash
    git remote add origin https://github.com/YOUR_USERNAME/camino.git
    git push -u origin main
-   ```
+   \`\`\`
 
 4. **Deploy on Vercel**
    - Go to vercel.com
    - Click "New Project"
    - Import from GitHub
    - Add environment variables manually:
-     ```
+     \`\`\`
      NEXT_PUBLIC_SUPABASE_URL=your_url
      NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
      SUPABASE_SERVICE_ROLE_KEY=your_service_key
-     ```
+     \`\`\`
    - Click Deploy
 
 ## Post-Deployment
@@ -142,17 +142,17 @@ SELECT * FROM profiles; -- Should only show own org
 ### 3. Set Up Monitoring (Optional but Recommended)
 
 **Sentry (Error Tracking)**
-```bash
+\`\`\`bash
 npm install @sentry/nextjs
 npx @sentry/wizard@latest -i nextjs
-```
+\`\`\`
 
 Add to environment variables:
-```
+\`\`\`
 NEXT_PUBLIC_SENTRY_DSN=your_dsn
 SENTRY_ORG=your_org
 SENTRY_PROJECT=camino
-```
+\`\`\`
 
 **Vercel Analytics** (Already Included)
 - Automatically tracks page views
@@ -202,10 +202,10 @@ Create these pages:
 - Export manually via SQL
 
 **Additional Safety**
-```bash
+\`\`\`bash
 # Weekly database export (run as cron job)
 pg_dump YOUR_DATABASE_URL > backup_$(date +%Y%m%d).sql
-```
+\`\`\`
 
 Store backups in:
 - AWS S3
@@ -227,12 +227,12 @@ Store backups in:
 ### 8. Team Onboarding
 
 **Create Admin Accounts**
-```sql
+\`\`\`sql
 -- In Supabase SQL editor
 UPDATE profiles 
 SET role = 'admin' 
 WHERE email = 'admin@camino.com';
-```
+\`\`\`
 
 **First Users**
 1. Invite 5-10 beta users

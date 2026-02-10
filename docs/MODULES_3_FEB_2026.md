@@ -8,7 +8,7 @@ Camino is structured as a **modular monolith** - logically separated modules wit
 
 ## Module Architecture
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                        PRESENTATION                              │
 │         (Signal cards, filters, dashboards, exports)            │
@@ -37,7 +37,7 @@ Camino is structured as a **modular monolith** - logically separated modules wit
 │                         DATA IN                                  │
 │       (File uploads, API connectors, staging, discovery)        │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 

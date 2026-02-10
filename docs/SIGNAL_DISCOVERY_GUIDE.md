@@ -56,11 +56,11 @@ Too many required fields are missing.
 ### Example 1: Zoho Desk Ticket Export
 
 **Uploaded Data:**
-```csv
+\`\`\`csv
 Ticket ID,Subject,Status,Priority,Created Time,Closed Time,Assignee
 TICK-001,Login Issue,Closed,High,2025-01-01 10:00,2025-01-02 14:30,John
 TICK-002,Feature Request,Open,Low,2025-01-02 09:15,,,Sarah
-```
+\`\`\`
 
 **Discovery Results:**
 - ✅ **Available (7 signals)**
@@ -84,11 +84,11 @@ TICK-002,Feature Request,Open,Low,2025-01-02 09:15,,,Sarah
 ### Example 2: CRM Deal Export
 
 **Uploaded Data:**
-```csv
+\`\`\`csv
 Deal Name,Amount,Stage,Close Date,Owner,Created Date
 Acme Corp,$50000,Closed Won,2025-01-15,Alice,2024-12-01
 Beta Inc,$25000,Negotiation,2025-02-01,Bob,2024-12-15
-```
+\`\`\`
 
 **Discovery Results:**
 - ✅ **Available (5 signals)**
@@ -111,12 +111,12 @@ Beta Inc,$25000,Negotiation,2025-02-01,Bob,2024-12-15
 ### Example 3: Product Analytics Export
 
 **Uploaded Data:**
-```csv
+\`\`\`csv
 User ID,Activity Date,Feature,Session Duration
 USER-001,2025-01-01,Dashboard,240
 USER-001,2025-01-02,Export,60
 USER-002,2025-01-01,Dashboard,180
-```
+\`\`\`
 
 **Discovery Results:**
 - ✅ **Available (4 signals)**
@@ -155,7 +155,7 @@ This flow helps users:
 
 To add a new signal to the discovery system, update `SIGNAL_DEFINITIONS` in `lib/signal-discovery-service.ts`:
 
-```typescript
+\`\`\`typescript
 {
   signalId: "your_signal_id",
   signalName: "Your Signal Name",
@@ -174,7 +174,7 @@ To add a new signal to the discovery system, update `SIGNAL_DEFINITIONS` in `lib
   optionalFields: [],
   calculationType: "direct|calculated|aggregated|time-series"
 }
-```
+\`\`\`
 
 ### Customizing Match Thresholds
 

@@ -10,7 +10,7 @@ A B2B SaaS signal intelligence platform that helps businesses extract, analyze, 
 
 ## Architecture
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              FRONTEND (Next.js 16)                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -56,7 +56,7 @@ A B2B SaaS signal intelligence platform that helps businesses extract, analyze, 
 │  - staged_* tables       │                                                   │
 │  - signal_relationships  │                                                   │
 └─────────────────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -81,10 +81,10 @@ A B2B SaaS signal intelligence platform that helps businesses extract, analyze, 
 - Supports required fields, calculation types (aggregated, direct), and formulas
 
 **Debug Points:**
-```typescript
+\`\`\`typescript
 console.log("[v0] discoverSignals - columns:", columns)
 console.log("[v0] discoverSignals - matched signals:", result.available.length)
-```
+\`\`\`
 
 ---
 
@@ -108,7 +108,7 @@ console.log("[v0] discoverSignals - matched signals:", result.available.length)
 - `field_availability` - Index of all available fields per user
 
 **Cross-Source Flow:**
-```
+\`\`\`
 Upload A (CRM)     Upload B (Finance)
      │                    │
      └───────┬────────────┘
@@ -122,7 +122,7 @@ Upload A (CRM)     Upload B (Finance)
              ▼
     Signal Opportunities
     (ready, partial, missing)
-```
+\`\`\`
 
 ---
 
@@ -140,9 +140,9 @@ Upload A (CRM)     Upload B (Finance)
 **Important:** Reads from **Neon** (not Supabase) using `DISTINCT ON (name)` to deduplicate
 
 **Debug Points:**
-```typescript
+\`\`\`typescript
 console.log("[v0] getSignals - org:", organizationId, "found:", signals.length)
-```
+\`\`\`
 
 ---
 
@@ -159,9 +159,9 @@ console.log("[v0] getSignals - org:", organizationId, "found:", signals.length)
 | `calculateUrgencyScore()` | Scores urgency based on anomalies/changes | signal | 0-100 score |
 
 **Ranking Formula:**
-```
+\`\`\`
 Total Score = (Relevance × 0.40) + (Goal Alignment × 0.35) + (Urgency × 0.25)
-```
+\`\`\`
 
 **Role-Signal Relevance Matrix:**
 | Role | High Priority Categories |
@@ -204,13 +204,13 @@ Total Score = (Relevance × 0.40) + (Goal Alignment × 0.35) + (Urgency × 0.25)
 | `generateInterpretation()` | Creates new AI interpretation | signal, context | interpretation |
 
 **Interpretation Structure:**
-```typescript
+\`\`\`typescript
 interface SignalInterpretation {
   what_we_found: { title: string; points: string[] }
   what_it_means: { title: string; points: string[] }
   so_what: { title: string; actions: string[] }
 }
-```
+\`\`\`
 
 ---
 
@@ -244,7 +244,7 @@ interface SignalInterpretation {
 | `/api/upload/stage` | POST | Stage upload for cross-source | staging-service |
 
 **Upload Flow:**
-```
+\`\`\`
 1. POST /api/upload/discover-signals
    - Parse CSV/XLSX
    - Detect columns and types
@@ -257,7 +257,7 @@ interface SignalInterpretation {
    - Calculate values using matched fields
    - UPSERT into signals table (dedup by name+org)
    - Return: created signal IDs
-```
+\`\`\`
 
 ### Signal Routes
 
@@ -315,7 +315,7 @@ interface SignalInterpretation {
 
 ### Flow 1: New User Onboarding
 
-```
+\`\`\`
 1. Sign up (Supabase Auth)
 2. Redirect to /auth/onboarding
 3. Step 1: Organization (name, industry, size, stage)
@@ -326,7 +326,7 @@ interface SignalInterpretation {
    - Updates profiles.organization_id
    - Creates user_context record
 7. Redirect to /signals (dashboard)
-```
+\`\`\`
 
 **Debug Checklist:**
 - [ ] Organization created in `organizations` table
@@ -335,7 +335,7 @@ interface SignalInterpretation {
 
 ### Flow 2: File Upload to Signals
 
-```
+\`\`\`
 1. Navigate to /upload
 2. Select file (CSV/XLSX)
 3. POST /api/upload/discover-signals
@@ -346,7 +346,7 @@ interface SignalInterpretation {
    - UPSERTS signals (prevents duplicates)
 6. Redirect to /signals
 7. Signals appear in accordion cards
-```
+\`\`\`
 
 **Debug Checklist:**
 - [ ] File parsed correctly (check row count)
@@ -358,7 +358,7 @@ interface SignalInterpretation {
 
 ### Flow 3: Signal Exploration (L1→L2→L3)
 
-```
+\`\`\`
 1. /signals page loads
 2. GET /api/signals (filtered by organization_id)
 3. L1: Accordion card shows name, value, trend, change%
@@ -367,7 +367,7 @@ interface SignalInterpretation {
 6. Click "Get AI Insights"
 7. GET /api/signals/[id]/interpretation
 8. L3: AI interpretation (What We Found, What It Means, So What)
-```
+\`\`\`
 
 **Debug Checklist:**
 - [ ] organization_id correctly fetched from Neon profiles
@@ -384,12 +384,12 @@ interface SignalInterpretation {
 **Cause:** Signal calculation falling through to default `rows.length`
 
 **Debug:**
-```typescript
+\`\`\`typescript
 // In /api/upload/calculate/route.ts
 console.log("[v0] calculateAggregatedSignal - signal:", signal.signalId)
 console.log("[v0] calculateAggregatedSignal - matchedFields:", matchedFields)
 console.log("[v0] calculateAggregatedSignal - numericField:", numericField)
-```
+\`\`\`
 
 **Fix:** Ensure signal name patterns match calculation logic (total, average, rate, etc.)
 
@@ -400,13 +400,13 @@ console.log("[v0] calculateAggregatedSignal - numericField:", numericField)
 **Cause:** organization_id mismatch between insert and query
 
 **Debug:**
-```typescript
+\`\`\`typescript
 // Check what org_id is used on insert
 console.log("[v0] Calculate - inserting with org:", organizationId)
 
 // Check what org_id is used on query
 console.log("[v0] Signals page - querying org:", organizationId)
-```
+\`\`\`
 
 **Fix:** Ensure both read from Neon `profiles` table (not Supabase)
 
@@ -417,11 +417,11 @@ console.log("[v0] Signals page - querying org:", organizationId)
 **Cause:** Missing unique constraint, multiple uploads
 
 **Debug:**
-```sql
+\`\`\`sql
 SELECT name, COUNT(*) FROM signals 
 WHERE organization_id = 'xxx' 
 GROUP BY name HAVING COUNT(*) > 1
-```
+\`\`\`
 
 **Fix:** 
 1. Delete duplicates
@@ -435,10 +435,10 @@ GROUP BY name HAVING COUNT(*) > 1
 **Cause:** user_context not created or onboarding_completed = false
 
 **Debug:**
-```sql
+\`\`\`sql
 SELECT * FROM user_context WHERE user_id = 'xxx'
 SELECT * FROM profiles WHERE id = 'xxx'
-```
+\`\`\`
 
 **Fix:** Ensure `/api/user/complete-onboarding` creates user_context with `onboarding_completed = true`
 

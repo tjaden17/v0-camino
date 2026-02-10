@@ -251,7 +251,7 @@ The customer agrees to pay when all of these are true:
 
 This is the exact data flow that must work end-to-end for Tier 1:
 
-```
+\`\`\`
 STEP 1: Manager uploads CSV
   Page:    /upload (upload-page-client.tsx)
   API:     POST /api/upload/discover
@@ -290,7 +290,7 @@ STEP 7: User expands signal card
   Page:    /signals/[id] (signal-detail-client.tsx)
   Service: Fetches interpretation from Supabase
   Display: 5-section analysis in expandable sections
-```
+\`\`\`
 
 ### Key Files in Critical Path
 

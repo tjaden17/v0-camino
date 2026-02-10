@@ -9,6 +9,7 @@ North Star metric: 1 upload (manager) + 1 view/week (any user)
 
 Current phase: MSS (Minimum Sellable Service) - admin-in-the-loop model.
 First customer: Uses Zoho CRM, Zoho Desk, and custom CSV data files.
+Data sources: CSV/XLSX upload (manual) + API integration (Zoho CRM/Desk, automated).
 Delivery plan: /docs/DELIVERY_PLAN_MVP_GDOC.txt
 MSS scope: /docs/MSS_SCOPE.txt
 
@@ -54,6 +55,10 @@ MSS scope: /docs/MSS_SCOPE.txt
 - `organization-service.ts` - Organization management
 - `admin-service.ts` - Admin user management
 - `csv-parser.ts` / `xlsx-parser.ts` - File parsing utilities
+- `zoho-api-client.ts` - Zoho CRM/Desk REST API client (needs wiring to generate pipeline)
+- `zoho-oauth-service.ts` - Zoho OAuth token management
+- `zoho-desk-processor.ts` - Processes Zoho Desk data into rows
+- `zoho-signal-discovery.ts` - Zoho-specific signal definitions (needs migration to new pipeline)
 
 ### Deprecated Services (still in codebase, NOT used by active flows)
 - `signal-discovery-service.ts` - Old AI-powered signal detection with 92 definitions. REPLACED by 3-question upload flow.
@@ -69,7 +74,7 @@ MSS scope: /docs/MSS_SCOPE.txt
 
 This is the active data flow. Every change to these files needs extra care:
 
-```
+\`\`\`
 Upload CSV/XLSX (upload-proto-client.tsx)
   -> User classifies each tab via 3 questions:
      Q1: What does each row represent? (leads/deals/tickets/customers/events/agents)
@@ -83,7 +88,7 @@ Upload CSV/XLSX (upload-proto-client.tsx)
      - Upserts into signals table + signal_data_points table (Neon)
   -> /signals page reads from signals table via signals-service.ts
   -> signal-accordion-card.tsx renders each signal
-```
+\`\`\`
 
 Key design principle: Signals are generated from EXPLICIT user answers, not from heuristic guessing. If a required field can't be resolved, the signal is skipped (never show a wrong number).
 
@@ -150,7 +155,7 @@ Key design principle: Signals are generated from EXPLICIT user answers, not from
 - Mobile breakpoints: default is mobile, use md: and lg: for larger screens
 
 ### Protected Pages Pattern
-```tsx
+\`\`\`tsx
 // app/(protected)/example/page.tsx (server component, thin wrapper)
 import { ExampleClient } from "@/components/example-client"
 export default function ExamplePage() {
@@ -162,7 +167,7 @@ export default function ExamplePage() {
 export function ExampleClient() {
   // ... component logic
 }
-```
+\`\`\`
 
 
 ## What NOT To Do
@@ -192,14 +197,16 @@ Week 2 (CURRENT):
 - Admin can input user context via Admin CP (upcoming_priorities, signal_preferences)
 - AI analysis prompt uses user/org context for personalised insights
 - Admin can upload files on behalf of a user
-- Definition of Billable: manager uploads CSV, sees 3+ correct signals with AI analysis
+- API integration: wire Zoho CRM/Desk to generate pipeline (virtual tabs, pre-filled answers)
+- Data onboarding: admin-assisted workflow (receive samples, classify, validate, set up API)
+- Definition of Billable: 8 criteria including upload + API data sources, 3+ signals, personalised AI
 
 See /docs/DELIVERY_PLAN_MVP_GDOC.txt for the full 6-week plan.
 
 
 ## File Organization
 
-```
+\`\`\`
 /app
   /(protected)     Customer-facing pages (upload, signals, profile, decisions)
   /admin           Admin panel (users, orgs, uploads)
@@ -227,4 +234,4 @@ See /docs/DELIVERY_PLAN_MVP_GDOC.txt for the full 6-week plan.
 /scripts           SQL migration scripts
 /docs              MSS_SCOPE.txt, DELIVERY_PLAN_MVP_GDOC.txt
 /public            Static assets, icons
-```
+\`\`\`

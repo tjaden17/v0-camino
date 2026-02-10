@@ -16,7 +16,7 @@ The Signal Service transforms raw business data from Zoho CRM and Zoho Desk into
 
 ### Architecture Overview
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         DATA IMPORT LAYER                           │
 ├───────────────┬───────────────┬───────────────┬────────────────────┤
@@ -52,7 +52,7 @@ The Signal Service transforms raw business data from Zoho CRM and Zoho Desk into
 │   signals     │  data_points  │  Signal Hub   │  User Dashboards   │
 │   (current)   │  (historical) │  (admin)      │  (display)         │
 └───────────────┴───────────────┴───────────────┴────────────────────┘
-```
+\`\`\`
 
 ### Key Components
 
@@ -70,14 +70,14 @@ The Signal Service transforms raw business data from Zoho CRM and Zoho Desk into
 - Returns confidence level (high/medium/low) for each signal
 
 #### 3. Staging Tables (Database)
-```
+\`\`\`
 zoho_deals      - CRM deal/opportunity data
 zoho_tickets    - Support ticket data  
 zoho_accounts   - Company/account data
 zoho_contacts   - Contact/person data
 zoho_imports    - Import session tracking
 zoho_data_sources - Availability tracking per organization
-```
+\`\`\`
 
 #### 4. Signal Definitions (`signal_definitions` table)
 Pre-defined signals with:
@@ -195,7 +195,7 @@ Each tab is analyzed independently:
 
 The codebase is organized into logical modules that could be extracted as microservices when scale demands:
 
-```
+\`\`\`
 lib/modules/
 ├── import/     # File upload, parsing, validation
 ├── staging/    # Data normalization, storage, source tracking
@@ -203,7 +203,7 @@ lib/modules/
 ├── analysis/   # Trends, root cause, segments
 ├── impact/     # Goals, projections, business impact
 └── dashboard/  # Card composition, three-view UI
-```
+\`\`\`
 
 ### Module Boundaries
 
@@ -226,7 +226,7 @@ Each signal card supports three views:
 
 ### Usage Example
 
-```typescript
+\`\`\`typescript
 import { 
   stageRecords, 
   getDataSources 
@@ -249,7 +249,7 @@ const { available, locked } = await getAvailableSignals(organizationId)
 
 // Get complete signal card with all three views
 const { card, found, means, soWhat } = await composeFullSignalCard(signalId, organizationId)
-```
+\`\`\`
 
 ---
 

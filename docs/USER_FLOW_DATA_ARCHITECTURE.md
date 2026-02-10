@@ -8,9 +8,9 @@
 
 This document traces a single user journey:
 
-```
+\`\`\`
 Upload File → Parse & Discover → Calculate Signals → View L1 → Expand L2 → Generate L3
-```
+\`\`\`
 
 **Example Signal Used:** "Win Rate" from a Zoho CRM Deals export
 
@@ -23,7 +23,7 @@ Upload File → Parse & Discover → Calculate Signals → View L1 → Expand L2
 **User Action:** Drags `Zoho_CRM_Deals_Export.csv` onto the upload zone in Camino
 
 **File Contents (sample):**
-```csv
+\`\`\`csv
 Deal Name,Amount,Stage,Close Date,Owner,Lead Source
 Acme Corp,45000,Closed Won,2026-01-15,Sarah,Website
 Beta Inc,28000,Closed Lost,2026-01-18,Mike,Referral
@@ -31,11 +31,11 @@ Gamma Ltd,62000,Closed Won,2026-01-20,Sarah,LinkedIn
 Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 ...
 (53 total rows)
-```
+\`\`\`
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                     FRONTEND                                     │
 │  /components/upload-page-client.tsx                             │
@@ -52,10 +52,10 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │  - Parses file content                                          │
 │  - Detects source type (Zoho CRM identified from columns)       │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Data at this point:**
-```typescript
+\`\`\`typescript
 {
   fileName: "Zoho_CRM_Deals_Export.csv",
   fileType: "csv",
@@ -63,7 +63,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
   columns: ["Deal Name", "Amount", "Stage", "Close Date", "Owner", "Lead Source"],
   detectedSource: "zoho_crm"
 }
-```
+\`\`\`
 
 ---
 
@@ -73,7 +73,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                 STAGING SERVICE                                 │
 │  /lib/staging-service.ts                                        │
@@ -112,10 +112,10 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │                                                                  │
 │  4. Return discoverable signals with confidence scores          │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Output - Discovery Confirmation Popup:**
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │  Found 32 Calculable Signals                                    │
 │                                                                  │
@@ -127,7 +127,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │              
 │              [Cancel]  [Calculate Signals]                      │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **User sees:** Categories showing new/updated/partial signals, allows custom selection before calculation
 
@@ -139,7 +139,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                     API ROUTE                                    │
 │  /app/api/upload/calculate/route.ts                             │
@@ -174,10 +174,10 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │  5. formatSignalValue(32.08, "rate")                            │
 │     → Returns: "32.1%"                                          │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Calculation Result:**
-```typescript
+\`\`\`typescript
 {
   value: 32.08,
   formattedValue: "32.1%",
@@ -189,7 +189,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
   formula: "(Positive outcomes / Total) × 100",
   usedColumn: "Stage"
 }
-```
+\`\`\`
 
 ---
 
@@ -197,7 +197,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                     NEON DATABASE                                │
 │  Table: signals                                                  │
@@ -218,7 +218,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │                                                                  │
 │  Constraint: UNIQUE(name, organization_id) prevents duplicates  │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **User sees:** Success message, redirected to /signals page
 
@@ -230,7 +230,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                     SERVER COMPONENT                             │
 │  /app/signals/page.tsx                                          │
@@ -269,10 +269,10 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │    • Opportunities (high potential signals)                     │
 │    • Risks (signals trending down)                              │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **User sees - L1 Card for "Win Rate" (ranked #3 by intelligence):**
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │  Win Rate                                    [Sales]            │
 │                                                                  │
@@ -282,7 +282,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │                                                                  │
 │  [Share]  [Save]                              [More ▼]          │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Data displayed:**
 - Signal name: "Win Rate"
@@ -299,7 +299,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                   CLIENT COMPONENT                               │
 │  /components/signal-accordion-card.tsx                          │
@@ -316,10 +316,10 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │  - Display stats: data points, source, last updated             │
 │  - Display calculation method and field used                    │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **User sees - L2 Expanded (scroll down):**
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │  Win Rate                                    [Sales]            │
 │                                                                  │
@@ -348,7 +348,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │                                                                  │
 │  [Share]  [Save]                              [More ▼]          │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -358,7 +358,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 **Services Involved:**
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                   CLIENT COMPONENT                               │
 │  /components/signal-accordion-card.tsx                          │
@@ -413,10 +413,10 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │  Response time: ~2-3 seconds                                    │
 │  Output: Structured JSON with improved quality & accuracy       │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **AI Response:**
-```json
+\`\`\`json
 {
   "executive_summary": "Win rate improving: 32.1% (↑28.6%). On track for team targets.",
   
@@ -428,14 +428,14 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
   
   "implications_on_goals": "If revenue target is $5M: current rate yields ~$1.6M. Reaching 35% benchmark would yield ~$1.75M (+$150K). Recommend: analyze second-half winning patterns, replicate across team, implement qualification process."
 }
-```
+\`\`\`
 
 ---
 
 ### Step 8: User Sees Complete L3 View
 
 **User sees - Full L3 Expanded:**
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │  Win Rate                                    [Sales]            │
 │                                                                  │
@@ -481,7 +481,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 │                                                                  │
 │  [Share]  [Save]                              [More ▼]          │
 └─────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Complete User Experience:**
 - Single click on card expands/collapses vertically
@@ -494,7 +494,7 @@ Delta Co,35000,Negotiation,2026-01-25,Mike,Website
 
 ## Complete Data Flow Diagram
 
-```
+\`\`\`
 USER                    FRONTEND                 API                    SERVICES                 DATABASE
  │                         │                      │                        │                        │
  │ Drag file              │                      │                        │                        │
@@ -552,7 +552,7 @@ USER                    FRONTEND                 API                    SERVICES
  │                         │◄─────────────────────┤ {interpretation}       │                        │
  │ L3 AI Insights         │                      │                        │                        │
  │◄────────────────────────┤                      │                        │                        │
-```
+\`\`\`
 
 ---
 
@@ -572,13 +572,13 @@ USER                    FRONTEND                 API                    SERVICES
 ## Win Rate Calculation Deep Dive
 
 **Input Data:**
-```
+\`\`\`
 53 deals with "Stage" column containing:
 - "Closed Won": 17 deals
 - "Closed Lost": 21 deals  
 - "Negotiation": 8 deals
 - "Proposal": 7 deals
-```
+\`\`\`
 
 **Calculation Steps:**
 
@@ -587,27 +587,27 @@ USER                    FRONTEND                 API                    SERVICES
 2. **Column Resolution:** `findColumnByPattern(rows, ["status", "stage"])` → `"Stage"`
 
 3. **Rate Calculation:**
-   ```
+   \`\`\`
    Total deals: 53
    Positive outcomes (Stage contains "Won"): 17
    Win Rate = (17 / 53) × 100 = 32.08%
-   ```
+   \`\`\`
 
 4. **Trend Calculation:**
-   ```
+   \`\`\`
    First 26 deals: 7 won → 26.9%
    Last 27 deals: 10 won → 37.0%
    Trend = ((37.0 - 26.9) / 26.9) × 100 = +37.5%
    Rounded: +28.6% (using half averages)
    Direction: "up"
-   ```
+   \`\`\`
 
 5. **Formatting:** `formatSignalValue(32.08, "rate")` → `"32.1%"`
 
 **Stored Summary:**
-```
+\`\`\`
 "Rate/Percentage: (Positive outcomes / Total) × 100. Based on 53 data points from "Stage" column."
-```
+\`\`\`
 
 ---
 

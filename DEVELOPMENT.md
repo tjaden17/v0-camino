@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-```
+\`\`\`
 camino/
 ├── app/
 │   ├── (protected)/          # Protected routes with auth
@@ -41,7 +41,7 @@ camino/
 │   ├── 003_create_kpis_and_decisions.sql
 │   └── 004_data_foundations_and_benchmarks.sql
 └── public/                   # Static assets
-```
+\`\`\`
 
 ## Key Technologies
 
@@ -65,7 +65,7 @@ camino/
 ## Development Workflow
 
 ### 1. Local Setup
-```bash
+\`\`\`bash
 # Install dependencies
 npm install
 
@@ -74,7 +74,7 @@ npm run dev
 
 # Open in browser
 open http://localhost:3000
-```
+\`\`\`
 
 ### 2. Making Changes
 
@@ -86,7 +86,7 @@ open http://localhost:3000
 5. Deploy preview to test
 
 **Adding a New Page**
-```typescript
+\`\`\`typescript
 // app/(protected)/new-feature/page.tsx
 import { createClient } from "@/lib/supabase/server"
 
@@ -96,10 +96,10 @@ export default async function NewFeaturePage() {
   
   return <div>Your page</div>
 }
-```
+\`\`\`
 
 **Adding an API Route**
-```typescript
+\`\`\`typescript
 // app/api/new-endpoint/route.ts
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
@@ -116,7 +116,7 @@ export async function GET() {
   
   return NextResponse.json({ data: [] })
 }
-```
+\`\`\`
 
 ### 3. Database Changes
 
@@ -128,7 +128,7 @@ export async function GET() {
 5. Create service functions in `lib/`
 
 **Example Migration**
-```sql
+\`\`\`sql
 -- scripts/005_new_feature.sql
 CREATE TABLE new_table (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -143,7 +143,7 @@ ALTER TABLE new_table ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own data"
   ON new_table FOR SELECT
   USING (auth.uid() = user_id);
-```
+\`\`\`
 
 ### 4. Testing
 
@@ -159,24 +159,24 @@ CREATE POLICY "Users can view own data"
 - [ ] Navigation between pages
 
 **Testing Auth**
-```typescript
+\`\`\`typescript
 // Test in browser console
 const { data: { user } } = await supabase.auth.getUser()
 console.log(user) // Should show current user
-```
+\`\`\`
 
 **Testing Database**
-```sql
+\`\`\`sql
 -- Run in Supabase SQL editor
 SELECT * FROM profiles LIMIT 5;
 SELECT * FROM signals LIMIT 5;
 SELECT COUNT(*) FROM signal_data_points;
-```
+\`\`\`
 
 ## Common Tasks
 
 ### Add New Signal Category
-```typescript
+\`\`\`typescript
 // Update type in lib/signals-service.ts
 type SignalCategory = 
   | "revenue"
@@ -184,22 +184,22 @@ type SignalCategory =
   | "product"
   | "operations"
   | "your-new-category" // Add here
-```
+\`\`\`
 
 ### Change AI Analysis Prompt
-```typescript
+\`\`\`typescript
 // Update in lib/signals-service.ts
 const analysis = await generateText({
   model: "openai/gpt-4o",
   prompt: `Your updated prompt here...`
 })
-```
+\`\`\`
 
 ### Add New Benchmark Type
-```sql
+\`\`\`sql
 -- Update enum in database
 ALTER TYPE benchmark_type ADD VALUE 'your_new_type';
-```
+\`\`\`
 
 ### Customize Email Templates
 1. Go to Supabase Dashboard
@@ -210,25 +210,25 @@ ALTER TYPE benchmark_type ADD VALUE 'your_new_type';
 ## Debugging
 
 ### Check Auth State
-```typescript
+\`\`\`typescript
 // Add to any component
 const supabase = createClientComponentClient()
 const { data: { session } } = await supabase.auth.getSession()
 console.log("[v0] Session:", session)
-```
+\`\`\`
 
 ### Check Database Connection
-```typescript
+\`\`\`typescript
 // Add to API route
 const { data, error } = await supabase
   .from('signals')
   .select('*')
   .limit(1)
 console.log("[v0] Database test:", { data, error })
-```
+\`\`\`
 
 ### Enable Supabase Logs
-```typescript
+\`\`\`typescript
 // lib/supabase/client.ts
 createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -242,7 +242,7 @@ createBrowserClient(
     },
   }
 )
-```
+\`\`\`
 
 ## Performance Tips
 
@@ -258,7 +258,7 @@ createBrowserClient(
 - Cache results with React `cache()`
 
 ### Image Optimization
-```typescript
+\`\`\`typescript
 import Image from 'next/image'
 
 <Image 
@@ -267,12 +267,12 @@ import Image from 'next/image'
   height={300}
   alt="Description"
 />
-```
+\`\`\`
 
 ## Code Style
 
 ### TypeScript
-```typescript
+\`\`\`typescript
 // Use explicit types
 const getSignals = async (): Promise<Signal[]> => {
   // ...
@@ -281,10 +281,10 @@ const getSignals = async (): Promise<Signal[]> => {
 // Avoid any
 const data: any // ❌ Bad
 const data: Signal[] // ✅ Good
-```
+\`\`\`
 
 ### React
-```typescript
+\`\`\`typescript
 // Use async Server Components
 export default async function Page() {
   const data = await fetchData()
@@ -297,7 +297,7 @@ export function InteractiveComponent() {
   const [state, setState] = useState()
   return <button onClick={() => setState(...)}>Click</button>
 }
-```
+\`\`\`
 
 ### Naming
 - **Components**: PascalCase (`SignalCard`)

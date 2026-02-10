@@ -21,14 +21,14 @@ This document outlines the high-level steps to integrate with Zoho Desk and Zoho
 - Note: Client ID, Client Secret, Redirect URI
 
 **Step 1.2: Implement OAuth 2.0 Flow**
-```
+\`\`\`
 User clicks "Connect Zoho" 
   → Redirect to Zoho authorization URL
   → User grants permissions
   → Zoho redirects back with authorization code
   → Exchange code for access token + refresh token
   → Store tokens securely (encrypted in database)
-```
+\`\`\`
 
 **Step 1.3: Token Management**
 - Access tokens expire in 1 hour
@@ -52,11 +52,11 @@ Zoho Desk provides pre-calculated metrics via their Analytics API:
 - SLA Compliance rates
 
 **API Endpoints:**
-```
+\`\`\`
 GET /api/v1/reports
 GET /api/v1/reports/{reportId}
 GET /api/v1/dashboards
-```
+\`\`\`
 
 **Implementation:**
 1. List available reports via `/reports` endpoint
@@ -92,21 +92,21 @@ Zoho CRM provides analytics through:
 - Revenue Forecasts
 
 **API Endpoints:**
-```
+\`\`\`
 GET /crm/v2/analytics
 GET /crm/v2/reports
 POST /crm/v2/coql (for custom aggregations)
-```
+\`\`\`
 
 **Implementation:**
 1. Fetch available analytics reports
 2. Use COQL to run aggregations:
-   ```sql
+   \`\`\`sql
    SELECT Stage, SUM(Amount) as pipeline_value 
    FROM Deals 
    WHERE Stage != 'Closed Lost' 
    GROUP BY Stage
-   ```
+   \`\`\`
 3. Map results to your signals
 4. Schedule periodic sync (hourly/daily)
 
@@ -128,13 +128,13 @@ POST /crm/v2/coql (for custom aggregations)
 **Use Case:** When you need ALL ticket details for custom signal calculation
 
 **API Approach:**
-```
+\`\`\`
 GET /api/v1/tickets (paginated, max 100 per page)
 GET /api/v1/tickets/search (with filters)
-```
+\`\`\`
 
 **Bulk Export Approach (Recommended for >10K records):**
-```
+\`\`\`
 POST /api/v1/bulkExport
 {
   "module": "tickets",
@@ -144,7 +144,7 @@ POST /api/v1/bulkExport
 → Returns job ID
 → Poll for completion
 → Download CSV file
-```
+\`\`\`
 
 **Implementation:**
 1. Schedule daily/weekly bulk exports
@@ -177,14 +177,14 @@ POST /api/v1/bulkExport
 **Step 3.2: Zoho CRM - Bulk Data Export**
 
 **API Approach (Paginated):**
-```
+\`\`\`
 GET /crm/v2/Deals (max 200 per page)
 GET /crm/v2/Contacts
 GET /crm/v2/Accounts
-```
+\`\`\`
 
 **Bulk Export Approach:**
-```
+\`\`\`
 POST /crm/bulk/v2/read
 {
   "query": {
@@ -196,7 +196,7 @@ POST /crm/bulk/v2/read
 → Returns bulk read job ID
 → Poll for status
 → Download result CSV
-```
+\`\`\`
 
 **Implementation:**
 1. Export Deals, Contacts, Accounts modules
@@ -244,7 +244,7 @@ POST /crm/bulk/v2/read
 
 Add integration tracking tables:
 
-```sql
+\`\`\`sql
 CREATE TABLE integrations (
   id UUID PRIMARY KEY,
   organization_id UUID REFERENCES organizations(id),
@@ -268,7 +268,7 @@ CREATE TABLE integration_sync_jobs (
   completed_at TIMESTAMP,
   error_message TEXT
 );
-```
+\`\`\`
 
 **4.2: Sync Strategy**
 
@@ -297,7 +297,7 @@ CREATE TABLE integration_sync_jobs (
 
 Create mapping configurations:
 
-```typescript
+\`\`\`typescript
 const ZOHO_SIGNAL_MAPPINGS = {
   'zoho_desk': {
     'avg_resolution_time': {
@@ -321,13 +321,13 @@ const ZOHO_SIGNAL_MAPPINGS = {
     }
   }
 }
-```
+\`\`\`
 
 **5.2: Custom Signal Calculation**
 
 For signals requiring raw data:
 
-```typescript
+\`\`\`typescript
 // Example: Calculate Bug Impact Score
 async function calculateBugImpact(tickets: RawDataRow[]) {
   const bugs = tickets.filter(t => t.data.Category === 'Bug');
@@ -347,7 +347,7 @@ async function calculateBugImpact(tickets: RawDataRow[]) {
     date: new Date().toISOString().split('T')[0]
   };
 }
-```
+\`\`\`
 
 ---
 

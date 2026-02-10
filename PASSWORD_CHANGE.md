@@ -49,9 +49,9 @@ All passwords must meet the following criteria:
 ## Setup Instructions
 
 1. Run the migration script to add the password change columns:
-   ```sql
+   \`\`\`sql
    -- Run scripts/006_add_password_change_flag.sql in Supabase SQL Editor
-   ```
+   \`\`\`
 
 2. The system automatically handles:
    - Setting the flag for new signups

@@ -40,9 +40,9 @@ This guide explains how to extract the necessary data from Zoho CRM and Zoho Des
 - `Expected Close Date` → Maps to "date" in signal system
 
 **Calculation:**
-```
+\`\`\`
 Pipeline Value = SUM(Amount WHERE Stage NOT IN ['Closed Won', 'Closed Lost'])
-```
+\`\`\`
 
 ---
 
@@ -71,9 +71,9 @@ Pipeline Value = SUM(Amount WHERE Stage NOT IN ['Closed Won', 'Closed Lost'])
 - `Closing Date` → Maps to "closed_date" in signal system
 
 **Calculation:**
-```
+\`\`\`
 Conversion Rate = (COUNT(Stage = 'Closed Won') / COUNT(All Deals)) * 100
-```
+\`\`\`
 
 ---
 
@@ -105,9 +105,9 @@ Conversion Rate = (COUNT(Stage = 'Closed Won') / COUNT(All Deals)) * 100
 - `Status` → Maps to "status" in signal system
 
 **Calculation:**
-```
+\`\`\`
 Bug Count = COUNT(tickets WHERE Type = 'Bug' OR Category = 'Bug' OR Subject CONTAINS 'bug')
-```
+\`\`\`
 
 **Note:** You may need to create a custom field called "Type" if not already configured in Zoho Desk.
 
@@ -141,13 +141,13 @@ Bug Count = COUNT(tickets WHERE Type = 'Bug' OR Category = 'Bug' OR Subject CONT
 - `Closed Time` → Maps to "closed_date" in signal system
 
 **Calculation:**
-```
+\`\`\`
 Bug Impact Score = 
   (Critical Bugs × 10) + 
   (High Priority Bugs × 5) + 
   (Medium Priority Bugs × 2) + 
   (Low Priority Bugs × 1)
-```
+\`\`\`
 
 **Advanced:** Weight by customer tier if available:
 - Enterprise customers: multiply by 2x
@@ -181,7 +181,7 @@ Bug Impact Score =
 - `Contract End Date` → Maps to "contract_end_date" in signal system
 
 **Calculation:**
-```
+\`\`\`
 Days Since Last Activity = TODAY - Last Activity Time
 
 Retention Status:
@@ -190,7 +190,7 @@ Retention Status:
 - Churned: > 90 days
 
 Retention Score = 100 - (Days Since Last Activity / 3.65)
-```
+\`\`\`
 
 **Important Setup:**
 Zoho's "Last Activity Time" can update on any field change. For accurate retention tracking:
@@ -202,10 +202,10 @@ Zoho's "Last Activity Time" can update on any field change. For accurate retenti
    - An email is sent
 
 **Workflow Example:**
-```
+\`\`\`
 Trigger: On Task Complete, Call Logged, or Meeting Scheduled
 Action: Update Custom Field "Last Real Activity" = Current Date/Time
-```
+\`\`\`
 
 ---
 
@@ -244,7 +244,7 @@ You'll need to create these in Zoho CRM:
 - `Onboarding Status` → Maps to "onboarding_status" in signal system
 
 **Calculation:**
-```
+\`\`\`
 Activation Milestones:
 1. First Login (25 points)
 2. Profile Completed (25 points)
@@ -252,7 +252,7 @@ Activation Milestones:
 4. Used 3+ features (25 points)
 
 Activation Score = (Completed Milestones / Total Milestones) * 100
-```
+\`\`\`
 
 **Advanced Setup with Zoho Apptics:**
 For product usage tracking:

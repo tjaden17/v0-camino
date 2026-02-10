@@ -18,7 +18,7 @@ When you upload data (like Zoho Desk tickets or CRM data), the system uses a **d
 
 ## How It Works
 
-```
+\`\`\`
 Your CSV Upload
    ↓
 ┌──────────────────────────────────────────────┐
@@ -36,51 +36,51 @@ Your CSV Upload
 │  ✓ Available for future AI queries          │
 │                                              │
 └──────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## Real-World Example: Zoho Desk Upload
 
 ### Your CSV Has These Columns:
-```
+\`\`\`
 Ticket Number, Subject, Status, Priority, Created Date, 
 Closed Date, Assignee, Department, Customer Name, 
 Customer Revenue, CSAT Rating, Resolution Notes
-```
+\`\`\`
 
 ### You Map (Path 1):
-```
+\`\`\`
 ✓ Ticket Number → unique_id
 ✓ Status → status
 ✓ Created Date → created_at
 ✓ Closed Date → closed_at
-```
+\`\`\`
 
 ### System Immediately Generates:
-```
+\`\`\`
 ✓ Total Ticket Volume
 ✓ Open Tickets
 ✓ Average Resolution Time
 ✓ Ticket Backlog (7+ days)
-```
+\`\`\`
 
 ### System Also Preserves (Path 2):
-```
+\`\`\`
 ✓ Priority (not mapped, but preserved)
 ✓ Customer Revenue (not mapped, but preserved)
 ✓ Department (not mapped, but preserved)
 ✓ CSAT Rating (not mapped, but preserved)
 ✓ Resolution Notes (not mapped, but preserved)
-```
+\`\`\`
 
 ### Future AI Queries (Enabled by Path 2):
-```
+\`\`\`
 "Show me high-priority tickets from high-revenue customers"
 "What's the average resolution time by department?"
 "Correlate CSAT ratings with resolution time"
 "Which assignees handle the most urgent tickets?"
-```
+\`\`\`
 
 **All of this is possible because the original data was preserved!**
 
@@ -104,29 +104,29 @@ Customer Revenue, CSAT Rating, Resolution Notes
 ## How to Use It
 
 ### Step 1: Upload Your Data
-```
+\`\`\`
 1. Click "Upload Data" in your organization admin
 2. Select your CSV file (Zoho Desk, CRM, etc.)
 3. System parses and shows preview
-```
+\`\`\`
 
 ### Step 2: Map Key Columns
-```
+\`\`\`
 1. Signal Discovery shows available signals
 2. Map the columns you need NOW:
    - Ticket ID → unique_id
    - Status → status
    - Created Date → created_at
 3. Skip columns you don't need yet
-```
+\`\`\`
 
 ### Step 3: Confirmation
-```
+\`\`\`
 ✓ Signals Created: 10
 ✓ Data Points Added: 1,000
 ✓ Raw Rows Stored: 1,000
 ✓ Columns Preserved: 12
-```
+\`\`\`
 
 **All 12 original columns are now stored for future use!**
 
@@ -135,7 +135,7 @@ Customer Revenue, CSAT Rating, Resolution Notes
 ## Database Structure
 
 ### Immediate Signals (Path 1)
-```sql
+\`\`\`sql
 signals table:
 - id
 - name: "Total Tickets"
@@ -147,10 +147,10 @@ data_points table:
 - signal_id
 - value: 450
 - date: "2025-01-15"
-```
+\`\`\`
 
 ### Raw Data Storage (Path 2)
-```sql
+\`\`\`sql
 raw_data_uploads table:
 - id
 - upload_name: "Zoho Desk Tickets Jan 2025"
@@ -165,7 +165,7 @@ raw_data_rows table:
 - original_data: { COMPLETE original row with ALL columns }
 - normalized_data: { only mapped columns }
 - generated_signal_ids: ["signal-1", "signal-2"]
-```
+\`\`\`
 
 ---
 

@@ -10,7 +10,7 @@ This test plan validates the Signal Intelligence System works correctly with rea
 
 ### Prerequisites
 
-```bash
+\`\`\`bash
 # 1. Database with schema
 # Run: scripts/008_user_context_and_intelligence.sql
 
@@ -23,11 +23,11 @@ This test plan validates the Signal Intelligence System works correctly with rea
 # - CXO with high-level KPIs
 # - Sales Manager with pipeline KPIs
 # - Support Lead with CSAT KPIs
-```
+\`\`\`
 
 ### Test Data Preparation
 
-```sql
+\`\`\`sql
 -- Create test users with different contexts
 INSERT INTO user_context (user_id, role_level, function, business_stage, kpi_1, kpi_2, kpi_3)
 VALUES 
@@ -35,7 +35,7 @@ VALUES
   ('test-sales-mgr', 'manager', 'sales', 'scale', 'Pipeline Value', 'Win Rate', 'Sales Cycle'),
   ('test-support', 'manager', 'support', 'PMF', 'CSAT Score', 'Resolution Time', 'First Response Time'),
   ('test-ic', 'IC', 'product', 'pre-product', 'DAU', 'Retention', 'Feature Adoption');
-```
+\`\`\`
 
 ---
 
@@ -48,12 +48,12 @@ VALUES
 **Objective**: Validate ticket data transforms into support KPIs correctly.
 
 **Test Data**: `test-data/zoho-desk-tickets.csv`
-```csv
+\`\`\`csv
 Ticket ID,Subject,Status,Priority,Created Time,Closed Time,Assignee
 12345,Login issue,Closed,High,2025-01-01 09:00,2025-01-03 14:00,john@company.com
 12346,Billing question,Closed,Medium,2025-01-01 10:00,2025-01-02 11:00,jane@company.com
 12347,Feature request,Open,Low,2025-01-04 15:00,,john@company.com
-```
+\`\`\`
 
 **Expected Signals**:
 | Signal Name | Value | Category | Trend |
@@ -65,7 +65,7 @@ Ticket ID,Subject,Status,Priority,Created Time,Closed Time,Assignee
 | High Priority Tickets | 1 | support | N/A |
 
 **Validation**:
-```typescript
+\`\`\`typescript
 // Test code
 const processor = new ZohoDeskProcessor()
 const signals = await processor.processTickets(tickets)
@@ -73,7 +73,7 @@ const signals = await processor.processTickets(tickets)
 assert.equal(signals.length, 5)
 assert.equal(signals.find(s => s.name === "Total Support Tickets").value, 3)
 assert.equal(signals.find(s => s.name === "Avg Resolution Time").value, 1.5)
-```
+\`\`\`
 
 **Pass Criteria**:
 - ✅ All 5 KPIs generated
@@ -86,13 +86,13 @@ assert.equal(signals.find(s => s.name === "Avg Resolution Time").value, 1.5)
 #### Test 1.2: HubSpot Deals → Signals
 
 **Test Data**: `test-data/hubspot-deals.json`
-```json
+\`\`\`json
 [
   {"dealname": "Acme Corp", "amount": 50000, "dealstage": "closedwon", "closedate": "2025-01-15"},
   {"dealname": "TechCo", "amount": 75000, "dealstage": "closedwon", "closedate": "2025-01-20"},
   {"dealname": "StartupXYZ", "amount": 25000, "dealstage": "closedlost", "closedate": "2025-01-18"}
 ]
-```
+\`\`\`
 
 **Expected Signals**:
 | Signal Name | Value | Category | Trend |
@@ -113,12 +113,12 @@ assert.equal(signals.find(s => s.name === "Avg Resolution Time").value, 1.5)
 #### Test 1.3: CSV with Time Series Data
 
 **Test Data**: `test-data/revenue-time-series.csv`
-```csv
+\`\`\`csv
 Date,Revenue
 2024-11-01,50000
 2024-12-01,55000
 2025-01-01,52000
-```
+\`\`\`
 
 **Expected Result**:
 - Signal: "Revenue"
@@ -128,13 +128,13 @@ Date,Revenue
 - Change: -5.5%
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const signal = await transformCSV(csvData, { name: "Revenue", category: "finance" })
 
 assert.equal(signal.latest_value, 52000)
 assert.equal(signal.trend, "decreasing")
 assert.equal(signal.change_percent, -5.5)
-```
+\`\`\`
 
 **Pass Criteria**:
 - ✅ Trend detected correctly
@@ -154,14 +154,14 @@ assert.equal(signal.change_percent, -5.5)
 - Reason: "Directly matches your KPI: Revenue"
 
 **Test Code**:
-```typescript
+\`\`\`typescript
 const userKPIs = ["Revenue"]
 const signal = { name: "Monthly Recurring Revenue", category: "finance" }
 const score = signalIntelligence.calculateSignalImportance(signal, userKPIs)
 
 assert.isAtLeast(score.relevanceScore, 85)
 assert.include(score.reasons, "Directly matches your KPI: Revenue")
-```
+\`\`\`
 
 ---
 
@@ -175,7 +175,7 @@ assert.include(score.reasons, "Directly matches your KPI: Revenue")
 - Reason: "Declining trend detected"
 
 **Test Code**:
-```typescript
+\`\`\`typescript
 const signal = {
   name: "Customer Satisfaction",
   current_value: 65,
@@ -187,7 +187,7 @@ const score = signalIntelligence.calculateSignalImportance(signal, [])
 assert.isAtLeast(score.urgencyScore, 70)
 assert.include(score.reasons, "below target")
 assert.include(score.reasons, "Declining trend")
-```
+\`\`\`
 
 ---
 
@@ -201,7 +201,7 @@ assert.include(score.reasons, "Declining trend")
 - Reason: "High monetary value"
 
 **Test Code**:
-```typescript
+\`\`\`typescript
 const signal = {
   name: "Monthly Revenue",
   current_value: 500000,
@@ -210,7 +210,7 @@ const signal = {
 const score = signalIntelligence.calculateSignalImportance(signal, [])
 
 assert.isAtLeast(score.impactScore, 65)
-```
+\`\`\`
 
 ---
 
@@ -219,7 +219,7 @@ assert.isAtLeast(score.impactScore, 65)
 **Scenario**: High-priority revenue signal, declining, below benchmark.
 
 **Test Data**:
-```typescript
+\`\`\`typescript
 const signal = {
   name: "Monthly Recurring Revenue",
   current_value: 50000,
@@ -230,7 +230,7 @@ const signal = {
   metadata: { unit: "$" }
 }
 const userKPIs = ["Revenue", "Growth"]
-```
+\`\`\`
 
 **Expected Overall Score Breakdown**:
 - Relevance: ~85 (direct KPI match)
@@ -262,7 +262,7 @@ const userKPIs = ["Revenue", "Growth"]
 - Bottom 5: Sales/Product signals
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const signals = await getSignals()
 
 // Sales Manager context
@@ -278,7 +278,7 @@ const supportScores = signals.map(s =>
 )
 const topForSupport = supportScores.sort((a,b) => b.score - a.score)[0]
 assert.equal(topForSupport.signal.category, "support")
-```
+\`\`\`
 
 **Pass Criteria**:
 - ✅ Different users see different top signals
@@ -316,13 +316,13 @@ assert.equal(topForSupport.signal.category, "support")
 - Recommendations: "Connect data sources", "Upload CSV"
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const quality = await assessDataQuality("new-user")
 
 assert.equal(quality.state, "zero")
 assert.equal(quality.overall_score, 0)
 assert.isNotEmpty(quality.recommendations)
-```
+\`\`\`
 
 ---
 
@@ -368,10 +368,10 @@ assert.isNotEmpty(quality.recommendations)
 **Scenario**: Marketing Spend → Inbound Leads (3 day lag).
 
 **Test Data**:
-```typescript
+\`\`\`typescript
 const marketingSpend = [1000, 1500, 2000, 1800, 2200]
 const leads = [50, 52, 75, 90, 88, 110]  // 3 day lag
-```
+\`\`\`
 
 **Expected**:
 - Relationship detected: ✅
@@ -381,7 +381,7 @@ const leads = [50, 52, 75, 90, 88, 110]  // 3 day lag
 - Correlation: >0.75
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const relationships = await detectRelationships([
   { signal_id: "marketing-spend", data: marketingSpend },
   { signal_id: "inbound-leads", data: leads }
@@ -396,7 +396,7 @@ assert.isNotNull(rel)
 assert.equal(rel.relationship_type, "causes")
 assert.isAtLeast(rel.confidence_score, 0.80)
 assert.equal(rel.time_lag_days, 3)
-```
+\`\`\`
 
 ---
 
@@ -405,10 +405,10 @@ assert.equal(rel.time_lag_days, 3)
 **Scenario**: Two signals move together but no causal link.
 
 **Test Data**:
-```typescript
+\`\`\`typescript
 const signalA = [100, 110, 105, 115, 120]
 const signalB = [50, 55, 52, 58, 60]  // Perfectly correlated
-```
+\`\`\`
 
 **Expected**:
 - Relationship detected: ✅
@@ -432,7 +432,7 @@ const signalB = [50, 55, 52, 58, 60]  // Perfectly correlated
 - End-to-end confidence: Product of individual confidences
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const chains = await detectRelationshipChains()
 
 const chain = chains.find(c => 
@@ -447,7 +447,7 @@ assert.deepEqual(chain.path, [
   "qualified-opportunities",
   "revenue"
 ])
-```
+\`\`\`
 
 ---
 
@@ -456,11 +456,11 @@ assert.deepEqual(chain.path, [
 **Scenario**: Two unrelated signals with random correlation.
 
 **Test Data**:
-```typescript
+\`\`\`typescript
 const signalA = [1, 2, 3, 4, 5]  // Linear growth
 const signalB = [5, 4, 3, 2, 1]  // Linear decline
 // Correlation: -1.0 (perfect inverse)
-```
+\`\`\`
 
 **Expected**:
 - Relationship NOT detected (no plausible causal link)
@@ -483,7 +483,7 @@ const signalB = [5, 4, 3, 2, 1]  // Linear decline
 - Cache hit rate: 50%
 
 **Validation**:
-```typescript
+\`\`\`typescript
 // First call
 const result1 = await analyzeSignal(signalId, "why_analysis")
 assert.equal(result1.cached, false)
@@ -492,7 +492,7 @@ assert.equal(result1.cached, false)
 const result2 = await analyzeSignal(signalId, "why_analysis")
 assert.equal(result2.cached, true)
 assert.deepEqual(result1.analysis, result2.analysis)
-```
+\`\`\`
 
 **Pass Criteria**:
 - ✅ Second call uses cache
@@ -510,7 +510,7 @@ assert.deepEqual(result1.analysis, result2.analysis)
 - After 7 days: Cache expired → Generate new analysis
 
 **Validation**:
-```typescript
+\`\`\`typescript
 // First call
 await analyzeSignal(signalId, "why_analysis")
 
@@ -520,7 +520,7 @@ await updateTimestamp(signalId, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
 // Second call
 const result = await analyzeSignal(signalId, "why_analysis")
 assert.equal(result.cached, false)
-```
+\`\`\`
 
 ---
 
@@ -529,7 +529,7 @@ assert.equal(result.cached, false)
 **Scenario**: Declining revenue signal.
 
 **Test Data**:
-```typescript
+\`\`\`typescript
 const signal = {
   name: "Monthly Recurring Revenue",
   current_value: 50000,
@@ -537,7 +537,7 @@ const signal = {
   trend: "decreasing",
   change_percent: -16.7
 }
-```
+\`\`\`
 
 **Expected Analysis Contains**:
 - Quantitative summary: "-16.7% decrease"
@@ -546,13 +546,13 @@ const signal = {
 - 2-3 sentences max
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const analysis = await analyzeSignal(signal.id, "why_analysis")
 
 assert.include(analysis.result.toLowerCase(), "decrease")
 assert.include(analysis.result.toLowerCase(), "churn")
 assert.isBelow(analysis.result.split(".").length, 5)  // Max 4 sentences
-```
+\`\`\`
 
 ---
 
@@ -563,24 +563,24 @@ assert.isBelow(analysis.result.split(".").length, 5)  // Max 4 sentences
 **Scenario**: Increase marketing spend by 20% → Impact on leads.
 
 **Expected**:
-```javascript
+\`\`\`javascript
 {
   target: "Inbound Leads",
   predicted_change: "+25%",
   confidence: 0.85,
   explanation: "Historical data shows strong correlation"
 }
-```
+\`\`\`
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const impacts = await predictImpact("marketing-spend", 20)  // 20% increase
 
 const leadImpact = impacts.find(i => i.target === "inbound-leads")
 assert.isNotNull(leadImpact)
 assert.isAtLeast(leadImpact.predicted_change, 20)  // At least 20%
 assert.isAtLeast(leadImpact.confidence, 0.80)
-```
+\`\`\`
 
 ---
 
@@ -591,7 +591,7 @@ assert.isAtLeast(leadImpact.confidence, 0.80)
 **Expected**: Cascading impact predictions for all downstream signals.
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const impacts = await predictImpact("marketing-spend", 20)
 
 // Should predict impact on all 3 downstream signals
@@ -603,7 +603,7 @@ assert.isNotNull(impacts.find(i => i.target === "revenue"))
 const leadConfidence = impacts.find(i => i.target === "inbound-leads").confidence
 const revenueConfidence = impacts.find(i => i.target === "revenue").confidence
 assert.isBelow(revenueConfidence, leadConfidence)
-```
+\`\`\`
 
 ---
 
@@ -612,7 +612,7 @@ assert.isBelow(revenueConfidence, leadConfidence)
 **Scenario**: Show which signals influence "Revenue" KPI.
 
 **Expected**:
-```javascript
+\`\`\`javascript
 {
   kpi: "Revenue",
   influencers: [
@@ -621,16 +621,16 @@ assert.isBelow(revenueConfidence, leadConfidence)
     { signal: "Average Deal Size", weight: 0.62 }
   ]
 }
-```
+\`\`\`
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const matrix = await generateKPIImpactMatrix("revenue")
 
 assert.isAtLeast(matrix.influencers.length, 3)
 const topInfluencer = matrix.influencers[0]
 assert.isAtLeast(Math.abs(topInfluencer.weight), 0.70)
-```
+\`\`\`
 
 ---
 
@@ -653,7 +653,7 @@ assert.isAtLeast(Math.abs(topInfluencer.weight), 0.70)
 - AI insights available (cached or generated)
 
 **Validation**:
-```typescript
+\`\`\`typescript
 // 1. Upload
 const uploadResult = await uploadCSV(csvFile, "zoho-desk")
 assert.equal(uploadResult.signals_created, 10)
@@ -671,7 +671,7 @@ const qualities = signals.map(s => s.data_quality)
 assert.isTrue(qualities.every(q => 
   ["zero", "low", "fair", "good", "excellent"].includes(q.state)
 ))
-```
+\`\`\`
 
 ---
 
@@ -685,7 +685,7 @@ assert.isTrue(qualities.every(q =>
 - Combined KPI impact
 
 **Validation**:
-```typescript
+\`\`\`typescript
 // Upload both datasets
 await uploadCSV(hubspotDeals, "hubspot")
 await uploadCSV(zohoDeskTickets, "zoho-desk")
@@ -700,7 +700,7 @@ const crossSource = relationships.find(r =>
   r.signal_b.source === "zoho_desk"
 )
 assert.isNotNull(crossSource)
-```
+\`\`\`
 
 ---
 
@@ -716,14 +716,14 @@ assert.isNotNull(crossSource)
 - Relationship detection: <30 seconds (background)
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const start = Date.now()
 const signals = await getSignals(userId)
 const loadTime = Date.now() - start
 
 assert.isBelow(loadTime, 2000)  // 2 seconds
 assert.equal(signals.length, 100)
-```
+\`\`\`
 
 ---
 
@@ -737,14 +737,14 @@ assert.equal(signals.length, 100)
 - Total token cost: <$5
 
 **Validation**:
-```typescript
+\`\`\`typescript
 const analytics = await getAIAnalyticsReport(30)  // 30 days
 
 assert.isAtLeast(analytics.cache_hit_rate, 0.80)
 assert.isBelow(analytics.total_cost, 5.00)
 assert.isAtLeast(analytics.total_analyses, 1000)  // 100 × 10
 assert.isBelow(analytics.ai_calls, 150)
-```
+\`\`\`
 
 ---
 
@@ -826,7 +826,7 @@ assert.isBelow(analytics.ai_calls, 150)
 
 ### Setup
 
-```bash
+\`\`\`bash
 # Install dependencies
 npm install --save-dev vitest @vitest/ui
 
@@ -835,11 +835,11 @@ npm run db:setup:test
 
 # Seed test data
 npm run db:seed:test
-```
+\`\`\`
 
 ### Run Tests
 
-```bash
+\`\`\`bash
 # All tests
 npm test
 
@@ -851,11 +851,11 @@ npm test -- --grep "Integration Tests"
 
 # With coverage
 npm test -- --coverage
-```
+\`\`\`
 
 ### CI/CD Pipeline
 
-```yaml
+\`\`\`yaml
 name: Test Signal Intelligence
 
 on: [push, pull_request]
@@ -870,7 +870,7 @@ jobs:
       - run: npm run db:setup:test
       - run: npm test -- --coverage
       - uses: codecov/codecov-action@v2
-```
+\`\`\`
 
 ---
 
@@ -904,7 +904,7 @@ jobs:
 
 ### Test Report Template
 
-```markdown
+\`\`\`markdown
 # Test Execution Report - [Date]
 
 ## Summary
@@ -930,7 +930,7 @@ jobs:
 - [ ] Fix failed tests
 - [ ] Optimize slow queries
 - [ ] Add test for edge case X
-```
+\`\`\`
 
 ---
 

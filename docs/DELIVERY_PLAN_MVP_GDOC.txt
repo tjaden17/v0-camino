@@ -29,17 +29,22 @@ USER PROBLEMS WE ARE SOLVING
    Desired Outcome: Decreased time to produce reports.
 
 
-DEFINITION OF BILLABLE (END OF WEEK 2)
-----------------------------------------
+DEFINITION OF BILLABLE (END OF WEEK 2) -- Updated 11 Feb 2026
+---------------------------------------------------------------
 
 The customer agrees to pay when ALL of these are true:
 
-[ ] Manager can upload a CSV/XLSX and see it processed
-[ ] System generates at least 3 signals with correct values
-[ ] Each signal has AI analysis personalised to the user
-[ ] Exec can browse signals and read expanded view
-[ ] Admin can create users and upload on their behalf
-[ ] App is deployed to production
+[ ] User onboarding - Exec/manager tells Camino Admin what's important (data types, signal needs, business context, upcoming decisions)
+[ ] Data onboarding - Manager sends CSV/XLSX samples from all tools to Camino Admin
+[ ] Data onboarding - Camino Admin helps system understand data shape, identify signals, make correct calculations
+[ ] Signals - System generates at least 3 signals from data layer (uploaded or via API integration) with correct values
+[ ] AI analysis - Each pinned/saved signal has AI analysis personalised to org and user
+[ ] Browse - Exec can browse signals and read expanded view
+[ ] Admin - Admin can create users and upload on their behalf
+[ ] Deployed - App is deployed to production
+
+Note: API integration (Zoho CRM/Desk) is crucial for billing as it solves the "easy integrations" pain point.
+Data onboarding is admin-assisted and not scalable, but overcomes signal flow challenges for MSS.
 
 
 MSS USER STORIES (SCOPE)
@@ -183,20 +188,44 @@ Exit Criteria:
 Demo: Friday 14 Feb. Show customer the upload flow and resulting signals. Get feedback on accuracy.
 
 
-WEEK 2: PERSONALISED AI AND ADMIN OPS
----------------------------------------
+WEEK 2: PERSONALISED AI, ADMIN OPS, AND API INTEGRATION
+----------------------------------------------------------
 Dates: 17 Feb - 23 Feb 2026
-Goal: AI analysis is personalised. Admin tooling works. Customer agrees to pay.
-Delivers: US1, US2, US3 (admin upload), US6, US8
+Goal: AI analysis is personalised. Admin tooling works. API integration flows data automatically. Customer agrees to pay.
+Delivers: US1, US2, US3 (admin upload + API integration), US6, US8
 
 Key Changes This Week:
+
+A) USER CONTEXT + AI PERSONALISATION
 - Add upcoming_priorities (text) and signal_preferences (text) columns to the profiles table. These fields feed into the AI prompt so analysis is personalised.
 - Build Admin CP form to input discovery call notes into any user's profile. Admin fills this after the onboarding call.
 - Update buildInterpretationPrompt in interpretation-service.ts to fetch user profile data and include it in the AI prompt. Add a USER CONTEXT section: role, upcoming priorities, signal preferences, business context, org industry, company stage, team size.
 - Make profile page read-only for non-admin users. Admin manages profiles on behalf of users during MSS.
-- Add admin upload-on-behalf-of-user. In admin panel, admin selects org/user, uploads file, answers 3 prompts. Signals are attributed to that org.
 - Auto-trigger AI analysis on upload completion.
+
+B) ADMIN OPS
+- Add admin upload-on-behalf-of-user. In admin panel, admin selects org/user, uploads file, answers 3 prompts. Signals are attributed to that org.
 - Verify admin create-user, create-org, assign-user-to-org flows work end-to-end.
+
+C) API INTEGRATION (Zoho CRM + Zoho Desk)
+- Wire existing Zoho OAuth + API client code to the new signal generation pipeline.
+- Admin connects customer's Zoho account via existing OAuth flow.
+- System pulls data from Zoho API (deals, leads, tickets).
+- Data is formatted as "virtual tabs" (same shape as CSV upload rows).
+- 3-question answers are PRE-FILLED automatically for known Zoho data types:
+  - Zoho CRM Deals: row_type=deals, metric=Amount, date=Closing_Date
+  - Zoho CRM Leads: row_type=leads, metric=(count rows), date=Created_Time
+  - Zoho Desk Tickets: row_type=tickets, metric=(count rows), date=createdTime
+- Virtual tabs are sent through POST /api/upload/generate (same pipeline as uploads).
+- Signals tagged with source_type="api-zoho-crm" or "api-zoho-desk".
+- Admin triggers sync manually for MSS. Auto-refresh is Week 3+.
+
+D) DATA ONBOARDING WORKFLOW
+- During onboarding, Admin receives CSV/XLSX samples from customer.
+- Admin uploads samples and classifies data via the 3-question flow.
+- Admin validates generated signals are correct.
+- For tools with API integration (Zoho), Admin sets up OAuth so future data flows automatically.
+- This admin-assisted flow is not scalable but overcomes signal flow challenges.
 
 Stories:
   MSS-07  Add upcoming_priorities and signal_preferences to profiles DB
@@ -206,14 +235,17 @@ Stories:
   MSS-11  Profile page read-only, show new fields
   MSS-12  Admin upload-on-behalf-of-user (org/user selector)
   MSS-13  Verify admin create user, create org, assign flows
+  MSS-14  Wire Zoho API to generate pipeline (virtual tabs + pre-filled answers)
+  MSS-15  Admin Zoho sync trigger (pull data, generate signals)
 
 Exit Criteria:
 - Admin inputs discovery notes for a user via Admin CP.
-- Admin uploads file on behalf of user.
+- Admin uploads file on behalf of user. Signals are correct.
+- Admin connects Zoho, triggers sync, signals appear with correct values.
 - AI analysis references the user's role and priorities in its commentary.
 - Customer agrees scope is billable.
 
-Demo: Friday 21 Feb. Show personalised AI analysis. Close billing agreement.
+Demo: Friday 21 Feb. Show personalised AI analysis + Zoho integration. Close billing agreement.
 
 
 WEEK 3: MULTI-FILE DATA LAYER
@@ -229,10 +261,11 @@ Key Changes This Week:
 - Upload history visible to user (list of past uploads with date, file name, tab count, signal count).
 
 Stories:
-  MSS-14  Create org_data_sources table and persist tab metadata
-  MSS-15  Returning upload recognition and delta comparison
-  MSS-16  Upload history page for user and admin
-  MSS-17  Cross-file signal discovery (e.g. lead-to-deal conversion)
+  MSS-16  Create org_data_sources table and persist tab metadata
+  MSS-17  Returning upload recognition and delta comparison
+  MSS-18  Upload history page for user and admin
+  MSS-19  Cross-file signal discovery (e.g. lead-to-deal conversion)
+  MSS-20  API auto-refresh (scheduled Zoho sync, not just manual trigger)
 
 Exit Criteria:
 - Upload Deals CSV, then Leads CSV for same org. System shows signals from both.
@@ -379,3 +412,18 @@ DECISIONS LOG
 
 10 Feb 2026 - Dual database (Neon for signals, Supabase for auth)
   Rationale: Keep separation clean. Auth is Supabase-native. Signal data is relational on Neon.
+
+11 Feb 2026 - API integration (Zoho) added to Tier 1 billing gate
+  Rationale: Manual CSV uploads are a key user pain point (Problem 4: Easy Integrations).
+  API integration removes the friction. Existing Zoho code can be wired to the new generate pipeline.
+  Pre-filling the 3-question answers for known data shapes means API data flows through the same pipeline as uploads.
+
+11 Feb 2026 - Data onboarding is admin-assisted (not self-service)
+  Rationale: Not scalable, but overcomes signal flow challenges for MSS.
+  Admin receives samples, classifies data, validates signals, sets up API if available.
+  This bridges the gap until the pipeline is fully productised.
+
+11 Feb 2026 - Updated Tier 1 billing gate with explicit criteria from customer agreement draft
+  Rationale: Previous billing gate was informal. New version has 8 explicit criteria aligned to
+  the customer agreement draft. Key additions: API integration as a data source, data onboarding
+  as an admin workflow, AI personalisation to org KPIs (not just user).

@@ -22,7 +22,7 @@ This document outlines the **hybrid integration strategy** for pulling signals f
 
 Each platform has an adapter that knows what's available:
 
-```typescript
+\`\`\`typescript
 // lib/integrations/base-adapter.ts
 export abstract class BaseIntegrationAdapter {
   abstract platform: string
@@ -42,11 +42,11 @@ export abstract class BaseIntegrationAdapter {
     options: { startDate: Date, endDate: Date }
   ): Promise<any[]>
 }
-```
+\`\`\`
 
 ### 2. Zoho Desk Adapter
 
-```typescript
+\`\`\`typescript
 // lib/integrations/zoho-desk-adapter.ts
 import { BaseIntegrationAdapter } from './base-adapter'
 
@@ -99,11 +99,11 @@ export class ZohoDeskAdapter extends BaseIntegrationAdapter {
     return response.json()
   }
 }
-```
+\`\`\`
 
 ### 3. HubSpot Adapter
 
-```typescript
+\`\`\`typescript
 // lib/integrations/hubspot-adapter.ts
 import { BaseIntegrationAdapter } from './base-adapter'
 
@@ -179,13 +179,13 @@ export class HubSpotAdapter extends BaseIntegrationAdapter {
     return response.json()
   }
 }
-```
+\`\`\`
 
 ### 4. Smart Signal Router
 
 Decides whether to pull or calculate:
 
-```typescript
+\`\`\`typescript
 // lib/integrations/signal-router.ts
 import { ZohoDeskAdapter } from './zoho-desk-adapter'
 import { HubSpotAdapter } from './hubspot-adapter'
@@ -258,13 +258,13 @@ export class SignalRouter {
     return (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
   }
 }
-```
+\`\`\`
 
 ---
 
 ## Decision Tree: Pull vs Calculate
 
-```
+\`\`\`
 ┌─────────────────────────────────────┐
 │ Need Signal Value                    │
 └───────────┬─────────────────────────┘
@@ -305,7 +305,7 @@ export class SignalRouter {
                   │ Calculate  │ │ Pull     │
                   │ Trend      │ │ Direct   │
                   └────────────┘ └──────────┘
-```
+\`\`\`
 
 ---
 
@@ -313,7 +313,7 @@ export class SignalRouter {
 
 ### Example 1: Pull Pre-Calculated Metric
 
-```typescript
+\`\`\`typescript
 const router = new SignalRouter()
 
 // This will call Zoho Analytics API directly
@@ -325,11 +325,11 @@ const avgResolutionTime = await router.fetchSignalValue(
     endDate: new Date('2025-12-31')
   }
 )
-```
+\`\`\`
 
 ### Example 2: Calculate Custom Metric
 
-```typescript
+\`\`\`typescript
 // This requires custom logic, so fetch raw data
 const ticketVelocity = await router.fetchSignalValue(
   'zoho_desk',
@@ -340,11 +340,11 @@ const ticketVelocity = await router.fetchSignalValue(
     customLogic: true
   }
 )
-```
+\`\`\`
 
 ### Example 3: Hybrid - Standard Metric with Trend
 
-```typescript
+\`\`\`typescript
 // Pull current value (pre-calculated)
 const currentValue = await router.fetchSignalValue(
   'hubspot',
@@ -360,7 +360,7 @@ const previousValue = await router.fetchSignalValue(
 )
 
 const trend = ((currentValue - previousValue) / previousValue) * 100
-```
+\`\`\`
 
 ---
 
@@ -405,7 +405,7 @@ const trend = ((currentValue - previousValue) / previousValue) * 100
 - Only recalculate trends when new data arrives
 - Use incremental updates, not full recalculation
 
-```typescript
+\`\`\`typescript
 // Caching strategy
 const CACHE_DURATION = {
   'avg_resolution_time': 4 * 60 * 60 * 1000, // 4 hours
@@ -426,7 +426,7 @@ async function fetchWithCache(platform: string, metric: string, options: any) {
   
   return value
 }
-```
+\`\`\`
 
 ---
 
@@ -434,7 +434,7 @@ async function fetchWithCache(platform: string, metric: string, options: any) {
 
 Add to your environment variables:
 
-```bash
+\`\`\`bash
 # Zoho
 ZOHO_DESK_CLIENT_ID=xxx
 ZOHO_DESK_CLIENT_SECRET=xxx
@@ -448,7 +448,7 @@ HUBSPOT_PORTAL_ID=xxx
 # Refresh intervals (in minutes)
 SIGNAL_CACHE_DURATION_DEFAULT=240 # 4 hours
 SIGNAL_CACHE_DURATION_FAST=60 # 1 hour
-```
+\`\`\`
 
 ---
 

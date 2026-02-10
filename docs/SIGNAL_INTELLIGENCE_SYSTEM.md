@@ -8,7 +8,7 @@ The Signal Intelligence System is a sophisticated data analysis platform that tr
 
 ### Three-Tier System
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────┐
 │                    TIER 3: Action Layer                      │
 │  "So What?" - Impact prediction, recommendations, decisions  │
@@ -23,7 +23,7 @@ The Signal Intelligence System is a sophisticated data analysis platform that tr
 │                    TIER 1: Data Layer                        │
 │       "What" - Raw data, normalization, aggregation         │
 └─────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -34,7 +34,7 @@ The Signal Intelligence System is a sophisticated data analysis platform that tr
 **Purpose**: Normalize data from different sources into a consistent format.
 
 **Key Interface**:
-```typescript
+\`\`\`typescript
 interface UniversalDataPoint {
   name: string           // Signal/metric name
   value: number          // Current value
@@ -46,7 +46,7 @@ interface UniversalDataPoint {
   ownerId?: string       // User responsible
   metadata?: any         // Source-specific data
 }
-```
+\`\`\`
 
 **How it works**:
 1. **Mapping**: Each data source has predefined field mappings (e.g., `ZOHO_CRM_MAPPINGS`, `HUBSPOT_MAPPINGS`)
@@ -55,7 +55,7 @@ interface UniversalDataPoint {
 4. **Trend Calculation**: Automatic trend detection by comparing current vs previous values
 
 **Example**:
-```typescript
+\`\`\`typescript
 // Raw Zoho Desk ticket data
 const tickets = [{
   ticketNumber: "12345",
@@ -73,7 +73,7 @@ const dataPoint = {
   source: "zoho_desk",
   trend: "stable"
 }
-```
+\`\`\`
 
 ---
 
@@ -82,9 +82,9 @@ const dataPoint = {
 **Purpose**: Score and prioritize signals based on relevance, urgency, and impact.
 
 **Scoring Algorithm**:
-```
+\`\`\`
 Overall Score = (Relevance × 30%) + (Urgency × 35%) + (Impact × 35%)
-```
+\`\`\`
 
 #### Relevance Score (0-100)
 Measures how relevant the signal is to the user's KPIs.
@@ -121,7 +121,7 @@ Measures potential business impact.
 - Critical function (payment, security): +20 points
 
 **Example**:
-```typescript
+\`\`\`typescript
 const signal = {
   name: "Monthly Recurring Revenue",
   current_value: 50000,
@@ -136,7 +136,7 @@ const signal = {
 // Urgency: 40 (high priority) + 30 (declining) + 40 (below 70%) = 110 → 100
 // Impact: 35 (revenue keyword) + 20 (monetary value) = 55
 // Overall: (90 × 0.3) + (100 × 0.35) + (55 × 0.35) = 81.25
-```
+\`\`\`
 
 ---
 
@@ -145,7 +145,7 @@ const signal = {
 **Purpose**: Personalize signal relevance based on user role, function, and business stage.
 
 **User Context Factors**:
-```typescript
+\`\`\`typescript
 interface UserContext {
   role_level: "CXO" | "manager" | "IC"
   function: "business" | "product" | "tech" | "sales" | "support"
@@ -155,18 +155,18 @@ interface UserContext {
   kpi_3: string
   upcoming_decisions: Decision[]
 }
-```
+\`\`\`
 
 **Context-Aware Relevance**:
-```
+\`\`\`
 Signal Relevance = (KPI Alignment × 40%) + 
                    (Role Relevance × 25%) + 
                    (Urgency × 20%) + 
                    (Decision Support × 15%)
-```
+\`\`\`
 
 **Example**:
-```typescript
+\`\`\`typescript
 // For a Sales Manager at a scaling company
 const context = {
   role_level: "manager",
@@ -185,7 +185,7 @@ const context = {
 // Low relevance signals:
 // - "Support Ticket Volume" (different function)
 // - "Code Deployment Frequency" (not relevant to sales)
-```
+\`\`\`
 
 ---
 
@@ -222,7 +222,7 @@ const context = {
 | Rich | 76-100 | Complete data | Full analysis, predictions |
 
 **Example**:
-```typescript
+\`\`\`typescript
 const signal = {
   data_points: 45,  // 90 days
   last_updated: "2025-01-04",  // Yesterday
@@ -235,7 +235,7 @@ const signal = {
 // Consistency: 100 (daily updates)
 // Overall: (100 × 0.4) + (80 × 0.3) + (100 × 0.3) = 94
 // Quality: "Excellent"
-```
+\`\`\`
 
 ---
 
@@ -267,14 +267,14 @@ const signal = {
 - `impacts`: A affects B indirectly
 
 **Confidence Scoring**:
-```
+\`\`\`
 Confidence = (Correlation Strength × 50%) + 
              (Statistical Significance × 30%) + 
              (Domain Plausibility × 20%)
-```
+\`\`\`
 
 **Example**:
-```typescript
+\`\`\`typescript
 // Detected relationship
 {
   signal_a: "Marketing Spend",
@@ -288,7 +288,7 @@ Confidence = (Correlation Strength × 50%) +
 
 // Chain detection
 Marketing Spend → Leads → Qualified Opportunities → Revenue
-```
+\`\`\`
 
 ---
 
@@ -308,14 +308,14 @@ Marketing Spend → Leads → Qualified Opportunities → Revenue
 Explains what caused a signal change.
 
 **Prompt Template**:
-```
+\`\`\`
 Signal: [name]
 Change: [value] to [new_value] ([change]%)
 Trend: [trend]
 Context: [related signals, events]
 
 Explain why this changed in 2-3 sentences for a business user.
-```
+\`\`\`
 
 **Example Output**:
 > "Customer satisfaction decreased by 15% this month likely due to increased support ticket volume (+30%) and longer resolution times. The engineering team shipped a major release on Jan 15th which introduced several bugs, driving ticket volume up."
@@ -333,7 +333,7 @@ Actionable next steps.
 > "Based on declining win rate, consider: 1) Review lost deals to identify common objections, 2) Provide additional sales training on handling pricing questions, 3) Adjust qualification criteria to focus on higher-intent leads."
 
 **Caching Logic**:
-```typescript
+\`\`\`typescript
 // Check cache first
 const cached = await getCachedAnalysis(signal.id, "why_analysis")
 if (cached && !isExpired(cached, 7)) {
@@ -344,7 +344,7 @@ if (cached && !isExpired(cached, 7)) {
 const result = await generateAIAnalysis(signal)
 await cacheAnalysis(signal.id, "why_analysis", result, 7)
 return result
-```
+\`\`\`
 
 ---
 
@@ -353,9 +353,9 @@ return result
 **Purpose**: Forecast how signal changes will affect KPIs and related signals.
 
 **Prediction Method**:
-```
+\`\`\`
 Predicted Impact = Δ Signal × Relationship Weight × Confidence
-```
+\`\`\`
 
 **Weight Sources**:
 1. Historical correlations (learned from data)
@@ -363,7 +363,7 @@ Predicted Impact = Δ Signal × Relationship Weight × Confidence
 3. User-defined relationships
 
 **Example**:
-```typescript
+\`\`\`typescript
 // Scenario: Marketing Spend increases by 20%
 const predictions = await predictImpact("marketing_spend", 20)
 
@@ -388,12 +388,12 @@ const predictions = await predictImpact("marketing_spend", 20)
     explanation: "Additional leads convert at historical 12% rate"
   }
 ]
-```
+\`\`\`
 
 **KPI Impact Matrix**:
 Shows which signals influence each KPI.
 
-```
+\`\`\`
 KPI: Monthly Recurring Revenue
 
 Top Influencers:
@@ -401,7 +401,7 @@ Top Influencers:
 2. Churn Rate (-0.78)
 3. Average Deal Size (+0.62)
 4. Expansion Revenue (+0.54)
-```
+\`\`\`
 
 ---
 
@@ -409,7 +409,7 @@ Top Influencers:
 
 ### End-to-End Example: Zoho Desk Upload
 
-```
+\`\`\`
 1. USER UPLOADS CSV
    ↓
 2. CSV PARSER (lib/csv-parser.ts)
@@ -457,7 +457,7 @@ Top Influencers:
     - Displays quality badges
     - Highlights relationships
     - Offers AI insights
-```
+\`\`\`
 
 ---
 
@@ -465,7 +465,7 @@ Top Influencers:
 
 ### 1. Trend Detection Algorithm
 
-```typescript
+\`\`\`typescript
 function detectTrend(dataPoints: number[]): TrendType {
   // Linear regression
   const n = dataPoints.length
@@ -486,11 +486,11 @@ function detectTrend(dataPoints: number[]): TrendType {
   if (Math.abs(slope) < threshold) return "stable"
   return slope > 0 ? "increasing" : "decreasing"
 }
-```
+\`\`\`
 
 ### 2. Correlation Calculation
 
-```typescript
+\`\`\`typescript
 function pearsonCorrelation(x: number[], y: number[]): number {
   const n = x.length
   const xMean = x.reduce((a, b) => a + b) / n
@@ -510,11 +510,11 @@ function pearsonCorrelation(x: number[], y: number[]): number {
   
   return numerator / Math.sqrt(xDenom * yDenom)
 }
-```
+\`\`\`
 
 ### 3. Anomaly Detection
 
-```typescript
+\`\`\`typescript
 function detectAnomaly(value: number, historical: number[]): boolean {
   const mean = historical.reduce((a, b) => a + b) / historical.length
   const variance = historical.reduce((sum, val) => 
@@ -525,7 +525,7 @@ function detectAnomaly(value: number, historical: number[]): boolean {
   const zScore = Math.abs(value - mean) / stdDev
   return zScore > 3
 }
-```
+\`\`\`
 
 ---
 
@@ -535,13 +535,13 @@ function detectAnomaly(value: number, historical: number[]): boolean {
 
 **Location**: `lib/signal-intelligence.ts` → `calculateSignalImportance()`
 
-```typescript
+\`\`\`typescript
 // Current weights
 scores.overallScore = 
   scores.relevanceScore * 0.30 +  // 30% relevance
   scores.urgencyScore * 0.35 +    // 35% urgency
   scores.impactScore * 0.35       // 35% impact
-```
+\`\`\`
 
 **Tuning guide**:
 - Increase urgency weight for fast-moving businesses
@@ -552,9 +552,9 @@ scores.overallScore =
 
 **Location**: `lib/signal-relationships-service.ts` → `detectRelationships()`
 
-```typescript
+\`\`\`typescript
 const CORRELATION_THRESHOLD = 0.7  // Strong correlation
-```
+\`\`\`
 
 **Tuning guide**:
 - Lower (0.5-0.6): More relationships detected, but more false positives
@@ -564,9 +564,9 @@ const CORRELATION_THRESHOLD = 0.7  // Strong correlation
 
 **Location**: `lib/ai-analysis-service.ts`
 
-```typescript
+\`\`\`typescript
 const CACHE_DURATION_DAYS = 7  // Reuse insights for 7 days
-```
+\`\`\`
 
 **Tuning guide**:
 - Shorter (1-3 days): More up-to-date insights, higher AI costs
@@ -576,14 +576,14 @@ const CACHE_DURATION_DAYS = 7  // Reuse insights for 7 days
 
 **Location**: `lib/progressive-data-service.ts`
 
-```typescript
+\`\`\`typescript
 const QUALITY_THRESHOLDS = {
   excellent: 90,  // 90-100
   good: 75,       // 75-89
   fair: 50,       // 50-74
   poor: 0         // 0-49
 }
-```
+\`\`\`
 
 **Tuning guide**:
 - Adjust based on your data collection frequency
@@ -596,7 +596,7 @@ const QUALITY_THRESHOLDS = {
 
 ### Core Tables
 
-```sql
+\`\`\`sql
 -- User context
 CREATE TABLE user_context (
   user_id UUID PRIMARY KEY,
@@ -665,7 +665,7 @@ CREATE TABLE ai_analysis_cache (
   token_cost INTEGER,
   PRIMARY KEY (signal_id, analysis_type)
 );
-```
+\`\`\`
 
 ---
 
@@ -715,11 +715,11 @@ CREATE TABLE ai_analysis_cache (
 4. User context mismatch?
 
 **Fix**:
-```typescript
+\`\`\`typescript
 // Debug relevance
 const score = signalIntelligence.calculateSignalImportance(signal, userKPIs)
 console.log("Score:", score)  // Check reasons array
-```
+\`\`\`
 
 ### Incorrect Trend Detection
 
@@ -729,10 +729,10 @@ console.log("Score:", score)  // Check reasons array
 3. Threshold too sensitive?
 
 **Fix**:
-```typescript
+\`\`\`typescript
 // Adjust threshold in universal-schema.ts
 const threshold = 0.05  // 5% instead of 1%
-```
+\`\`\`
 
 ### No Relationships Detected
 
@@ -742,10 +742,10 @@ const threshold = 0.05  // 5% instead of 1%
 3. Correlation threshold too high?
 
 **Fix**:
-```typescript
+\`\`\`typescript
 // Lower threshold temporarily
 const CORRELATION_THRESHOLD = 0.5
-```
+\`\`\`
 
 ### High AI Costs
 
@@ -755,14 +755,14 @@ const CORRELATION_THRESHOLD = 0.5
 3. Prompt length
 
 **Fix**:
-```typescript
+\`\`\`typescript
 // Check cache performance
 SELECT 
   COUNT(*) as total_requests,
   SUM(CASE WHEN cached THEN 1 ELSE 0 END) as cache_hits
 FROM ai_analysis_cache
 // Target: >80% cache hit rate
-```
+\`\`\`
 
 ---
 

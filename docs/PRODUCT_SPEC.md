@@ -113,7 +113,7 @@ Then managers will adopt Camino as their weekly rhythm, executives will trust th
 
 #### First Time Experience
 
-```
+\`\`\`
 US-M1: First Upload
 As a Manager,
 I want to upload my first data file,
@@ -125,9 +125,9 @@ Acceptance Criteria:
 - Within 30 seconds, see list of detected signals
 - Each signal shows: name, current value
 - Message indicates this is baseline (no trends yet)
-```
+\`\`\`
 
-```
+\`\`\`
 US-M2: Explore First Signal
 As a Manager,
 I want to tap on a signal to see details,
@@ -138,11 +138,11 @@ Acceptance Criteria:
 - "What We Found" section shows breakdown (by category, by day, etc.)
 - "What It Means" section explains in plain language
 - Can navigate back to signal list easily
-```
+\`\`\`
 
 #### Ongoing Experience
 
-```
+\`\`\`
 US-M3: Weekly Upload
 As a Manager,
 I want to upload this week's data,
@@ -153,9 +153,9 @@ Acceptance Criteria:
 - Processing shows "Comparing to last week..."
 - Results grouped by: Needs Attention, Improved, Steady
 - Each signal shows: value, change %, trend direction
-```
+\`\`\`
 
-```
+\`\`\`
 US-M4: Explore Problem Signal
 As a Manager,
 I want to drill into a signal marked "Needs Attention",
@@ -166,9 +166,9 @@ Acceptance Criteria:
 - "What We Found" shows where problem is concentrated
 - "What It Means" compares to benchmarks/expectations
 - "So What" suggests 2-3 specific actions
-```
+\`\`\`
 
-```
+\`\`\`
 US-M5: Share Signal to Manager
 As a Manager,
 I want to share a signal insight with my VP,
@@ -180,9 +180,9 @@ Acceptance Criteria:
 - Can toggle: include metric, include meaning, include recommendation
 - Copy to clipboard with one tap
 - Option to send via email (pre-filled recipient from org)
-```
+\`\`\`
 
-```
+\`\`\`
 US-M6: Share Win with Team
 As a Manager,
 I want to share a positive signal with my team,
@@ -192,7 +192,7 @@ Acceptance Criteria:
 - Share sheet allows posting to Slack channel
 - Summary is concise and celebratory in tone
 - Team channel shows formatted message with metric + context
-```
+\`\`\`
 
 ---
 
@@ -200,7 +200,7 @@ Acceptance Criteria:
 
 #### First Time Experience
 
-```
+\`\`\`
 US-E1: View Available Signals
 As an Executive,
 I want to see all signals my team has uploaded,
@@ -210,9 +210,9 @@ Acceptance Criteria:
 - See list of all signals in my organization
 - Each shows: name, current value, trend indicator
 - Signals my team flagged as "Needs Attention" are highlighted
-```
+\`\`\`
 
-```
+\`\`\`
 US-E2: Save Key Signals
 As an Executive,
 I want to save the 3-5 signals I care most about,
@@ -222,11 +222,11 @@ Acceptance Criteria:
 - Tap star icon to save/unsave a signal
 - Visual confirmation when saved
 - Can save up to 10 signals
-```
+\`\`\`
 
 #### Ongoing Experience
 
-```
+\`\`\`
 US-E3: Weekly Check-in
 As an Executive,
 I want to open Camino and immediately see my key signals,
@@ -237,9 +237,9 @@ Acceptance Criteria:
 - Shows only saved signals
 - Grouped by: Needs Attention, On Track
 - Most concerning signal is visually prominent
-```
+\`\`\`
 
-```
+\`\`\`
 US-E4: Drill into Problem
 As an Executive,
 I want to tap a flagged signal to understand the issue,
@@ -249,7 +249,7 @@ Acceptance Criteria:
 - See same detail view as Manager
 - "So What" section is relevant to executive decisions
 - Can see who uploaded the data and when
-```
+\`\`\`
 
 ---
 
@@ -257,7 +257,7 @@ Acceptance Criteria:
 
 ### Information Architecture
 
-```
+\`\`\`
 ├── Onboarding
 │   ├── Sign Up / Sign In
 │   ├── Role Selection (Executive / Manager)
@@ -286,7 +286,7 @@ Acceptance Criteria:
     ├── Summary preview
     ├── Include options (toggles)
     └── Destination (Copy / Slack / Email)
-```
+\`\`\`
 
 ### Screen Specifications
 
@@ -336,7 +336,7 @@ Acceptance Criteria:
 
 Each signal interpretation follows this structure:
 
-```
+\`\`\`
 WHAT WE FOUND (Layer 1)
 ───────────────────────
 - Primary observation (metric + change)
@@ -357,7 +357,7 @@ SO WHAT (Layer 3)
 - Recommendation 2 (if applicable)
 - Questions to investigate further
 - Confidence level (High/Medium/Low)
-```
+\`\`\`
 
 ### Signal Status Logic
 
@@ -378,7 +378,7 @@ SO WHAT (Layer 3)
 
 ### Architecture Overview
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────────┐
 │                           FRONTEND                                  │
 │  Next.js 16 App Router + React 19 + Tailwind CSS + shadcn/ui       │
@@ -395,11 +395,11 @@ SO WHAT (Layer 3)
 │                          EXTERNAL                                   │
 │  AI Gateway (OpenAI) │ Slack API │ Email (Resend)                  │
 └─────────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ### Database Schema (MVP)
 
-```sql
+\`\`\`sql
 -- Core Tables (Existing)
 ───────────────────────
 
@@ -484,7 +484,7 @@ signal_shares
 ├── destination (string, nullable)
 ├── summary_text (text)
 └── created_at
-```
+\`\`\`
 
 ### API Endpoints
 
@@ -501,7 +501,7 @@ signal_shares
 
 ### Service Layer
 
-```
+\`\`\`
 lib/
 ├── services/
 │   ├── signals-service.ts      # CRUD for signals + values
@@ -514,14 +514,14 @@ lib/
 └── utils/
     ├── calculations.ts         # Trend detection, change %
     └── benchmarks.ts           # Industry benchmark data
-```
+\`\`\`
 
 ### AI Integration
 
 **Model:** `openai/gpt-4o-mini` via Vercel AI Gateway
 
 **Interpretation Generation:**
-```typescript
+\`\`\`typescript
 const interpretation = await generateObject({
   model: 'openai/gpt-4o-mini',
   schema: interpretationSchema,
@@ -534,7 +534,7 @@ const interpretation = await generateObject({
     organizationContext
   })
 })
-```
+\`\`\`
 
 **Caching Strategy:**
 - Cache interpretations in `signal_interpretations` table
@@ -544,7 +544,7 @@ const interpretation = await generateObject({
 
 ### Component Structure
 
-```
+\`\`\`
 components/
 ├── signals/
 │   ├── signals-list.tsx        # Main list view
@@ -569,7 +569,7 @@ components/
     ├── trend-badge.tsx         # ↑12% styled badge
     ├── status-indicator.tsx    # Red/green/gray dot
     └── empty-state.tsx         # No data states
-```
+\`\`\`
 
 ---
 
@@ -632,14 +632,14 @@ components/
 ### User Workflow Diagrams
 
 **Executive Weekly Flow:**
-```
+\`\`\`
 Open App → My Signals (3-5 saved) → See "Needs Attention" → Tap to explore → Understand context → Prepared for 1:1
-```
+\`\`\`
 
 **Manager Weekly Flow:**
-```
+\`\`\`
 Export from tool → Upload to Camino → See what changed → Explore problems → Share to VP → Share win to team
-```
+\`\`\`
 
 ### Competitive Landscape
 
