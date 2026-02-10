@@ -1,13 +1,16 @@
 # Camino - Cursor Rules
-# Last updated: 7 Feb 2026
+# Last updated: 10 Feb 2026
 
 ## Project Overview
 
-Camino is a mobile-first business intelligence platform that turns raw business data (CSV uploads, integrations) into actionable signals with AI-powered interpretation. The target user is a small business executive/manager who needs to understand their data without being a data analyst.
+Camino is a mobile-first business intelligence platform that turns raw business data (CSV/XLSX uploads) into actionable signals with AI-powered interpretation. The target user is a small business executive/manager who needs to understand their data without being a data analyst.
 
 North Star metric: 1 upload (manager) + 1 view/week (any user)
 
-Current phase: MVP Tier 1 - getting the core pipeline to "start charging" state.
+Current phase: MSS (Minimum Sellable Service) - admin-in-the-loop model.
+First customer: Uses Zoho CRM, Zoho Desk, and custom CSV data files.
+Delivery plan: /docs/DELIVERY_PLAN_MVP_GDOC.txt
+MSS scope: /docs/MSS_SCOPE.txt
 
 
 ## Tech Stack
@@ -15,7 +18,8 @@ Current phase: MVP Tier 1 - getting the core pipeline to "start charging" state.
 - Framework: Next.js 16 (App Router) with React 19.2
 - Language: TypeScript 5
 - Styling: Tailwind CSS v4 with shadcn/ui components
-- Database: Supabase (PostgreSQL with RLS)
+- Auth: Supabase Auth (client at lib/supabase/client.ts, server at lib/supabase/server.ts)
+- Database: Neon PostgreSQL (primary data store for signals, profiles, orgs)
 - AI: Vercel AI SDK v6 (ai@6.0.6)
 - File parsing: xlsx for Excel/CSV
 - Hosting: Vercel
@@ -32,84 +36,86 @@ Current phase: MVP Tier 1 - getting the core pipeline to "start charging" state.
 - `app/admin/*` - Admin panel (sidebar nav, desktop layout)
 - `app/auth/*` - Authentication flows (login, signup, onboarding)
 - `app/api/*` - API routes (REST endpoints)
-- `app/test/*` - Test/debug pages (smoke tests, e2e, review)
 
-### Supabase Clients
-There are TWO Supabase client files. Use the correct one:
-- `lib/supabase/client.ts` - Browser/client components. Uses `createBrowserClient()`. Call in 'use client' components.
-- `lib/supabase/server.ts` - Server components and API routes. Uses `createServerClient()` with cookies. Always `await createClient()`.
-- `lib/supabase/admin.ts` - Service role client for admin operations. Uses SUPABASE_SERVICE_ROLE_KEY.
+### Database (Dual: Supabase Auth + Neon Data)
+- Supabase: Used ONLY for authentication (auth.users, session management)
+- Neon: Used for ALL application data (signals, profiles, orgs, uploads, data points)
+- Connection: `import { neon } from "@neondatabase/serverless"` then `const sql = neon(process.env.NEON_DATABASE_URL!)`
+- The `profiles` table in Neon is linked to Supabase auth.users via `profiles.id = auth.user.id`
+
+### Supabase Clients (Auth Only)
+- `lib/supabase/client.ts` - Browser/client components. Uses `createBrowserClient()`.
+- `lib/supabase/server.ts` - Server components and API routes. Uses `createServerClient()` with cookies.
+- `lib/supabase/admin.ts` - Service role client for admin operations.
 
 ### Key Services (lib/)
-- `upload-service.ts` - CSV upload processing
-- `staging-service.ts` - Data staging before signal creation
-- `signal-discovery-service.ts` - AI-powered signal detection from staged data
-- `signal-calculation-service.ts` - Statistical calculations (sum, avg, trend, change%)
-- `interpretation-service.ts` - AI interpretation (5-section analysis: what_we_found, what_it_means, so_what)
-- `signals-service.ts` - CRUD operations for signals table
+- `signals-service.ts` - CRUD for signals table (Neon). Core read path for /signals page.
+- `interpretation-service.ts` - AI interpretation (5-section analysis)
 - `organization-service.ts` - Organization management
-- `admin-service.ts` - Admin user management, password resets
+- `admin-service.ts` - Admin user management
 - `csv-parser.ts` / `xlsx-parser.ts` - File parsing utilities
 
-### Critical Pipeline (Tier 1 MVP)
-This is the core value loop. Every change to these files needs extra care:
+### Deprecated Services (still in codebase, NOT used by active flows)
+- `signal-discovery-service.ts` - Old AI-powered signal detection with 92 definitions. REPLACED by 3-question upload flow.
+- `signal-calculation-service.ts` - Old heuristic calculation. REPLACED by spec-driven calculation in generate route.
+- `staging-service.ts` - Old staging pipeline. Not used.
+- `intelligent-mapping-service.ts` - Old field mapping. Not used.
+- `upload-page-client.tsx` - Old upload component. REPLACED by upload-proto-client.tsx.
+- `signal-discovery-panel.tsx` - Old discovery panel. Not used.
+- `upload-modal.tsx` - Old upload modal. Not used.
+
+
+### Critical Pipeline (MSS - Current)
+
+This is the active data flow. Every change to these files needs extra care:
 
 ```
-Upload CSV (upload-page-client.tsx)
-  -> POST /api/upload (route.ts) - parses file, stages data
-  -> Signal Discovery (signal-discovery-service.ts) - AI identifies signals
-  -> POST /api/upload/calculate (route.ts) - statistical calculations
-  -> Signal Calculation (signal-calculation-service.ts) - computes values
-  -> AI Interpretation (interpretation-service.ts) - generates 5-section analysis
-  -> Display (signals-page-client.tsx, signal-detail-client.tsx) - signal cards + expanded view
+Upload CSV/XLSX (upload-proto-client.tsx)
+  -> User classifies each tab via 3 questions:
+     Q1: What does each row represent? (leads/deals/tickets/customers/events/agents)
+     Q2: Which column is the main metric? (dropdown of numeric columns, or "just count rows")
+     Q3: Which column is the date? (dropdown of date columns)
+  -> POST /api/upload/generate (route.ts)
+     - Receives classified tabs + raw row data
+     - Generates signal definitions from user answers (NOT from fuzzy matching)
+     - Calculates values server-side (count, sum, avg, monthly_rate, group_by)
+     - Extracts monthly time-series for trends
+     - Upserts into signals table + signal_data_points table (Neon)
+  -> /signals page reads from signals table via signals-service.ts
+  -> signal-accordion-card.tsx renders each signal
 ```
 
+Key design principle: Signals are generated from EXPLICIT user answers, not from heuristic guessing. If a required field can't be resolved, the signal is skipped (never show a wrong number).
 
-## Database
 
-### Environments
-- Production: `fimcowyogwffkpckicjl` (supabase-orange-yacht) - customer-facing
-- Development: `juacwfiquhzawpzaylen` (camino-dev) - testing and development
+## Database (Neon)
 
-For local dev, use .env.local pointing at camino-dev:
-```
-NEXT_PUBLIC_SUPABASE_URL=https://juacwfiquhzawpzaylen.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<camino-dev anon key>
-SUPABASE_SERVICE_ROLE_KEY=<camino-dev service role key>
-```
-
-### Core Tables (18 total)
-- profiles - User profiles, linked to auth.users
+### Core Tables
+- profiles - User profiles (id links to Supabase auth.users)
 - organizations - Customer organizations
-- organization_members - User-org membership with roles (admin/read-only)
-- signals - Discovered signals with values, trends, status
-- data_points - Time-series data for signals (signal_id, date, value)
-- signal_interpretations - Cached AI interpretations (what_we_found, what_it_means, so_what)
+- organization_members - User-org membership with roles
+- signals - Computed signals (name, category, absolute_value, trend, trend_value, summary, source_metadata, organization_id)
+- signal_data_points - Monthly time-series per signal (signal_id, date, value)
+- signal_interpretations - Cached AI interpretations
 - saved_signals - User bookmarks
-- signal_shares - Share tracking
-- kpi_ownership - Which user owns which signal
-- decisions - Business decisions linked to signals
-- decision_signals - Junction table for decisions-signals
-- benchmark_history - Historical benchmark values
-- data_quality_metrics - Completeness/timeliness/accuracy scores
-- signal_analytics - Pre-computed analytics per period
-- signal_alerts - Threshold breaches, missing data alerts
-- upload_history - Upload tracking (file_name, status, signals_created)
+- upload_history - Upload tracking
 - integrations - OAuth connections (zoho-crm, zoho-desk, hubspot)
-- sync_history - Integration sync tracking
 
-### RLS Pattern
-All tables have Row Level Security enabled. Common patterns:
-- Profiles: users can only see/edit their own profile
-- Signals: open read for all authenticated users, authenticated write
-- Organizations: members can read, admins can update
-- Upload history: users can only see their own uploads
+### Key Relationships
+- signals.organization_id -> organizations.id (signals are scoped to an org)
+- signal_data_points.signal_id -> signals.id
+- profiles.organization_id -> organizations.id
+- The /signals page queries signals WHERE organization_id matches the user's profile.organization_id
+
+### Unique Constraints
+- signals: unique on (name, organization_id) - enables upsert on re-upload
+- signal_data_points: unique on (signal_id, date) - enables upsert of time-series
 
 ### Migration Discipline
 1. Write SQL in `/scripts/` with descriptive name
-2. Run against camino-dev first
+2. Run against dev first
 3. Test the app against dev
-4. Run the EXACT SAME file against prod (no freehand SQL)
+4. Run the EXACT SAME file against prod
 5. Commit the script to git
 
 
@@ -130,15 +136,16 @@ All tables have Row Level Security enabled. Common patterns:
 - Mobile-first: design for 375px width, then scale up
 
 ### API Routes
-- Always validate input with zod or manual checks
+- Always validate input
 - Always check auth: `const supabase = await createClient()` then `supabase.auth.getUser()`
+- For data queries: `const sql = neon(process.env.NEON_DATABASE_URL!)`
 - Return consistent JSON: `{ success: boolean, data?: any, error?: string }`
-- Use parameterized queries (Supabase handles this via its client)
+- Use parameterized queries (Neon template literals handle this)
 
 ### Styling
 - Tailwind CSS v4 with design tokens (bg-background, text-foreground, etc.)
 - Never use direct colors (no bg-white, text-black) - use semantic tokens
-- Fonts: Geist (sans) and Geist Mono (mono) via --font-sans and --font-mono
+- Fonts: Geist (sans) and Geist Mono (mono)
 - Spacing: use Tailwind scale (p-4, gap-6) not arbitrary values
 - Mobile breakpoints: default is mobile, use md: and lg: for larger screens
 
@@ -152,22 +159,8 @@ export default function ExamplePage() {
 
 // components/example-client.tsx (client component, all logic)
 "use client"
-import { createBrowserClient } from "@/lib/supabase/client"
 export function ExampleClient() {
-  const supabase = createBrowserClient()
   // ... component logic
-}
-```
-
-### Admin Pages Pattern
-Admin pages can be client components directly in the page file since the admin layout already handles auth:
-```tsx
-// app/admin/example/page.tsx
-"use client"
-import { createBrowserClient } from "@/lib/supabase/client"
-export default function AdminExamplePage() {
-  const supabase = createBrowserClient()
-  // ... admin logic
 }
 ```
 
@@ -175,48 +168,63 @@ export default function AdminExamplePage() {
 ## What NOT To Do
 
 - Do NOT use localStorage for data persistence
-- Do NOT add new npm packages without checking if an existing one covers the need
-- Do NOT modify the Supabase client files without understanding both client/server patterns
+- Do NOT add new npm packages without checking if existing ones cover the need
+- Do NOT modify Supabase client files without understanding both client/server patterns
 - Do NOT run migrations directly on prod - always dev first
-- Do NOT build features outside the current sprint scope (check /docs/delivery-plan.ts)
-- Do NOT add purple/violet colors (design system uses blue primary + neutral accents)
+- Do NOT build features outside the current sprint scope (check /docs/DELIVERY_PLAN_MVP_GDOC.txt)
+- Do NOT add purple/violet colors
 - Do NOT use `space-*` Tailwind classes - use `gap-*` instead
 - Do NOT create new service files when existing ones cover the domain
+- Do NOT use the old signal-discovery-service.ts or signal-calculation-service.ts for new features
+- Do NOT use upload-page-client.tsx or upload-modal.tsx - they are deprecated
+- Do NOT import from signal-discovery-service.ts in new code
 
 
-## Current Sprint Focus
+## Current Sprint Focus (Week 1-2 MSS)
 
-Tier 1 MVP (target: start charging):
-1. Upload CSV -> Stage -> Discover signals (working, needs real data testing)
-2. Signal calculation (sum, avg, trend, change%) 
-3. AI interpretation (5-section analysis)
-4. Signal list + expanded card display
-5. Master admin user management
+Week 1 (DONE):
+- Replaced old upload flow with 3-question proto flow at /upload
+- Generate route at /api/upload/generate calculates signals from user answers
+- Raw numeric values stored in absolute_value (not formatted strings)
+- org_id sourced from profiles table (matching signals page query)
 
-See /docs/delivery-plan.ts for full story breakdown and status.
-See /docs/DELIVERY_PLAN_MVP.md for the human-readable delivery plan.
+Week 2 (CURRENT):
+- Admin can input user context via Admin CP (upcoming_priorities, signal_preferences)
+- AI analysis prompt uses user/org context for personalised insights
+- Admin can upload files on behalf of a user
+- Definition of Billable: manager uploads CSV, sees 3+ correct signals with AI analysis
+
+See /docs/DELIVERY_PLAN_MVP_GDOC.txt for the full 6-week plan.
 
 
 ## File Organization
 
 ```
 /app
-  /(protected)     Customer-facing pages
-  /admin           Admin panel
+  /(protected)     Customer-facing pages (upload, signals, profile, decisions)
+  /admin           Admin panel (users, orgs, uploads)
   /auth            Login, signup, onboarding
-  /api             API routes
-  /test            Test pages
+  /api
+    /upload/generate  NEW: Signal generation from 3-question flow
+    /upload/calculate OLD (deprecated): Heuristic-based calculation
+    /upload/discover  OLD (deprecated): Fuzzy signal discovery
+    /signals          Signal CRUD endpoints
+  /uploadproto     Redirects to /upload (legacy URL)
 /components
   /ui              shadcn/ui base components (DO NOT EDIT)
   /admin           Admin-specific components
-  /upload          Upload-specific components
-  /intelligence    Intelligence feature components
-  *.tsx            Shared components
+  upload-proto-client.tsx  ACTIVE upload component (3-question flow, multi-file)
+  upload-page-client.tsx   DEPRECATED (old upload flow)
+  signal-accordion-card.tsx  Signal display card with L1/L2/L3 accordion
+  signals-page-client.tsx    Signal list page
 /lib
-  /supabase        Supabase client setup
-  /modules         Feature module exports
-  *.ts             Service files
-/scripts           SQL migration scripts (numbered)
-/docs              Delivery plans, documentation
+  /supabase        Supabase client setup (auth only)
+  signals-service.ts         Reads signals from Neon for display
+  interpretation-service.ts  AI interpretation
+  organization-service.ts    Org management
+  signal-discovery-service.ts   DEPRECATED (old 92-definition pipeline)
+  signal-calculation-service.ts DEPRECATED (old heuristic calc)
+/scripts           SQL migration scripts
+/docs              MSS_SCOPE.txt, DELIVERY_PLAN_MVP_GDOC.txt
 /public            Static assets, icons
 ```
