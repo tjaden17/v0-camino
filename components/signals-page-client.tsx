@@ -45,6 +45,7 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
   const [savedOnly, setSavedOnly] = useState(userRole === "executive" && initialSavedIds.length > 0)
   const [functionFilter, setFunctionFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [showMyKpisOnly, setShowMyKpisOnly] = useState(preferredKpis.length > 0) // Default ON if user has KPIs
   const [sortBy, setSortBy] = useState<"rank" | "trend" | "recent">("rank")
   const [viewMode, setViewMode] = useState<"card" | "grouped">("card")
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set(initialSavedIds))
@@ -65,6 +66,29 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
     const categories = new Set(allSignals.map((s) => s.category).filter(Boolean)) as Set<string>
     return Array.from(categories).sort()
   }, [allSignals])
+
+  // Helper: does a signal match any of the user's preferred KPIs?
+  const signalMatchesKpi = (signal: SignalWithData): boolean => {
+    if (preferredKpis.length === 0) return false
+    const kpiLower = preferredKpis.map((k) => k.toLowerCase().trim())
+    const signalNameLower = (signal.name || "").toLowerCase()
+    const signalCategoryLower = (signal.category || "").toLowerCase()
+    const signalSummaryLower = (signal.summary || "").toLowerCase()
+    
+    return kpiLower.some((kpi) => {
+      // Exact or partial match in name
+      if (signalNameLower.includes(kpi) || kpi.includes(signalNameLower.replace(/ /g, ""))) return true
+      // Match in category
+      if (signalCategoryLower.includes(kpi) || kpi.includes(signalCategoryLower)) return true
+      // Match in summary
+      if (signalSummaryLower.includes(kpi)) return true
+      // Also check for common aliases: "sales" matches "revenue", "win rate" matches "win", etc.
+      if (kpi.includes("win") && signalNameLower.includes("win")) return true
+      if (kpi.includes("lead") && signalNameLower.includes("lead")) return true
+      if (kpi.includes("sales") && (signalNameLower.includes("deal") || signalNameLower.includes("revenue") || signalCategoryLower === "sales")) return true
+      return false
+    })
+  }
 
   const filteredSignals = useMemo(() => {
     return allSignals.filter((signal) => {
@@ -87,10 +111,13 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
       } else if (typeFilter === "risks") {
         matchesType = signal.status === "needs_attention" || signal.trend === "decreasing"
       }
+      
+      // My KPIs filter: if enabled, ONLY show signals that match user's preferred KPIs
+      const matchesMyKpis = !showMyKpisOnly || signalMatchesKpi(signal)
 
-      return matchesCategory && matchesTrend && matchesStatus && matchesSaved && matchesFunction && matchesType
+      return matchesCategory && matchesTrend && matchesStatus && matchesSaved && matchesFunction && matchesType && matchesMyKpis
     })
-  }, [allSignals, categoryFilter, trendFilter, statusFilter, savedOnly, savedIds, functionFilter, typeFilter])
+  }, [allSignals, categoryFilter, trendFilter, statusFilter, savedOnly, savedIds, functionFilter, typeFilter, showMyKpisOnly, preferredKpis])
 
   // Sort signals by rank (intelligence score), trend, or recency; stuck (pinned) signals always at top
   const sortedSignals = useMemo(() => {
@@ -357,6 +384,24 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
                 </SelectContent>
               </Select>
             </div>
+            
+            {preferredKpis.length > 0 && (
+              <Button
+                variant={showMyKpisOnly ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowMyKpisOnly(!showMyKpisOnly)}
+                className="h-9 text-sm shrink-0"
+              >
+                <Pin className="h-3.5 w-3.5 mr-1.5" />
+                My KPIs
+                {showMyKpisOnly && (
+                  <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                    {filteredSignals.length}
+                  </Badge>
+                )}
+              </Button>
+            )}
+            
             <div className="ml-auto shrink-0">
               <Button
                 variant="ghost"
