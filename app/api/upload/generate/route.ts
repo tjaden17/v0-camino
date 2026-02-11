@@ -38,7 +38,11 @@ interface SignalPayload {
 
 function parseNumber(val: string | undefined | null): number | null {
   if (!val || val.trim() === "") return null
-  const cleaned = val.replace(/[$,\s%]/g, "")
+  // Remove currency codes (AUD, USD, EUR, etc.) and symbols
+  const cleaned = val
+    .replace(/^[A-Z]{3}\s*/i, "") // Remove 3-letter currency codes at start
+    .replace(/[$€£¥,\s%]/g, "")    // Remove currency symbols, commas, spaces, percent
+    .replace(/^\((.+)\)$/, "-$1")  // Handle negative numbers in parentheses
   const n = Number(cleaned)
   return isNaN(n) ? null : n
 }
