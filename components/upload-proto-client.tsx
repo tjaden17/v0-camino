@@ -105,8 +105,12 @@ function detectColumnType(values: string[], columnName?: string): "text" | "numb
   if (dateCount > sample.length * 0.6) return "date"
 
   const numCount = sample.filter(v => {
-    // More aggressive currency cleaning: remove $, €, £, ¥, commas, spaces, %, and trim
-    const cleaned = v.replace(/[$€£¥,\s%]/g, "").trim()
+    // Remove currency codes (AUD, USD, EUR, GBP, etc.) and symbols ($, €, £, ¥)
+    // Also remove commas, spaces, %, and trim
+    const cleaned = v
+      .replace(/^[A-Z]{3}\s*/i, "") // Remove 3-letter currency codes at start (AUD, USD, etc.)
+      .replace(/[$€£¥,\s%]/g, "")    // Remove currency symbols, commas, spaces, percent
+      .trim()
     // Also handle parentheses for negative numbers: (123) -> -123
     const withNegative = cleaned.replace(/^\((.+)\)$/, "-$1")
     return withNegative !== "" && !isNaN(Number(withNegative))
@@ -119,12 +123,20 @@ function detectColumnType(values: string[], columnName?: string): "text" | "numb
   const numberThreshold = columnName && VALUE_LIKE_COLUMN_PATTERN.test(columnName) ? 0.5 : 0.7
   if (numericRatio >= numberThreshold) {
     const allInts = sample.every(v => {
-      const cleaned = v.replace(/[$€£¥,\s%]/g, "").replace(/^\((.+)\)$/, "-$1")
+      const cleaned = v
+        .replace(/^[A-Z]{3}\s*/i, "")
+        .replace(/[$€£¥,\s%]/g, "")
+        .replace(/^\((.+)\)$/, "-$1")
       const n = Number(cleaned)
       return Number.isInteger(n)
     })
     const uniqueRatio = new Set(sample).size / sample.length
-    const firstNum = Number(sample[0].replace(/[$€£¥,\s%]/g, "").replace(/^\((.+)\)$/, "-$1"))
+    const firstNum = Number(
+      sample[0]
+        .replace(/^[A-Z]{3}\s*/i, "")
+        .replace(/[$€£¥,\s%]/g, "")
+        .replace(/^\((.+)\)$/, "-$1")
+    )
     if (allInts && uniqueRatio > 0.9 && firstNum > 100000) {
       return "id"
     }
@@ -223,7 +235,12 @@ export function generateSignals(tab: TabData, answers: TabAnswers): GeneratedSig
   // 3. Sum/Average of metric column (if not count-only)
   if (metricColumn && metricColumn !== "none") {
     const values = tab.sampleRows
-      .map(r => Number(r[metricColumn]?.replace(/[$,\s%]/g, "")))
+      .map(r => {
+        const cleaned = (r[metricColumn] || "")
+          .replace(/^[A-Z]{3}\s*/i, "") // Remove currency codes (AUD, USD, etc.)
+          .replace(/[$€£¥,\s%]/g, "")    // Remove symbols and commas
+        return Number(cleaned)
+      })
       .filter(v => !isNaN(v))
 
     if (values.length > 0) {
