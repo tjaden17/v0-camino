@@ -362,8 +362,6 @@ export async function POST(request: Request) {
         const trendText = result.trendPercentage !== null
           ? `${result.trendPercentage > 0 ? "+" : ""}${result.trendPercentage}%`
           : `${result.dataPointCount} data points`
-        // DB constraint signals_trend_check may allow only ('up', 'down', 'stable'); normalize so insert never fails
-        const dbTrend = result.trend === "increasing" ? "up" : result.trend === "decreasing" ? "down" : "stable"
 
         const summary = `${signalDef.operation}: ${result.formula}. ${signalDef.description}`
 
@@ -395,7 +393,7 @@ export async function POST(request: Request) {
           dbResult = await sql`
             UPDATE signals SET
               absolute_value = ${rawValue},
-              trend = ${dbTrend},
+              trend = ${result.trend},
               trend_value = ${trendText},
               summary = ${summary},
               source_metadata = ${metadata}::jsonb,
@@ -413,7 +411,7 @@ export async function POST(request: Request) {
               ${result.category},
               ${organizationId},
               ${rawValue},
-              ${dbTrend},
+              ${result.trend},
               ${trendText},
               'upload',
               ${summary},

@@ -9,7 +9,8 @@ import {
   ChevronUp,
   ArrowUp, 
   ArrowDown, 
-  Pin,
+  Bookmark, 
+  BookmarkCheck,
   TrendingUp,
   TrendingDown,
   Activity,
@@ -237,7 +238,7 @@ export function SignalAccordionCard({
               <span className="sr-only">Share</span>
             </Button>
             
-            {/* Stick to top */}
+            {/* Save / Bookmark */}
             <Button
               variant="ghost"
               size="icon"
@@ -250,14 +251,15 @@ export function SignalAccordionCard({
                 onToggleSave?.(signal.id)
               }}
               disabled={isSaving}
-              title={isSaved ? "Stuck to top" : "Stick to top"}
             >
               {isSaving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isSaved ? (
+                <BookmarkCheck className="h-4 w-4 fill-current" />
               ) : (
-                <Pin className={cn("h-4 w-4", isSaved && "fill-current")} />
+                <Bookmark className="h-4 w-4" />
               )}
-              <span className="sr-only">{isSaved ? "Stuck to top" : "Stick to top"}</span>
+              <span className="sr-only">{isSaved ? "Saved" : "Save"}</span>
             </Button>
 
             {/* More Menu */}
