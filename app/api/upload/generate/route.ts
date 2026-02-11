@@ -55,6 +55,9 @@ function parseDate(val: string | undefined | null): Date | null {
 }
 
 function formatValue(value: number, operation: string): string {
+  if (operation === "rate") {
+    return `${Math.round(value * 10) / 10}%`
+  }
   if (operation === "average" || operation === "sum") {
     if (Math.abs(value) >= 1000000) return `$${(value / 1000000).toFixed(1)}M`
     if (Math.abs(value) >= 1000) return `$${(value / 1000).toFixed(1)}K`
@@ -263,6 +266,76 @@ function calculateSignal(
         }
         for (const [dateStr, count] of Object.entries(monthly)) {
           timeSeries.push({ date: new Date(dateStr), value: count })
+        }
+      }
+      break
+    }
+
+    case "rate": {
+      // Win Rate calculation: count deals with positive outcomes vs total closed deals
+      // Requires a "stage" column with values like "won", "lost", "closed won", "closed lost"
+      const stageColumn = tab.columns.find(c => 
+        c.toLowerCase() === "stage" || 
+        c.toLowerCase() === "status" || 
+        c.toLowerCase() === "deal_stage" ||
+        c.toLowerCase() === "opportunity_stage"
+      )
+      
+      if (!stageColumn) {
+        console.log("[v0] Rate operation: no stage column found")
+        return null
+      }
+
+      // Define what counts as "closed" and "won"
+      const closedStatuses = ["won", "lost", "closed won", "closed lost", "closed-won", "closed-lost"]
+      const wonStatuses = ["won", "closed won", "closed-won", "success"]
+      
+      let totalClosed = 0
+      let totalWon = 0
+      
+      // Count closed deals and won deals
+      for (const row of rows) {
+        const stageValue = (row[stageColumn] || "").toLowerCase().trim()
+        if (closedStatuses.some(status => stageValue.includes(status))) {
+          totalClosed++
+          if (wonStatuses.some(status => stageValue.includes(status))) {
+            totalWon++
+          }
+        }
+      }
+      
+      console.log("[v0] Win Rate calculation:", { totalClosed, totalWon, stageColumn, sampleStages: rows.slice(0, 5).map(r => r[stageColumn]) })
+      
+      if (totalClosed === 0) {
+        console.log("[v0] No closed deals found")
+        return null
+      }
+      
+      value = (totalWon / totalClosed) * 100
+      formula = `${totalWon} won / ${totalClosed} closed = ${Math.round(value)}%`
+      
+      // Time-series: win rate per month
+      if (dateColumn) {
+        const monthly: Record<string, { closed: number; won: number }> = {}
+        for (const row of rows) {
+          const d = parseDate(row[dateColumn])
+          const stageValue = (row[stageColumn] || "").toLowerCase().trim()
+          const isClosed = closedStatuses.some(status => stageValue.includes(status))
+          const isWon = wonStatuses.some(status => stageValue.includes(status))
+          
+          if (d && isClosed) {
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`
+            if (!monthly[key]) monthly[key] = { closed: 0, won: 0 }
+            monthly[key].closed++
+            if (isWon) monthly[key].won++
+          }
+        }
+        
+        for (const [dateStr, { closed, won }] of Object.entries(monthly)) {
+          if (closed > 0) {
+            const rate = (won / closed) * 100
+            timeSeries.push({ date: new Date(dateStr), value: Math.round(rate * 10) / 10 })
+          }
         }
       }
       break

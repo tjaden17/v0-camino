@@ -270,7 +270,31 @@ export function generateSignals(tab: TabData, answers: TabAnswers): GeneratedSig
     }
   }
 
-  // 4. Group-by signals for meaningful text columns
+  // 4. Win Rate (for deals only, if stage column exists)
+  if (rowType === "deals" || rowType === "opportunities") {
+    const stageColumn = tab.columns.find(c => 
+      c.toLowerCase() === "stage" || 
+      c.toLowerCase() === "status" || 
+      c.toLowerCase() === "deal_stage" ||
+      c.toLowerCase() === "opportunity_stage"
+    )
+    
+    if (stageColumn) {
+      signals.push({
+        name: "Win Rate",
+        description: "Percentage of deals won vs total closed deals",
+        operation: "rate",
+        valueColumn: null,
+        dateColumn,
+        groupByColumn: null,
+        tabKey: tab.key,
+        tabName: tab.name,
+        preview: null,
+      })
+    }
+  }
+
+  // 5. Group-by signals for meaningful text columns
   const textCols = tab.columns.filter(c =>
     tab.columnTypes[c] === "text" && c.toLowerCase() !== "id" && c.toLowerCase() !== "email"
   )
