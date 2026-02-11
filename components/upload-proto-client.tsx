@@ -105,19 +105,27 @@ function detectColumnType(values: string[], columnName?: string): "text" | "numb
   if (dateCount > sample.length * 0.6) return "date"
 
   const numCount = sample.filter(v => {
-    const cleaned = v.replace(/[$,\s%]/g, "").trim()
-    return cleaned !== "" && !isNaN(Number(cleaned))
+    // More aggressive currency cleaning: remove $, €, £, ¥, commas, spaces, %, and trim
+    const cleaned = v.replace(/[$€£¥,\s%]/g, "").trim()
+    // Also handle parentheses for negative numbers: (123) -> -123
+    const withNegative = cleaned.replace(/^\((.+)\)$/, "-$1")
+    return withNegative !== "" && !isNaN(Number(withNegative))
   }).length
   const numericRatio = numCount / sample.length
+  
+  console.log("[v0] Column type detection:", { columnName, sample: sample.slice(0, 5), numCount, numericRatio })
+  
   // Use lower threshold (50%) for columns named like amount/value/revenue so we don't miss them
   const numberThreshold = columnName && VALUE_LIKE_COLUMN_PATTERN.test(columnName) ? 0.5 : 0.7
   if (numericRatio >= numberThreshold) {
     const allInts = sample.every(v => {
-      const n = Number(v.replace(/[$,\s%]/g, ""))
+      const cleaned = v.replace(/[$€£¥,\s%]/g, "").replace(/^\((.+)\)$/, "-$1")
+      const n = Number(cleaned)
       return Number.isInteger(n)
     })
     const uniqueRatio = new Set(sample).size / sample.length
-    if (allInts && uniqueRatio > 0.9 && Number(sample[0].replace(/[$,\s%]/g, "")) > 100000) {
+    const firstNum = Number(sample[0].replace(/[$€£¥,\s%]/g, "").replace(/^\((.+)\)$/, "-$1"))
+    if (allInts && uniqueRatio > 0.9 && firstNum > 100000) {
       return "id"
     }
     return "number"
