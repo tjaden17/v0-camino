@@ -15,8 +15,7 @@ import {
   Filter, 
   Sparkles, 
   X, 
-  Bookmark, 
-  BookmarkCheck, 
+  Pin,
   AlertTriangle, 
   TrendingUp, 
   Minus, 
@@ -35,9 +34,11 @@ interface SignalsPageClientProps {
   userId: string
   savedSignalIds?: string[]
   userRole?: "executive" | "manager"
+  /** KPI names from profile (kpi_1, kpi_2, kpi_3) – matching signals are ordered to the top */
+  preferredKpis?: string[]
 }
 
-export function SignalsPageClient({ signals: initialSignals, userId, savedSignalIds: initialSavedIds = [], userRole = "manager" }: SignalsPageClientProps) {
+export function SignalsPageClient({ signals: initialSignals, userId, savedSignalIds: initialSavedIds = [], userRole = "manager", preferredKpis = [] }: SignalsPageClientProps) {
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [trendFilter, setTrendFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -58,6 +59,12 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
 
   const [touchStart, setTouchStart] = useState<{ x: number, y: number } | null>(null)
   const [touchEnd, setTouchEnd] = useState<{ x: number, y: number } | null>(null)
+
+  // Unique categories (functions) from signals for the filter dropdown
+  const functionOptions = useMemo(() => {
+    const categories = new Set(allSignals.map((s) => s.category).filter(Boolean)) as Set<string>
+    return Array.from(categories).sort()
+  }, [allSignals])
 
   const filteredSignals = useMemo(() => {
     return allSignals.filter((signal) => {
@@ -85,7 +92,7 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
     })
   }, [allSignals, categoryFilter, trendFilter, statusFilter, savedOnly, savedIds, functionFilter, typeFilter])
 
-  // Sort signals by rank (intelligence score), trend, or recency
+  // Sort signals by rank (intelligence score), trend, or recency; stuck (pinned) signals always at top
   const sortedSignals = useMemo(() => {
     const sorted = [...filteredSignals]
     
@@ -124,8 +131,22 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
       })
     }
     
-    return sorted
-  }, [filteredSignals, sortBy])
+    // Order: 1) Stuck (pinned), 2) Profile KPIs (signals matching user's kpi_1/kpi_2/kpi_3), 3) Rest
+    const pinned = sorted.filter((s) => savedIds.has(s.id))
+    const unpinned = sorted.filter((s) => !savedIds.has(s.id))
+    if (preferredKpis.length === 0) return [...pinned, ...unpinned]
+
+    const kpiLower = preferredKpis.map((k) => k.toLowerCase())
+    const matchesProfileKpi = (s: SignalWithData) =>
+      kpiLower.some(
+        (k) =>
+          (s.name && s.name.toLowerCase().includes(k)) ||
+          (s.category && s.category.toLowerCase().includes(k))
+      )
+    const profileMatched = unpinned.filter(matchesProfileKpi)
+    const rest = unpinned.filter((s) => !profileMatched.includes(s))
+    return [...pinned, ...profileMatched, ...rest]
+  }, [filteredSignals, sortBy, savedIds, preferredKpis])
 
   // Toggle save status for a signal
   const handleToggleSave = async (signalId: string) => {
@@ -319,17 +340,35 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
   
   <div className="sticky top-[57px] z-10 bg-card border-b border-border shadow-sm">
         <div className="container max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-end">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Select value={functionFilter} onValueChange={setFunctionFilter}>
+                <SelectTrigger className="h-9 w-[180px] text-sm">
+                  <SelectValue placeholder="Function" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All functions</SelectItem>
+                  {functionOptions.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="ml-auto shrink-0">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setViewMode(viewMode === "card" ? "grouped" : "card")}
-                className="h-9 w-9 shrink-0 hover:bg-primary/10"
+                className="h-9 w-9 hover:bg-primary/10"
                 title={viewMode === "card" ? "Switch to grouped view" : "Switch to card view"}
               >
                 {viewMode === "card" ? <Layers className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
                 <span className="sr-only">{viewMode === "card" ? "Grouped view" : "Card view"}</span>
               </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -411,7 +450,7 @@ export function SignalsPageClient({ signals: initialSignals, userId, savedSignal
                                 {signal.name}
                               </h3>
                               {savedIds.has(signal.id) && (
-                                <BookmarkCheck className="h-4 w-4 text-primary shrink-0" />
+                                <Pin className="h-4 w-4 text-primary fill-current shrink-0" />
                               )}
                             </div>
                             <p className="text-sm text-muted-foreground truncate">

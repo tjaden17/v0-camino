@@ -1,6 +1,7 @@
 // Intelligent signal discovery - analyzes uploaded data and determines which signals are available
 
 import type { ParsedCSVRow } from "./csv-parser"
+import { getWeek1CoreSignals } from "./signal-definitions-week1"
 
 /**
  * Explicit calculation specification - tells the calc engine
@@ -96,215 +97,111 @@ export interface DetectedColumn {
 }
 
 // ============================================
-// UTILITY FUNCTIONS
+// SIGNAL DEFINITIONS (the "Signal Catalog")
 // ============================================
 
-// Normalize field name using FIELD_ALIASES to find canonical name
-export function normalizeFieldName(columnName: string): string {
-  const normalized = columnName.toLowerCase().trim().replace(/[_\s-]+/g, "_")
-  
-  // Check if this column name matches any alias
-  for (const [canonicalName, aliases] of Object.entries(FIELD_ALIASES)) {
-    for (const alias of aliases) {
-      const aliasNormalized = alias.toLowerCase().replace(/[_\s-]+/g, "_")
-      if (normalized === aliasNormalized || normalized.includes(aliasNormalized) || aliasNormalized.includes(normalized)) {
-        return canonicalName
-      }
-    }
-  }
-  
-  // Return the normalized name if no alias match
-  return normalized
-}
+/**
+ * Week 1 MSS Delivery Plan: Cut from 93 to ~20 core signals.
+ * Every signal has an explicit calcSpec. No heuristic calculations.
+ * Aligned to first customer's Zoho data.
+ */
+export const SIGNAL_DEFINITIONS: SignalRequirement[] = getWeek1CoreSignals()
 
-// Detect column type from sample values
-export function detectColumnType(values: unknown[]): "string" | "number" | "date" | "boolean" | "unknown" {
-  const nonNullValues = values.filter(v => v !== null && v !== undefined && v !== "")
-  if (nonNullValues.length === 0) return "unknown"
-  
-  let numberCount = 0
-  let dateCount = 0
-  let booleanCount = 0
-  
-  for (const value of nonNullValues.slice(0, 100)) {
-    const strValue = String(value).trim()
-    
-    // Check boolean
-    if (["true", "false", "yes", "no", "1", "0"].includes(strValue.toLowerCase())) {
-      booleanCount++
-      continue
-    }
-    
-    // Check number (including currency)
-    const numericStr = strValue.replace(/[$€£¥,\s]/g, "")
-    if (!isNaN(parseFloat(numericStr)) && isFinite(Number(numericStr))) {
-      numberCount++
-      continue
-    }
-    
-    // Check date
-    const datePatterns = [
-      /^\d{4}-\d{2}-\d{2}/, // ISO date
-      /^\d{1,2}\/\d{1,2}\/\d{2,4}/, // US date
-      /^\d{1,2}-\d{1,2}-\d{2,4}/, // EU date
-      /^\w{3}\s+\d{1,2},?\s+\d{4}/, // Mon DD, YYYY
-    ]
-    if (datePatterns.some(p => p.test(strValue)) || !isNaN(Date.parse(strValue))) {
-      dateCount++
-    }
-  }
-  
-  const total = nonNullValues.slice(0, 100).length
-  const threshold = 0.7
-  
-  if (numberCount / total >= threshold) return "number"
-  if (dateCount / total >= threshold) return "date"
-  if (booleanCount / total >= threshold) return "boolean"
-  
-  return "string"
-}
-
-// Detect columns from parsed data
-export function detectColumns(rows: ParsedCSVRow[]): DetectedColumn[] {
-  if (rows.length === 0) return []
-  
-  const columns = Object.keys(rows[0])
-  const detectedColumns: DetectedColumn[] = []
-  
-  for (const colName of columns) {
-    const values = rows.map(row => row[colName])
-    const nonNullValues = values.filter(v => v !== null && v !== undefined && v !== "")
-    const uniqueValues = new Set(nonNullValues.map(v => String(v)))
-    
-    const sampleValues = Array.from(uniqueValues).slice(0, 5).map(v => String(v))
-    const inferredType = detectColumnType(values)
-    
-    // Calculate confidence based on type consistency
-    let typeMatchCount = 0
-    for (const value of nonNullValues.slice(0, 50)) {
-      const valueType = detectColumnType([value])
-      if (valueType === inferredType || valueType === "unknown") {
-        typeMatchCount++
-      }
-    }
-    const confidence = nonNullValues.length > 0 
-      ? typeMatchCount / Math.min(nonNullValues.length, 50) 
-      : 0
-    
-    detectedColumns.push({
-      name: colName,
-      inferredType,
-      sampleValues,
-      nullCount: values.length - nonNullValues.length,
-      uniqueCount: uniqueValues.size,
-      confidence,
-    })
-  }
-  
-  return detectedColumns
-}
-
-// Comprehensive Signal Library for B2B SaaS (20-200 employees)
-// Covers: Revenue, Sales, Marketing, Customer Success, Support, Product, Finance, HR
-export const SIGNAL_DEFINITIONS: SignalRequirement[] = [
-  // ============================================
-  // REVENUE SIGNALS (CEO, CFO, Board)
-  // ============================================
-  {
-    signalId: "mrr",
-    signalName: "Monthly Recurring Revenue (MRR)",
-    description: "Total predictable revenue generated per month",
-    category: "Revenue",
-    valuableFor: ["CEO", "CFO", "Board"],
-    businessStage: ["Post-PMF", "Scaling"],
+// ============================================
+// OLD 93-SIGNAL DEFINITIONS REMOVED (Week 1 MSS)\
+    signalName: "Monthly Recurring Revenue (MRR)",\
+    description: "Total predictable revenue generated per month",\
+    category: "Revenue",\
+    valuableFor: ["CEO", "CFO", "Board"],\
+    businessStage: ["Post-PMF", "Scaling"],\
     requiredFields: [
       { name: "revenue_amount", type: "number", description: "Revenue value", examples: ["1000", "5000.50"] },
-    ],
+    ],\
     optionalFields: [
       { name: "date", type: "date", description: "Transaction date", examples: ["2025-01-01"] },
       { name: "subscription_type", type: "string", description: "Type of subscription", examples: ["monthly", "annual"] },
       { name: "customer_id", type: "string", description: "Customer identifier", examples: ["CUST-001"] },
-    ],
-    calculationType: "aggregated",
+    ],\
+    calculationType: "aggregated",\
     calcSpec: {
-      sourceTab: ["revenue", "subscriptions", "invoices", "deals"],
-      operation: "sum",
-      valueField: "revenue_amount",
-      dateField: "date",
-      filters: [],
-      displayUnit: "currency",
-    },
+      sourceTab: ["revenue", "subscriptions", "invoices", "deals"],\
+      operation: "sum",\
+      valueField: "revenue_amount",\
+      dateField: "date",\
+      filters: [],\
+      displayUnit: "currency",\
+    },\
   },
   {
-    signalId: "arr",
-    signalName: "Annual Recurring Revenue (ARR)",
-    description: "MRR × 12 - Total recurring revenue normalized annually",
-    category: "Revenue",
-    valuableFor: ["CEO", "CFO", "Board"],
-    businessStage: ["Post-PMF", "Scaling"],
+    signalId: "arr",\
+    signalName: "Annual Recurring Revenue (ARR)",\
+    description: "MRR × 12 - Total recurring revenue normalized annually",\
+    category: "Revenue",\
+    valuableFor: ["CEO", "CFO", "Board"],\
+    businessStage: ["Post-PMF", "Scaling"],\
     requiredFields: [
       { name: "revenue_amount", type: "number", description: "Monthly recurring revenue", examples: ["10000", "50000"] },
-    ],
-    optionalFields: [],
-    calculationType: "calculated",
+    ],\
+    optionalFields: [],\
+    calculationType: "calculated",\
   },
   {
-    signalId: "revenue_growth_rate",
-    signalName: "Revenue Growth Rate",
-    description: "Month-over-month or year-over-year revenue growth percentage",
-    category: "Revenue",
-    valuableFor: ["CEO", "CFO", "Board"],
-    businessStage: ["Post-PMF", "Scaling"],
+    signalId: "revenue_growth_rate",\
+    signalName: "Revenue Growth Rate",\
+    description: "Month-over-month or year-over-year revenue growth percentage",\
+    category: "Revenue",\
+    valuableFor: ["CEO", "CFO", "Board"],\
+    businessStage: ["Post-PMF", "Scaling"],\
     requiredFields: [
       { name: "revenue_amount", type: "number", description: "Revenue amount", examples: ["10000", "50000"] },
       { name: "date", type: "date", description: "Period date", examples: ["2025-01-01"] },
-    ],
-    optionalFields: [],
-    calculationType: "time-series",
+    ],\
+    optionalFields: [],\
+    calculationType: "time-series",\
   },
   {
-    signalId: "net_revenue_retention",
-    signalName: "Net Revenue Retention (NRR)",
-    description: "Revenue retained from existing customers including expansions",
-    category: "Revenue",
-    valuableFor: ["CEO", "CFO", "Customer Success"],
-    businessStage: ["Post-PMF", "Scaling"],
+    signalId: "net_revenue_retention",\
+    signalName: "Net Revenue Retention (NRR)",\
+    description: "Revenue retained from existing customers including expansions",\
+    category: "Revenue",\
+    valuableFor: ["CEO", "CFO", "Customer Success"],\
+    businessStage: ["Post-PMF", "Scaling"],\
     requiredFields: [
       { name: "customer_id", type: "string", description: "Customer identifier", examples: ["CUST-001"] },
       { name: "revenue_amount", type: "number", description: "Revenue amount", examples: ["1000"] },
-    ],
+    ],\
     optionalFields: [
       { name: "date", type: "date", description: "Period date", examples: ["2025-01-01"] },
-    ],
-    calculationType: "aggregated",
+    ],\
+    calculationType: "aggregated",\
   },
   {
-    signalId: "gross_revenue_retention",
-    signalName: "Gross Revenue Retention (GRR)",
-    description: "Revenue retained excluding expansions (measures churn impact)",
-    category: "Revenue",
-    valuableFor: ["CEO", "CFO", "Customer Success"],
-    businessStage: ["Post-PMF", "Scaling"],
+    signalId: "gross_revenue_retention",\
+    signalName: "Gross Revenue Retention (GRR)",\
+    description: "Revenue retained excluding expansions (measures churn impact)",\
+    category: "Revenue",\
+    valuableFor: ["CEO", "CFO", "Customer Success"],\
+    businessStage: ["Post-PMF", "Scaling"],\
     requiredFields: [
       { name: "customer_id", type: "string", description: "Customer identifier", examples: ["CUST-001"] },
       { name: "revenue_amount", type: "number", description: "Revenue amount", examples: ["1000"] },
       { name: "status", type: "string", description: "Customer status", examples: ["active", "churned"] },
-    ],
-    optionalFields: [],
-    calculationType: "aggregated",
+    ],\
+    optionalFields: [],\
+    calculationType: "aggregated",\
   },
   {
-    signalId: "revenue_per_customer",
-    signalName: "Average Revenue per Customer (ARPC)",
-    description: "Total revenue divided by number of customers",
-    category: "Revenue",
-    valuableFor: ["CEO", "CFO", "Sales"],
-    businessStage: ["Post-PMF", "Scaling"],
+    signalId: "revenue_per_customer",\
+    signalName: "Average Revenue per Customer (ARPC)",\
+    description: "Total revenue divided by number of customers",\
+    category: "Revenue",\
+    valuableFor: ["CEO", "CFO", "Sales"],\
+    businessStage: ["Post-PMF", "Scaling"],\
     requiredFields: [
       { name: "revenue_amount", type: "number", description: "Revenue amount", examples: ["5000"] },
       { name: "customer_id", type: "string", description: "Customer identifier", examples: ["CUST-001"] },
-    ],
-    optionalFields: [],
+    ],\
+    optionalFields: [],\
     calculationType: "aggregated",
   },
   {

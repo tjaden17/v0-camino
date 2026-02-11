@@ -1,348 +1,410 @@
-# Camino - Metric Specifications
-# Last updated: 11 Feb 2026
-# Purpose: Single source of truth for every signal calculation.
-# Every signal the system generates MUST match these specs exactly.
-# If the code doesn't match the spec, the code is wrong.
+# Metric Specifications Document
 
-
-## How to Use This Doc
-
-1. Pick a signal type below
-2. Upload a known test dataset (where you can manually verify the answer)
-3. Compare the system output to the "Expected Output" in the spec
-4. If they don't match, the bug is in the code, not the data
-
-
-## Architecture Issues Identified
-
-Before the specs, here are the structural problems causing incorrect numbers:
-
-### Issue 1: Client-Side Preview vs Server-Side Calculation Divergence
-
-The `generateSignals()` function in `upload-proto-client.tsx` computes a **preview value**
-from `tab.sampleRows` (client side). The server-side `calculateSignal()` in
-`/api/upload/generate/route.ts` recomputes from `tab.rows` (full dataset). These can
-diverge because:
-
-- `sampleRows` may be a subset of `rows` (e.g. first 100 rows only)
-- Client preview of monthly_rate uses sampleRows date range, server uses full rows date range
-- Client preview of sum/average uses sampleRows, server uses all rows
-
-**Recommendation:** The client preview should be labeled "estimate" or "preview based on
-sample." Only the server-side value should be stored as the signal's `absolute_value`.
-Alternatively, send ALL rows to both and ensure they use the same function.
-
-
-### Issue 2: No Row Filtering
-
-The current pipeline has NO row filtering. Every row in the tab is included in every
-calculation. This means:
-
-- Pipeline Value includes Closed Won AND Closed Lost deals (should only include open)
-- Win Rate cannot be calculated (needs to filter by Closed Won vs all closed)
-- Ticket Resolution Time includes open tickets (should only include resolved)
-
-**Recommendation:** Add a `filters` field to the signal definition. The 3-question flow
-should auto-detect common filters based on row type:
-- deals: exclude Closed Lost for pipeline signals
-- tickets: filter by status for resolution signals
-
-This is the biggest accuracy problem. See Issue 5 for the recommended fix.
-
-
-### Issue 3: Date Parsing Inconsistency
-
-`parseDate()` in the generate route accepts ISO dates and common formats but may fail on:
-- DD/MM/YYYY (Australian format) vs MM/DD/YYYY (US format) -- ambiguous for dates like 02/03/2026
-- Dates with timezone offsets
-- Dates formatted as "11 Feb 2026" or "February 11, 2026"
-
-**Recommendation:** Add a date format detection step during the 3-question flow. When the
-user selects a date column, sample 5 values and show them: "Is this date March 2 or
-February 3?" Let the user confirm the format. Store the format with the tab answers.
-
-
-### Issue 4: Trend Calculation Uses Halves, Not Periods
-
-`determineTrend()` splits ALL data points into two halves and compares averages. This means:
-- A dataset spanning 12 months compares months 1-6 vs months 7-12 (sensible)
-- A dataset spanning 2 months compares weeks 1-2 vs weeks 3-4 (less sensible)
-- A dataset with 3 data points returns "stable" (minimum is 4)
-
-**Recommendation:** Use a proper period comparison: current month vs previous month, or
-current quarter vs previous quarter. The period should match the data density.
-
-
-### Issue 5: No Signal Subtypes (The Root Cause)
-
-The current system generates one signal per operation type (count, sum, average, monthly_rate,
-group_by). But business metrics often need COMBINATIONS:
-
-- "Pipeline Value" = SUM(Amount) WHERE Stage NOT IN ('Closed Won', 'Closed Lost')
-- "Win Rate" = COUNT(WHERE Stage = 'Closed Won') / COUNT(WHERE Stage IN ('Closed Won', 'Closed Lost'))
-- "Average Resolution Time" = AVG(Resolution_Time) WHERE Status = 'Resolved'
-
-The 3-question flow only asks what, how much, and when. It doesn't ask "which rows to include."
-
-**Recommendation:** Add signal templates per row type. When user selects "deals" as the row
-type and a stage/status column exists, auto-generate:
-- Total Deals (count, no filter)
-- Pipeline Value (sum of amount, WHERE stage is open)
-- Closed Won Value (sum of amount, WHERE stage = Closed Won)
-- Win Rate (rate: Closed Won / (Closed Won + Closed Lost))
-- Average Deal Size (average of amount, all deals)
-
-These templates encode the filter logic that the 3-question flow currently misses.
+## Purpose
+This document defines the exact calculation formulas, row filtering rules, and validation criteria for all signal types in Camino. It serves as the single source of truth for metric accuracy and is used to validate signal calculations against test data.
 
 ---
 
-## Signal Specifications by Row Type
+## Signal Types Overview
 
+Camino generates signals across four primary domains based on the data source:
 
-### DEALS / OPPORTUNITIES
-
-#### Signal: Total Deals
-- Operation: COUNT
-- Formula: COUNT(all rows)
-- Filters: None
-- Date column: Used for trend only (count per month)
-- Expected: If file has 150 rows, value = 150
-- Edge cases: Includes all statuses (open, won, lost)
-
-#### Signal: Total [Amount Column]
-- Operation: SUM
-- Formula: SUM(metricColumn) for all rows
-- Filters: None
-- Date column: Used for trend (sum per month)
-- Expected: If 5 deals with amounts $10K, $20K, $30K, $40K, $50K → value = $150K
-- Edge cases:
-  - Nulls/blanks in amount column are EXCLUDED (not treated as 0)
-  - Currency symbols ($, commas) are stripped before parsing
-  - If a value like "$1,234.56" fails to parse, it's excluded and logged
-
-#### Signal: Average [Amount Column]
-- Operation: AVERAGE
-- Formula: SUM(metricColumn) / COUNT(non-null metricColumn values)
-- Filters: None
-- Date column: Used for trend (average per month)
-- Expected: If 5 deals with amounts $10K, $20K, $30K, $40K, $50K → value = $30K
-- Edge cases: Same as Total above. Denominator is count of PARSEABLE values, not total rows.
-
-#### Signal: Deals per Month
-- Operation: MONTHLY_RATE
-- Formula: COUNT(all rows) / COUNT(distinct months in date range)
-- Filters: None
-- Date column: REQUIRED
-- Expected: If 120 deals over 12 months → value = 10/mo
-- Edge cases:
-  - Months with 0 deals are NOT counted in denominator (current behavior)
-  - Actually they SHOULD be: if data spans Jan-Dec but no deals in March, denominator = 12 not 11
-  - BUG: Current code calculates months as (newest - oldest + 1), which is correct calendar months.
-    But if dates are sparse, this may give misleading rate.
-
-#### Signal: Deals by [Stage/Status/Owner]
-- Operation: GROUP_BY
-- Formula: COUNT(rows) GROUP BY groupByColumn
-- Filters: None
-- Date column: Used for trend of total count
-- Expected: If 50 deals with stages: Qualification (20), Proposal (15), Closed Won (10), Closed Lost (5) → value = 4 groups, top: Qualification: 20, Proposal: 15, Closed Won: 10
-- Edge cases: Blank/null group values are excluded
-
-#### Signal: Pipeline Value (NOT YET IMPLEMENTED)
-- Operation: SUM with FILTER
-- Formula: SUM(Amount) WHERE Stage NOT IN ('Closed Won', 'Closed Lost', 'Lost', 'Won')
-- Filters: Exclude closed stages
-- Requires: Status/Stage column detection
-- Expected: If 5 deals ($10K open, $20K open, $30K won, $40K lost, $50K open) → value = $80K
-
-#### Signal: Win Rate (NOT YET IMPLEMENTED)
-- Operation: RATE
-- Formula: COUNT(WHERE Stage = 'Closed Won') / COUNT(WHERE Stage IN ('Closed Won', 'Closed Lost'))
-- Filters: Only include closed deals
-- Requires: Status/Stage column with recognizable win/loss values
-- Expected: If 10 Closed Won and 5 Closed Lost → value = 66.7%
-- Note: Deals still in pipeline are EXCLUDED from denominator
-
-
-### LEADS / CONTACTS
-
-#### Signal: Total Leads / Contacts
-- Operation: COUNT
-- Formula: COUNT(all rows)
-- Filters: None
-- Expected: Straightforward row count
-
-#### Signal: Leads per Month
-- Operation: MONTHLY_RATE
-- Formula: COUNT(all rows) / COUNT(distinct months)
-- Filters: None
-- Date column: REQUIRED
-
-#### Signal: Leads by [Source/Status/Owner]
-- Operation: GROUP_BY
-- Formula: COUNT(rows) GROUP BY groupByColumn
-- Expected: e.g. Web: 40, Referral: 30, Cold: 20
-
-#### Signal: Lead Conversion Rate (NOT YET IMPLEMENTED)
-- Operation: RATE
-- Formula: COUNT(WHERE is_converted = true) / COUNT(all leads)
-- Filters: Needs "is_converted" or similar boolean/status column
-- Expected: If 100 leads and 15 converted → value = 15%
-
-
-### SUPPORT TICKETS
-
-#### Signal: Total Tickets
-- Operation: COUNT
-- Formula: COUNT(all rows)
-- Filters: None
-
-#### Signal: Tickets per Month
-- Operation: MONTHLY_RATE
-- Formula: COUNT(all rows) / COUNT(distinct months)
-- Date column: REQUIRED
-
-#### Signal: Tickets by [Status/Priority/Channel/Agent]
-- Operation: GROUP_BY
-- Formula: COUNT(rows) GROUP BY groupByColumn
-
-#### Signal: Average Resolution Time (NOT YET IMPLEMENTED)
-- Operation: AVERAGE with FILTER
-- Formula: AVG(resolution_time_hours) WHERE Status = 'Resolved' or 'Closed'
-- Filters: Only resolved/closed tickets
-- Requires: Resolution time column OR (resolved_date - created_date) calculation
-
-#### Signal: First Response Time (NOT YET IMPLEMENTED)
-- Operation: AVERAGE
-- Formula: AVG(first_response_time) WHERE first_response_time IS NOT NULL
-- Requires: First response time column
-
-
-### CUSTOMERS / ACCOUNTS
-
-#### Signal: Total Customers
-- Operation: COUNT
-- Formula: COUNT(all rows)
-
-#### Signal: Customers per Month
-- Operation: MONTHLY_RATE
-- Formula: COUNT(all rows) / COUNT(distinct months)
-- Date column: REQUIRED
-
-#### Signal: Customers by [Type/Industry/Tier]
-- Operation: GROUP_BY
-- Formula: COUNT(rows) GROUP BY groupByColumn
-
-
-### EVENTS / ACTIVITIES
-
-#### Signal: Total Events
-- Operation: COUNT
-- Formula: COUNT(all rows)
-
-#### Signal: Events per Month
-- Operation: MONTHLY_RATE
-- Formula: COUNT(all rows) / COUNT(distinct months)
-
-#### Signal: Events by [Type/Category]
-- Operation: GROUP_BY
-- Formula: COUNT(rows) GROUP BY groupByColumn
-
-
-### AGENTS / TEAM
-
-#### Signal: Total Agents
-- Operation: COUNT
-- Formula: COUNT(all rows)
-
-#### Signal: Agents by [Status/Department/Role]
-- Operation: GROUP_BY
-- Formula: COUNT(rows) GROUP BY groupByColumn
+1. **Sales/Pipeline Signals** (from deals/opportunities)
+2. **Support/Customer Success Signals** (from tickets/conversations)
+3. **Activity/Engagement Signals** (from activities/interactions)
+4. **Custom Signals** (user-defined metrics)
 
 ---
 
-## Recommended Architecture Changes (Priority Order)
+## 1. SALES/PIPELINE SIGNALS
 
-### 1. Add Signal Templates per Row Type (HIGH - fixes Issue 5)
+### 1.1 Pipeline Value
 
-Replace the generic signal generation with row-type-specific templates that encode
-the correct formula, filters, and column expectations.
+**Definition:** Total monetary value of all deals in non-terminal stages.
 
+**Formula:**
 ```
-const DEAL_TEMPLATES = [
-  { name: "Total Deals", op: "count", filter: null },
-  { name: "Pipeline Value", op: "sum", column: "amount", filter: { field: "stage", op: "excludes", values: ["closed won", "closed lost"] } },
-  { name: "Closed Won Value", op: "sum", column: "amount", filter: { field: "stage", op: "includes", values: ["closed won"] } },
-  { name: "Win Rate", op: "rate", positiveFilter: { field: "stage", op: "includes", values: ["closed won"] }, totalFilter: { field: "stage", op: "includes", values: ["closed won", "closed lost"] } },
-  { name: "Average Deal Size", op: "average", column: "amount", filter: null },
-  { name: "Deals per Month", op: "monthly_rate", filter: null },
-]
+Pipeline Value = SUM(deal_amount) 
+WHERE deal_status NOT IN ('Closed Won', 'Closed Lost')
+AND deal_amount IS NOT NULL
+AND deal_amount > 0
 ```
 
-The 3-question answers determine WHICH templates to use. The templates determine HOW
-to calculate.
+**Test Case:**
+- Input: 10 deals, 3 Closed Won ($50K each), 2 Closed Lost ($40K each), 5 Open ($20K each)
+- Expected Output: $100K (only 5 open deals)
+- Validation: Row filtering is critical here
 
-### 2. Add Row Filtering to the Generate Pipeline (HIGH - fixes Issue 2)
-
-The `calculateSignal()` function needs to accept and apply filters before aggregating.
-Currently it operates on all rows. Add:
-
-```
-function applyFilters(rows, filters) {
-  return rows.filter(row => {
-    return filters.every(f => {
-      const val = (row[f.field] || "").toLowerCase()
-      if (f.op === "includes") return f.values.some(v => val.includes(v.toLowerCase()))
-      if (f.op === "excludes") return !f.values.some(v => val.includes(v.toLowerCase()))
-      return true
-    })
-  })
-}
-```
-
-### 3. Add a 4th Question: Status/Stage Column (MEDIUM - enables filtering)
-
-After "what does each row represent?" and before generating signals, ask:
-"Which column shows the status or stage?" (dropdown of text columns with 2-20 unique values)
-
-This enables the template system to apply the right filters. For deals, it detects
-the stage column. For tickets, the status column.
-
-### 4. Add Date Format Detection (MEDIUM - fixes Issue 3)
-
-When user selects a date column, sample 5 values and detect the format:
-- If all dates match YYYY-MM-DD → ISO, no ambiguity
-- If dates match DD/MM/YYYY or MM/DD/YYYY → show user a sample and ask which
-
-### 5. Fix Trend to Use Period Comparison (LOW - fixes Issue 4)
-
-Replace the "split in half" approach with:
-- If data spans 3+ months: compare last full month vs previous full month
-- If data spans 2 months: compare month 1 vs month 2
-- If data spans < 2 months: show "insufficient data for trend"
-
-### 6. Add Test Fixtures (LOW - ongoing quality)
-
-For each signal spec above, create a small JSON test dataset (10-20 rows) with
-known expected outputs. Run assertions in a test script:
-
-```
-assert(calculateSignal("Total Deals", testDealsData) === 15)
-assert(calculateSignal("Pipeline Value", testDealsData) === 80000)
-assert(calculateSignal("Win Rate", testDealsData) === 0.667)
-```
-
-This catches regressions when the calculation code changes.
+**Data Type:** Currency (numeric)
+**Frequency:** Real-time (recalculates on every data update)
+**Trend Calculation:** Compare current value to previous period (last 30 days vs. 30 days prior)
 
 ---
 
-## Validation Checklist (Use Before Billing Demo)
+### 1.2 Win Rate
 
-For each signal shown to the customer, manually verify:
+**Definition:** Percentage of deals closed won in the current period.
 
-- [ ] Open the source CSV/XLSX in a spreadsheet
-- [ ] Apply the formula from this spec manually (e.g. SUMIF in Excel)
-- [ ] Compare the manual result to Camino's displayed value
-- [ ] Check the trend direction matches your manual assessment
-- [ ] Confirm the signal name accurately describes what's being calculated
-- [ ] Confirm nulls/blanks are handled correctly (excluded, not zero)
+**Formula:**
+```
+Win Rate = (COUNT(deals WHERE status = 'Closed Won' AND close_date IN current_period) / 
+            COUNT(deals WHERE status IN ('Closed Won', 'Closed Lost') AND close_date IN current_period)) * 100
+
+WHERE close_date is not null
+```
+
+**Test Case:**
+- Input: 8 closed deals in period, 5 won, 3 lost
+- Expected Output: 62.5%
+- Validation: Denominator includes ONLY terminal stages
+
+**Data Type:** Percentage (0-100)
+**Frequency:** Period-based (daily/weekly/monthly)
+**Critical Rule:** Do NOT include open deals in denominator
+
+---
+
+### 1.3 Average Deal Size
+
+**Definition:** Average monetary value per deal in the current period.
+
+**Formula:**
+```
+Avg Deal Size = SUM(deal_amount) / COUNT(deal_id)
+WHERE deal_status IN ('Closed Won', 'Closed Lost')
+AND close_date IN current_period
+AND deal_amount > 0
+```
+
+**Test Case:**
+- Input: 4 closed deals ($10K, $20K, $15K, $25K)
+- Expected Output: $17.5K
+- Validation: Only closed deals, excludes nulls and zero values
+
+**Data Type:** Currency
+**Frequency:** Period-based
+**Edge Case:** Handle division by zero (return null if no deals)
+
+---
+
+### 1.4 Deal Velocity
+
+**Definition:** Average number of days from deal creation to close.
+
+**Formula:**
+```
+Deal Velocity = AVG(close_date - created_date)
+WHERE deal_status IN ('Closed Won', 'Closed Lost')
+AND close_date IN current_period
+AND close_date IS NOT NULL
+AND created_date IS NOT NULL
+```
+
+**Test Case:**
+- Input: 3 deals closed with durations of 30, 45, 60 days
+- Expected Output: 45 days
+- Validation: Only use closed deals with both dates
+
+**Data Type:** Integer (days)
+**Frequency:** Period-based
+**Anomaly Threshold:** Flag if > 3x normal velocity
+
+---
+
+## 2. SUPPORT/CUSTOMER SUCCESS SIGNALS
+
+### 2.1 Ticket Resolution Time
+
+**Definition:** Average time to resolve support tickets.
+
+**Formula:**
+```
+Resolution Time = AVG(resolved_date - created_date)
+WHERE ticket_status = 'Resolved'
+AND resolved_date IN current_period
+AND resolved_date IS NOT NULL
+AND created_date IS NOT NULL
+```
+
+**Test Case:**
+- Input: 5 resolved tickets with durations of 4hr, 2hr, 6hr, 3hr, 5hr
+- Expected Output: 4 hours
+- Validation: Only resolved tickets with complete timestamps
+
+**Data Type:** Time (hours or minutes)
+**Frequency:** Real-time (rolling average)
+**SLA Check:** Flag if > target (e.g., > 8 hours)
+
+---
+
+### 2.2 Ticket Reopen Rate
+
+**Definition:** Percentage of resolved tickets that are reopened.
+
+**Formula:**
+```
+Reopen Rate = (COUNT(tickets WHERE status = 'Reopened' AND reopened_date IN current_period) / 
+               COUNT(tickets WHERE status IN ('Resolved', 'Reopened') AND resolved_date IN current_period)) * 100
+```
+
+**Test Case:**
+- Input: 20 tickets resolved in period, 3 reopened
+- Expected Output: 15%
+- Validation: Denominator includes both resolved and reopened
+
+**Data Type:** Percentage
+**Frequency:** Period-based
+**Red Flag:** > 10% reopen rate indicates quality issues
+
+---
+
+### 2.3 Customer Satisfaction (CSAT)
+
+**Definition:** Average customer satisfaction score.
+
+**Formula:**
+```
+CSAT = AVG(satisfaction_score)
+WHERE satisfaction_score IS NOT NULL
+AND satisfaction_score BETWEEN 1 AND 5
+AND survey_date IN current_period
+```
+
+**Test Case:**
+- Input: 10 surveys with scores [5,4,5,3,4,5,4,5,4,3]
+- Expected Output: 4.2
+- Validation: Only scores within valid range
+
+**Data Type:** Decimal (1.0 - 5.0)
+**Frequency:** Period-based
+**Benchmark:** Target >= 4.0
+
+---
+
+### 2.4 First Response Time
+
+**Definition:** Average time from ticket creation to first response.
+
+**Formula:**
+```
+First Response Time = AVG(first_response_date - created_date)
+WHERE ticket_status IN ('Open', 'Resolved', 'Reopened')
+AND first_response_date IS NOT NULL
+AND created_date IS NOT NULL
+AND first_response_date IN current_period
+```
+
+**Test Case:**
+- Input: 8 tickets with first response times of 15min, 20min, 10min, 25min, 12min, 18min, 22min, 16min
+- Expected Output: 17.375 minutes
+- Validation: Only tickets with actual response timestamps
+
+**Data Type:** Time (minutes)
+**Frequency:** Real-time
+**Target:** < 1 hour for high-priority tickets
+
+---
+
+## 3. ACTIVITY/ENGAGEMENT SIGNALS
+
+### 3.1 Lead Activity Score
+
+**Definition:** Count of qualifying activities per lead in the current period.
+
+**Formula:**
+```
+Activity Score = COUNT(activity_id)
+WHERE contact_id = lead_id
+AND activity_type IN ('Email', 'Call', 'Meeting', 'Demo')
+AND activity_date IN current_period
+AND activity_status = 'Completed'
+```
+
+**Test Case:**
+- Input: Lead with 2 emails, 1 call, 1 meeting, 1 failed call (in period)
+- Expected Output: 4 (excludes failed activities)
+- Validation: Only completed, qualifying activities
+
+**Data Type:** Integer
+**Frequency:** Real-time
+**Scoring:** Can be weighted by activity type
+
+---
+
+### 3.2 Email Open Rate
+
+**Definition:** Percentage of sent emails that are opened.
+
+**Formula:**
+```
+Email Open Rate = (COUNT(emails WHERE was_opened = true) / 
+                   COUNT(emails WHERE was_sent = true)) * 100
+WHERE email_date IN current_period
+AND was_sent = true
+```
+
+**Test Case:**
+- Input: 50 emails sent, 35 opened
+- Expected Output: 70%
+- Validation: Only count sent emails in denominator
+
+**Data Type:** Percentage
+**Frequency:** Real-time
+**Industry Benchmark:** 20-30% typical
+
+---
+
+### 3.3 Meeting Attendance Rate
+
+**Definition:** Percentage of scheduled meetings that were attended.
+
+**Formula:**
+```
+Attendance Rate = (COUNT(meetings WHERE status = 'Completed') / 
+                   COUNT(meetings WHERE status IN ('Scheduled', 'Completed'))) * 100
+WHERE scheduled_date IN current_period
+AND scheduled_date IS NOT NULL
+```
+
+**Test Case:**
+- Input: 10 meetings scheduled, 8 completed, 2 cancelled
+- Expected Output: 80% (8/10, excludes cancelled)
+- Validation: Only use scheduled/completed, not cancelled
+
+**Data Type:** Percentage
+**Frequency:** Period-based
+**Alert:** < 70% may indicate engagement issues
+
+---
+
+## 4. TREND CALCULATION RULES
+
+### Trend Direction
+```
+IF current_period_value > previous_period_value
+  THEN trend = "UP"
+ELSE IF current_period_value < previous_period_value
+  THEN trend = "DOWN"
+ELSE
+  THEN trend = "FLAT"
+```
+
+### Trend Magnitude
+```
+Trend_Percent = ((current - previous) / previous) * 100
+IF ABS(Trend_Percent) > 20%
+  THEN flag as "Significant Trend"
+```
+
+### Period Definition
+- **Daily:** Last 24 hours vs. 24-48 hours prior
+- **Weekly:** Last 7 days vs. 7-14 days prior
+- **Monthly:** Last 30 days vs. 30-60 days prior
+
+---
+
+## 5. KNOWN ISSUES & FIXES NEEDED
+
+### Issue 1: No Row Filtering (CRITICAL)
+**Current Problem:** Every signal includes ALL rows. Pipeline Value includes Closed Lost deals.
+
+**Fix:** Add 4th question to onboarding
+- "Which column represents the status/stage of your data?"
+- Build status filtering into signal templates per row type
+
+**Test:** Verify Pipeline Value excludes terminal stages
+
+---
+
+### Issue 2: No Signal Templates Per Row Type
+**Current Problem:** Generic signals generated for every data type.
+
+**Fix:** Create templates that encode business logic
+- Template: "Sales Pipeline" → automatically filters to non-terminal stages
+- Template: "Support Tickets" → automatically filters to resolved only
+- Template: "Activities" → automatically filters to completed only
+
+---
+
+### Issue 3: Client Preview vs. Server Divergence
+**Current Problem:** Preview numbers differ from stored numbers.
+
+**Fix:** Use identical calculation logic on both client and server
+- Extract calculation into shared utility function
+- Pass same row set to both
+
+---
+
+### Issue 4: Date Parsing Ambiguity
+**Current Problem:** DD/MM vs MM/DD creates wrong date ranges.
+
+**Fix:** Add explicit format confirmation
+- Show user a sample date: "Is 01/02/2026 January 2nd or February 1st?"
+- Lock in format before calculations begin
+
+---
+
+### Issue 5: Trend Uses Halves, Not Periods
+**Current Problem:** Splits data exactly in half.
+
+**Fix:** Compare same-period previous ranges
+- Current: Last 30 days vs. 30-60 days ago (not half and half)
+- Aligns with business calendar
+
+---
+
+## 6. VALIDATION CHECKLIST
+
+Before deploying any signal, verify:
+
+- [ ] Row filtering is correctly applied per business rules
+- [ ] Null/zero values are handled (excluded or defaulted)
+- [ ] Date ranges match specification
+- [ ] Data types are correct (currency, percentage, integer, time)
+- [ ] Test case passes with expected output
+- [ ] Trend calculation uses correct period comparison
+- [ ] Division by zero is handled
+- [ ] Duplicate rows are deduplicated if needed
+- [ ] Timestamps are parsed in correct format
+- [ ] Signal works with both CSV and API data sources
+
+---
+
+## 7. IMPLEMENTATION PRIORITY
+
+**High Impact (implement first):**
+1. Add row filtering (fixes Pipeline Value, Win Rate, etc.)
+2. Build signal templates per row type
+3. Fix trend period comparisons
+
+**Medium Impact:**
+1. Date format confirmation
+2. Null/zero value handling
+3. Test fixture validation
+
+**Low Impact (polish):**
+1. Signal naming customization
+2. Decimal precision options
+3. Custom thresholds
+
+---
+
+## Appendix: Field Aliases Reference
+
+### Zoho CRM (Deals)
+- Amount → `deal_amount`
+- Stage → `deal_status`
+- Created Time → `created_date`
+- Expected Close Date → `close_date`
+
+### Zoho Desk (Tickets)
+- Resolution Time → `resolution_time`
+- Status → `ticket_status`
+- Created Time → `created_date`
+- Resolved Time → `resolved_date`
+
+### Generic Fields
+- Amount/Value → `numeric_column`
+- Status/Stage → `categorical_column`
+- Date Fields → `date_column`
+- Count/Volume → `integer_column`
