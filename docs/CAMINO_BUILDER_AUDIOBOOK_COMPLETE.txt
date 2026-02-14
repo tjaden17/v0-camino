@@ -1,0 +1,1745 @@
+CAMINO BUILDER: Complete 12-Week Learning Audiobook
+===================================================
+
+This is the complete Camino Builder learning curriculum, formatted for text-to-speech audio.
+Total duration: Approximately 3 hours.
+Best experienced: Listen to one chapter per week while following along with your codebase.
+
+
+========================================
+CHAPTER 1: TYPESCRIPT FUNDAMENTALS
+Week 1 - Duration: 15 minutes
+========================================
+
+Welcome to Week 1 of the Camino Builder learning curriculum. This week, we're diving into TypeScript fundamentals, the foundation of everything you'll build in Camino.
+
+Every file in your codebase is TypeScript. Understanding types prevents bugs, makes AI tools give you better code, and helps you reason about your system. By the end of this chapter, you'll understand type annotations, interfaces, generics, and how TypeScript flows through your Camino application.
+
+THE TYPESCRIPT MENTAL MODEL
+
+TypeScript is JavaScript with types. Every valid JavaScript is valid TypeScript, but TypeScript adds a layer on top that describes what kind of data your code expects. Think of types as contracts, promises your code makes about what it will accept and return.
+
+When you write a function in JavaScript, you might write: function addNumbers, parameters a and b, return a plus b. This function will happily add two numbers, two strings, a number and a string, or anything else. Sometimes this flexibility is useful. Often, it causes bugs.
+
+In TypeScript, you write: function addNumbers, parameters a colon number, b colon number, colon number, return a plus b. Now TypeScript knows this function only accepts numbers and only returns numbers. If you try to pass a string, TypeScript catches it before the code even runs.
+
+This is the magic of TypeScript. Bugs that would crash your app in production get caught while you're writing code.
+
+TYPE ANNOTATIONS VERSUS TYPE INFERENCE
+
+TypeScript has two ways to know what type something is: you tell it, or it figures it out.
+
+Type annotations are explicit. You write: const count colon number equals 5. You've told TypeScript that count is a number.
+
+Type inference is automatic. You write: const count equals 5. TypeScript sees the 5 and infers that count must be a number. No annotation needed.
+
+Both are valid. Use annotations when you want to be explicit, especially in function parameters and return types. Use inference for simple cases where the type is obvious.
+
+Here's a real example from your Camino codebase. In your signal discovery service, you have: function discoverSignals, parameter data colon ParsedCSVRow array, colon Promise angle bracket SignalRequirement array angle bracket. This tells TypeScript: this function takes an array of ParsedCSVRow objects and returns a Promise that resolves to an array of SignalRequirement objects.
+
+TypeScript can now check every call to discoverSignals and ensure you're passing the right data and handling the returned Promise correctly.
+
+INTERFACES VERSUS TYPES
+
+In TypeScript, you can define custom types in two ways: interfaces and types. They're similar but have subtle differences.
+
+An interface describes the shape of an object. In Camino, you have interface SignalInterpretation with fields: signal underscore id colon string, what underscore we underscore found colon string, what underscore it underscore means colon string, and so on. This interface says: any SignalInterpretation object must have these exact fields with these exact types.
+
+A type can do the same thing but is more flexible. You can write: type Status equals "active" pipe "archived" pipe "deleted". This creates a union type, Status can only be one of those three strings.
+
+The practical difference: interfaces are better for objects that might be extended. Types are better for unions, intersections, and complex combinations.
+
+In your codebase, you use both. Interfaces for database models like SignalInterpretation, ProfileComplete, OrgDataLayer. Types for things like TrendDirection which is "up" pipe "down" pipe "stable".
+
+GENERICS: TYPE VARIABLES
+
+Generics are TypeScript's way of creating reusable, type safe code. Think of them as variables, but for types instead of values.
+
+You see generics everywhere in JavaScript. Promise angle bracket boolean angle bracket means: a Promise that resolves to a boolean. Array angle bracket string angle bracket means: an array of strings.
+
+The angle brackets are generics. Promise is generic over T. When you write Promise angle bracket boolean angle bracket, you're telling TypeScript: T equals boolean for this Promise.
+
+In Camino, your Supabase queries use generics. When you write: supabase dot from open parenthesis "signals" close parenthesis dot select open parenthesis asterisk close parenthesis, Supabase infers the return type as an array of Signal objects. The generic type flows through the query builder automatically.
+
+You can write your own generics too. Here's a simple example: function getFirst angle bracket T angle bracket, parameter array colon T array, colon T pipe null, open brace, return array at index 0 pipe pipe null, close brace. This function works with any array type. Call it with strings, it returns a string or null. Call it with numbers, it returns a number or null.
+
+UNION TYPES: MULTIPLE POSSIBILITIES
+
+Union types describe values that could be one of several types. The pipe symbol means "or".
+
+In Camino, your signal trend field is defined as type TrendDirection equals "increasing" pipe "decreasing" pipe "stable". A signal's trend can be any one of these strings, but nothing else.
+
+Union types are incredibly useful for modeling state. Instead of using strings everywhere and hoping you spell them right, you define a union and TypeScript enforces it. Try to set trend to "going up" and TypeScript says: Type "going up" is not assignable to type TrendDirection.
+
+You can also union completely different types. Type ID equals string pipe number means an ID can be either a string or a number. To use it safely, you need type narrowing.
+
+TYPE NARROWING: CHECKING WHAT YOU HAVE
+
+When you have a union type, TypeScript doesn't know which variant you have until you check. This is called narrowing the type.
+
+The most common pattern is using typeof or instanceof. In your error handling code, you write: catch error open brace, if error instanceof Error open brace, console dot error, error dot message, close brace close brace.
+
+Before the if check, error is type unknown. TypeScript doesn't know what it is. Inside the if block, error is narrowed to Error. Now you can safely access error dot message.
+
+This pattern is everywhere in your codebase. Check if a variable exists before using it. Check if an array has items before accessing the first one. TypeScript tracks these checks and adjusts the type accordingly.
+
+OPTIONAL PROPERTIES: THE QUESTION MARK
+
+In TypeScript interfaces, the question mark means optional. Field colon string question mark means this field might be a string, or it might be undefined.
+
+In Camino, your SignalRequirement interface has: required underscore columns colon string array question mark. Some signals require specific columns, others don't. The question mark makes it optional.
+
+When accessing optional properties, you have two choices. Check if it exists: if signal dot required underscore columns open brace, process the columns, close brace. Or use optional chaining: signal dot required underscore columns question mark dot map open parenthesis col arrow col dot toLowerCase open close parenthesis close parenthesis. The question mark dot operator safely accesses the property, returning undefined if it doesn't exist instead of crashing.
+
+Optional properties are powerful but can be confusing. The rule: always check before using, or use optional chaining.
+
+APPLYING THIS TO CAMINO
+
+Let's put this all together by reading actual code from your project. Open lib slash interpretation dash service dot ts in your mind.
+
+You'll see: export async function interpretSignal, parameter signal colon any, colon Promise angle bracket SignalInterpretation angle bracket. This tells you: interpretSignal takes a signal object and returns a Promise that resolves to a SignalInterpretation.
+
+Inside, you see the generateText call, which returns Promise angle bracket object with text field angle bracket. TypeScript ensures you handle the Promise correctly with await.
+
+The return value matches SignalInterpretation. TypeScript checks that you're returning an object with signal underscore id, what underscore we underscore found, what underscore it underscore means, so what, opportunities, and risks. If you forget a field, TypeScript immediately tells you.
+
+Now open lib slash signal dash discovery dash service dot ts. You'll see type definitions for ParsedCSVRow, ColumnMatch, SignalRequirement. Follow how types flow through the code. discoverSignals takes ParsedCSVRow array and returns SignalRequirement array. Inside, it calls analyzeColumns which returns ColumnMatch. Each function's types connect to the next.
+
+This is the power of TypeScript. Types document what each function does and enforce that the pieces fit together correctly.
+
+EXERCISES FOR THIS WEEK
+
+To solidify your understanding, try these exercises:
+
+First, open lib slash signals dash service dot ts. Read every type definition. For each interface, list the required fields and optional fields. Understand what each represents.
+
+Second, find a function without type annotations. Add them. Explicitly type each parameter and the return value. See how TypeScript completes your code better with types.
+
+Third, try adding a new field to the SignalInterpretation interface. Add something like: growth underscore potential colon number. Save the file and watch TypeScript show errors everywhere SignalInterpretation is used. Fix each error by adding the field. This shows how types catch breaking changes.
+
+Fourth, find union types in your codebase. Search for the pipe symbol outside of comments. Understand what each union represents and why it's a union instead of separate types.
+
+COMMON TYPESCRIPT PATTERNS IN CAMINO
+
+Your codebase uses specific TypeScript patterns repeatedly. Learning these will help you read and write code faster.
+
+Pattern one: Database model interfaces. Every table has a corresponding interface. Signal interface matches the signals table. Profile interface matches the profiles table. These interfaces ensure you're working with the right data shape.
+
+Pattern two: Result types with data and error. Supabase returns open brace data, error close brace. TypeScript knows that if error exists, data might be null. If error is null, data exists. This pattern forces you to handle both success and failure cases.
+
+Pattern three: Const enums for categories. Instead of raw strings, you use union types. type SignalCategory equals "revenue" pipe "sales" pipe "marketing" pipe "support" pipe "product". This prevents typos and makes refactoring safe.
+
+Pattern four: Generic promises. Every async function returns Promise angle bracket something angle bracket. TypeScript tracks what the Promise resolves to and ensures you await it before using the result.
+
+RESOURCES FOR DEEPER LEARNING
+
+The TypeScript Handbook at typescriptlang.org slash docs slash handbook is the official reference. Read chapters 1 through 5 this week. It's dense but comprehensive.
+
+Matt Pocock's Total TypeScript free tutorials at totaltypescript.com slash tutorials are excellent for practical patterns. Watch the videos on type narrowing and generics.
+
+Practice by typing every function in lib slash signals dash service dot ts. Remove the existing types, then add them back yourself. This will cement your understanding of how types flow through the code.
+
+NEXT WEEK: REACT FUNDAMENTALS
+
+This week, you learned how TypeScript ensures your code's correctness at compile time. Next week, you'll learn React fundamentals, how components work, how state updates trigger re renders, and how effects handle side effects. React is the foundation of your entire UI, and understanding its mental model is essential.
+
+For now, remember: TypeScript is a tool to make your code more reliable. It might feel like extra work at first, but it pays dividends every time it catches a bug before you even run the code.
+
+
+========================================
+CHAPTER 2: REACT FUNDAMENTALS  
+Week 2 - Duration: 15 minutes
+========================================
+
+Welcome to Week 2 of the Camino Builder learning curriculum. This week focuses on React fundamentals, the library that powers your entire user interface.
+
+Your app is built with React components. Understanding how React works, how components communicate, how state triggers re renders, and how effects manage side operations is essential for building reliable, performant UIs.
+
+By the end of this chapter, you'll understand the React mental model and be able to read and write components confidently.
+
+COMPONENTS: FUNCTIONS THAT RETURN UI
+
+In React, everything is a component. A component is just a JavaScript function that returns some UI, written in JSX.
+
+Here's the simplest component: function Greeting open brace, return open angle bracket div close angle bracket Hello close angle bracket slash div close angle bracket, close brace. This function returns a div element with the text "Hello". That's it. That's a React component.
+
+JSX looks like HTML but it's actually JavaScript. When you write open angle bracket div close angle bracket content close angle bracket slash div close angle bracket, React translates it to React dot createElement open parenthesis "div", null, "content" close parenthesis. JSX is syntactic sugar that makes writing UI feel like writing markup.
+
+In your Camino codebase, every file in the components folder is a component. Open components slash signal dash accordion dash card dot tsx. You'll see: export function SignalAccordionCard open brace, return open angle bracket div class Name equals...close angle bracket, close brace. This component function returns JSX describing what the signal card looks like.
+
+Components can be composed. SignalAccordionCard contains Button components, Card components, and custom elements. React builds the UI by calling each component function and nesting the results.
+
+PROPS: HOW DATA FLOWS DOWN
+
+Props are arguments to components. Just like functions take parameters, components take props.
+
+Here's a component with props: function Greeting open brace signal colon Props close brace open brace, return open angle bracket div close angle bracket Hello comma open brace signal dot name close brace close angle bracket slash div close angle bracket, close brace. The curly braces around signal dot name tell React: evaluate this JavaScript expression and insert the result.
+
+Props flow from parent to child, never the reverse. This is called one way data flow. If SignalsList renders SignalCard and passes it a signal prop, the data flows down. SignalCard can't modify the signal and have that change flow back up. This restriction makes React predictable, you always know where data is coming from.
+
+In Camino, your SignalAccordionCard receives props: signal, userId, savedSignalIds. The parent component, SignalsPageClient, passes this data down. SignalAccordionCard uses the props to render the UI but doesn't modify them.
+
+To define props with TypeScript, you create an interface: interface SignalAccordionCardProps open brace, signal colon SignalWithData, userId colon string, savedSignalIds colon Set angle bracket string angle bracket, close brace. Then your component: export function SignalAccordionCard open brace props colon SignalAccordionCardProps close brace.
+
+Props can be anything: strings, numbers, objects, arrays, even functions. A common pattern is passing callback functions as props so child components can notify parents of events.
+
+STATE: VALUES THAT CHANGE OVER TIME
+
+Props are read only. If you need values that change, you use state.
+
+State is created with the useState hook: const open bracket count comma setCount close bracket equals useState open parenthesis zero close parenthesis. This creates a state variable count, initially zero, and a function setCount to update it.
+
+When you call setCount open parenthesis count plus 1 close parenthesis, React re renders the component with the new count value. This is React's core loop: state changes, component re renders, UI updates.
+
+In Camino, your upload page client uses state extensively. Open components slash upload dash page dash client dot tsx. You'll see: const open bracket selectedFile comma setSelectedFile close bracket equals useState angle bracket File pipe null angle bracket open parenthesis null close parenthesis. This tracks which file the user selected. When the user picks a file, you call setSelectedFile, React re renders, and the UI shows the new file.
+
+State is local to the component. If you have two instances of SignalAccordionCard, each has its own separate expanded state. Changing state in one doesn't affect the other.
+
+The rule: when you need a value to change and cause a re render, use state. If the value never changes, use a regular variable or a prop.
+
+EFFECTS: DOING THINGS OUTSIDE OF RENDER
+
+Components are functions that return UI. They should be pure, given the same props and state, they return the same UI. But sometimes you need to do things outside of rendering: fetch data, set up subscriptions, manipulate the DOM.
+
+This is where useEffect comes in. useEffect takes a function and runs it after the component renders.
+
+Here's an example: useEffect open parenthesis open brace, console dot log open parenthesis "Component rendered" close parenthesis, close brace comma open bracket close bracket close parenthesis. The empty array means run this effect once after the first render.
+
+Effects can have dependencies: useEffect open parenthesis open brace, fetchSignals open parenthesis userId close parenthesis, close brace comma open bracket userId close bracket close parenthesis. This runs the effect whenever userId changes. If userId is the same, the effect doesn't run again.
+
+Effects can return a cleanup function: useEffect open parenthesis open brace, const interval equals setInterval open parenthesis, close parenthesis, return open brace clearInterval open parenthesis interval close parenthesis close brace, close brace, open bracket close bracket close parenthesis. React calls the cleanup function before running the effect again or when the component unmounts.
+
+In Camino, you might use effects to load signals when the page loads, subscribe to real time updates, or track analytics events.
+
+The important rule: don't fetch data in useEffect if you can avoid it. In Next.js, fetch data in server components instead. Use effects for things that truly need to happen on the client, DOM manipulation, browser API calls, third party integrations.
+
+CONDITIONAL RENDERING: SHOWING AND HIDING UI
+
+React makes it easy to show different UI based on conditions. Use JavaScript's conditional operators directly in JSX.
+
+The simplest pattern: open brace isLoading and and open angle bracket div close angle bracket Loading dot dot dot close angle bracket slash div close angle bracket close brace. The and and operator short circuits. If isLoading is true, React renders the div. If false, it renders nothing.
+
+For if else logic, use the ternary operator: open brace user question mark open angle bracket Profile user equals open brace user close brace slash close angle bracket colon open angle bracket Login slash close angle bracket close brace. If user exists, render Profile. Otherwise, render Login.
+
+In SignalAccordionCard, you use conditional rendering for the expanded state. When expanded is true, you render the full signal details. When false, you render only the collapsed view.
+
+You can also return early: if exclamation mark signal return null. If there's no signal, return null which renders nothing.
+
+LISTS AND KEYS: RENDERING ARRAYS
+
+When rendering arrays, React needs a way to identify which items changed. This is where keys come in.
+
+The pattern: signals dot map open parenthesis signal arrow open angle bracket SignalCard key equals open brace signal dot id close brace signal equals open brace signal close brace slash close angle bracket close parenthesis. The key prop must be unique and stable. Use IDs, not array indexes.
+
+Why keys matter: when the array changes, React uses keys to figure out which components to keep, which to remove, and which to add. Without keys, React might re render the wrong components or lose state.
+
+In your signals page, you map over the signals array and render a SignalAccordionCard for each one. Each card gets a key equals signal dot id. This tells React: this card represents this specific signal. If the order changes, React keeps the right card with the right signal.
+
+Never use array index as key unless the list never changes. If items can be added, removed, or reordered, index keys cause bugs.
+
+EVENT HANDLERS: RESPONDING TO USER ACTIONS
+
+Components respond to user actions with event handlers. In React, you pass functions to event props.
+
+Button onClick equals open brace handleClick close brace. When the user clicks the button, React calls handleClick.
+
+Event handlers receive an event object: function handleClick open parenthesis event colon React dot MouseEvent close parenthesis open brace, event dot preventDefault open parenthesis close parenthesis, do something, close brace.
+
+In SignalAccordionCard, you have: onClick equals open brace open parenthesis close parenthesis arrow setExpanded open parenthesis exclamation mark expanded close parenthesis close brace. This is an inline arrow function that toggles the expanded state when clicked.
+
+You can also pass parameters: onClick equals open brace open parenthesis close parenthesis arrow handleSave open parenthesis signal dot id close parenthesis close brace. The arrow function captures the signal ID and passes it to handleSave.
+
+Common events: onClick for clicks, onChange for input changes, onSubmit for form submission, onKeyDown for keyboard events.
+
+APPLYING THIS TO CAMINO
+
+Let's read a real component from your codebase: SignalAccordionCard.
+
+The component receives props: signal, userId, savedSignalIds. It defines local state: expanded for showing details, isSaved for tracking saved status.
+
+It has an effect: useEffect that syncs isSaved with the savedSignalIds prop. When savedSignalIds changes, isSaved updates.
+
+It has event handlers: handleToggleSave for the save button, onClick for expanding and collapsing.
+
+It conditionally renders: when expanded is true, it shows the full analysis. When false, it shows only the summary.
+
+It renders lists: if there are data points, it maps over them and renders each one.
+
+This component demonstrates every React fundamental: props, state, effects, conditional rendering, lists, events. Understanding it means you understand React.
+
+COMMON REACT PATTERNS IN CAMINO
+
+Pattern one: Controlled inputs. The input value comes from state, and onChange updates state. input value equals open brace searchQuery close brace onChange equals open brace e arrow setSearchQuery open parenthesis e dot target dot value close parenthesis close brace. This makes React the source of truth for the input's value.
+
+Pattern two: Lifting state up. When two components need to share state, move it to their common parent. The parent passes the state down as props and passes updater functions as props.
+
+Pattern three: Composition over inheritance. Instead of extending components, compose them. Card wraps CardHeader and CardContent. This is more flexible than inheritance.
+
+Pattern four: Custom hooks for reusable logic. If you find yourself writing the same useEffect and useState pattern multiple times, extract it into a custom hook.
+
+EXERCISES FOR THIS WEEK
+
+First, open components slash signals dash page dash client dot tsx. Trace every useState. For each state variable, identify where it's updated and where it's used in the render.
+
+Second, find every useEffect in the codebase. For each one, identify its dependencies and understand why it runs when those dependencies change.
+
+Third, add a new piece of state to the signals page. Maybe a search filter or sort option. Wire it up to the UI and make it work. This will cement your understanding of the state update cycle.
+
+Fourth, find a component that doesn't use props. Add a prop. See how you pass it from the parent and use it in the child.
+
+COMMON MISTAKES AND HOW TO AVOID THEM
+
+Mistake one: Mutating state directly. Don't write signal dot name equals "new name". This doesn't trigger a re render. Instead, create a new object: setSignal open brace dot dot dot signal comma name colon "new name" close brace.
+
+Mistake two: Infinite loops with useEffect. If your effect updates a state variable that's in its dependency array, it creates an infinite loop. The effect runs, updates state, triggers re render, effect runs again, forever. Be careful with dependencies.
+
+Mistake three: Using index as key when the list can change. This causes React to mix up components and lose state. Always use stable, unique IDs.
+
+Mistake four: Not understanding stale closures. If you define a function inside a component that references state, the function captures the state value at the time it was created. If state changes, the function still sees the old value. Use the functional form of setState to avoid this: setState open parenthesis prev arrow prev plus 1 close parenthesis.
+
+RESOURCES FOR DEEPER LEARNING
+
+The React documentation at react.dev slash learn is the best resource. It's interactive, comprehensive, and well written. Do the entire tutorial this week.
+
+The useState reference at react.dev slash reference slash react slash useState explains every detail of state management.
+
+The useEffect reference at react.dev slash reference slash react slash useEffect covers all the nuances of effects, dependencies, and cleanup.
+
+Practice by rewriting a simple component from scratch. Pick SignalCard or UploadButton. Delete it and rebuild it piece by piece. This solidifies your understanding.
+
+NEXT WEEK: NEXT DOT JS APP ROUTER
+
+This week, you learned how React components work, how state and props flow, and how effects manage side operations. Next week, you'll learn how Next.js takes React and adds routing, server components, and API routes. You'll understand why some code runs on the server and some on the client, and how to structure your app for optimal performance.
+
+For now, remember: React is simple at its core. Components are functions. Props flow down. State triggers re renders. Effects handle side operations. Master these concepts and you master React.
+
+
+========================================
+CHAPTER 3: NEXT DOT JS APP ROUTER
+Week 3 - Duration: 15 minutes  
+========================================
+
+Welcome to Week 3 of the Camino Builder learning curriculum. This week, we're diving into the Next.js App Router, the framework that turns your React components into a full featured web application.
+
+Next.js adds routing, server components, API routes, and deployment optimization on top of React. Understanding the App Router model is essential because it determines where your code runs, how pages are generated, and how data flows through your app.
+
+By the end of this chapter, you'll understand file based routing, server versus client components, layouts, API routes, and how Next.js optimizes your app for production.
+
+FILE BASED ROUTING: FOLDERS BECOME URLS
+
+In traditional React apps, you manually configure routes with a router library. In Next.js, the file structure is the router.
+
+Every folder in the app directory represents a route segment. A file named page dot tsx inside that folder becomes the page at that route.
+
+Here's how it maps: app slash page dot tsx becomes the root route, slash. app slash signals slash page dot tsx becomes slash signals. app slash upload slash page dot tsx becomes slash upload.
+
+In your Camino app, you have app slash open parenthesis protected close parenthesis slash signals slash page dot tsx. The parentheses create a route group, which we'll explain in a moment. This file is the signals page at slash signals.
+
+You can nest routes as deep as you want. app slash settings slash profile slash page dot tsx would be slash settings slash profile.
+
+Dynamic routes use brackets: app slash signals slash open bracket id close bracket slash page dot tsx creates a route like slash signals slash 123. The id becomes a parameter you can access in the component.
+
+This file based routing is intuitive: to create a new page, create a new folder and page dot tsx file. No configuration needed.
+
+ROUTE GROUPS: ORGANIZING WITHOUT AFFECTING URLS
+
+Sometimes you want to organize your files without adding URL segments. That's what route groups do.
+
+Parentheses around a folder name make it a route group. The folder organizes your code but doesn't appear in the URL.
+
+In Camino, you have app slash open parenthesis protected close parenthesis. This groups all authenticated pages together without adding slash protected to the URL. The signals page is at slash signals, not slash protected slash signals.
+
+Route groups are useful for:
+- Organizing by feature: open parenthesis marketing close parenthesis, open parenthesis dashboard close parenthesis
+- Applying layouts to specific routes without affecting URLs
+- Separating public and protected routes
+
+You can have multiple route groups at the same level. app slash open parenthesis auth close parenthesis slash login and app slash open parenthesis dashboard close parenthesis slash settings would both be top level routes.
+
+SERVER COMPONENTS VERSUS CLIENT COMPONENTS
+
+This is the biggest mental shift in Next.js 13 and beyond. By default, all components are server components. They run on the server, generate HTML, and send it to the browser. No JavaScript ships to the client for these components.
+
+Client components opt in with "use client" at the top of the file. They run in the browser and can use browser APIs, React hooks like useState and useEffect, and event handlers.
+
+Here's the rule: use server components by default. Only use client components when you need interactivity, state, effects, or browser APIs.
+
+Server components benefits: They can directly access the database. They don't increase bundle size. They render faster because there's no JavaScript to download and execute.
+
+Client components benefits: They can be interactive. They can use state and effects. They can respond to user events.
+
+In Camino, your page dot tsx files are server components. They fetch data from Supabase, then render client components like SignalsPageClient. The server does the data loading, the client does the interactivity.
+
+The pattern: Server component fetches data and passes it as props to client component. Client component handles state, events, and UI updates.
+
+You can't import a server component into a client component directly. But you can pass it as children: Client component wraps open angle bracket ServerComponent slash close angle bracket works because children is just a prop.
+
+LAYOUTS: SHARED UI ACROSS ROUTES
+
+A layout is UI that wraps multiple pages. Instead of repeating the same header and nav on every page, you define it once in a layout.
+
+app slash layout dot tsx wraps your entire app. This is where you put the HTML tag, body tag, and global providers.
+
+Nested layouts wrap specific sections. app slash open parenthesis protected close parenthesis slash layout dot tsx wraps all protected pages. You use this to add authentication checks.
+
+Layouts are server components by default. They can fetch data, just like pages.
+
+In your Camino app, look at app slash open parenthesis protected close parenthesis slash layout dot tsx. It checks if the user is logged in. If not, it redirects to the login page. If yes, it renders the children, which is the page content.
+
+This is powerful: authentication logic lives in one place. Every page inside open parenthesis protected close parenthesis is automatically protected. No need to repeat the auth check on every page.
+
+Layouts preserve state across navigations. If you toggle a sidebar in a layout, it stays toggled when you navigate between pages.
+
+LOADING AND ERROR STATES
+
+Next.js provides special files for loading and error states.
+
+loading dot tsx shows while a page is loading. Create app slash signals slash loading dot tsx and it automatically shows during data fetching for the signals page.
+
+error dot tsx catches errors in the page or any child components. Create app slash error dot tsx to catch errors anywhere in the app.
+
+These files make it easy to provide consistent loading and error UX without manually managing state in every component.
+
+In Camino, you could add app slash signals slash loading dot tsx with a spinner. Users see the spinner while signals are being fetched. Once loaded, the spinner is replaced by the actual page.
+
+error dot tsx receives the error and a reset function. You can show the error message and a "try again" button that calls reset to re-render the page.
+
+API ROUTES: BACKEND ENDPOINTS IN NEXT DOT JS
+
+API routes let you create backend endpoints as part of your Next.js app. They're functions that handle HTTP requests and return responses.
+
+Create a file at app slash api slash route-name slash route dot ts. Export functions named GET, POST, PUT, DELETE for each HTTP method you want to handle.
+
+Here's a simple example:
+export async function GET open parenthesis request colon Request close parenthesis open brace
+  return Response dot json open parenthesis open brace message colon "Hello" close brace close parenthesis
+close brace
+
+This creates an endpoint at slash api slash route-name that returns JSON.
+
+In Camino, you have several API routes:
+- app slash api slash upload slash discover slash route dot ts handles file uploads and discovery
+- app slash api slash upload slash calculate slash route dot ts calculates signal values
+- app slash api slash upload slash generate slash route dot ts generates signals
+
+API routes are server only. They can access environment variables, talk to databases, and call third party APIs without exposing keys to the client.
+
+The pattern: Client component makes a fetch request to your API route. API route processes the request, talks to the database or external API, returns a response. Client component uses the response to update UI.
+
+SERVER ACTIONS: FUNCTIONS THAT RUN ON THE SERVER
+
+Server actions are a new pattern in Next.js. They're async functions that run on the server but can be called directly from client components.
+
+Mark a function with "use server" at the top:
+async function saveSignal open parenthesis id colon string close parenthesis open brace
+  "use server"
+  await supabase dot from open parenthesis "signals" close parenthesis dot update open parenthesis open brace saved colon true close brace close parenthesis
+close brace
+
+Now you can call this function from a client component like any regular function. Next.js automatically creates an API endpoint and handles serialization.
+
+Server actions simplify the pattern: instead of client makes fetch to API route, API route calls database, API route returns response, client updates UI, you just call the function. Next.js handles the network request behind the scenes.
+
+In Camino, you could use server actions for simple mutations: saving a signal, updating user preferences, marking a notification as read.
+
+The rule: use server actions for simple, direct operations. Use API routes for complex logic, third party integrations, or when you need more control over the request and response.
+
+MIDDLEWARE: INTERCEPTING REQUESTS
+
+Middleware runs before every request. You define it in middleware dot ts at the root of your project.
+
+Common uses:
+- Redirecting users based on auth status
+- Adding headers to all responses
+- Logging requests
+- Geolocation based routing
+
+In Camino, your middleware could check authentication and redirect unauthenticated users to the login page.
+
+Middleware is powerful but should be used sparingly. It runs on every request, so keep it fast. Don't do expensive operations in middleware.
+
+APPLYING THIS TO CAMINO
+
+Let's trace a request through your app:
+
+User navigates to slash signals.
+Next.js looks for app slash signals slash page dot tsx. Doesn't exist.
+Checks app slash open parenthesis protected close parenthesis slash signals slash page dot tsx. Found.
+First runs app slash open parenthesis protected close parenthesis slash layout dot tsx. This checks authentication.
+If authenticated, runs app slash open parenthesis protected close parenthesis slash signals slash page dot tsx. This is a server component that fetches signals from Supabase.
+Server component renders and passes signals as props to SignalsPageClient, a client component.
+SignalsPageClient renders in the browser with interactivity, filters, save buttons, expandable cards.
+User sees the page.
+
+This flow demonstrates: file based routing, route groups, layouts for shared logic, server components for data fetching, client components for interactivity.
+
+EXERCISES FOR THIS WEEK
+
+First, map every route in your app. List each page dot tsx file and the URL it creates. Understand how the folder structure maps to URLs.
+
+Second, identify which components are server and which are client. Search for "use client". Everything without that directive is a server component.
+
+Third, open app slash open parenthesis protected close parenthesis slash layout dot tsx. Understand how the auth check works. Trace what happens if the user is not logged in versus logged in.
+
+Fourth, look at app slash api slash upload slash route dot ts. Understand the request handling. See how it parses the request body, does work, and returns a response.
+
+COMMON PATTERNS IN NEXT DOT JS
+
+Pattern one: Server component fetches data, renders client component with data as props. This separates data loading from interactivity.
+
+Pattern two: Layouts provide structure and shared logic. Pages provide content.
+
+Pattern three: API routes for complex backend logic. Server actions for simple mutations.
+
+Pattern four: Error boundaries for graceful degradation. Loading states for perceived performance.
+
+RESOURCES FOR DEEPER LEARNING
+
+The Next.js documentation at nextjs.org slash docs slash app is comprehensive. Read the "Getting Started" and "Routing" sections this week.
+
+The App Router guide at nextjs.org slash docs slash app slash building-your-application slash routing explains every routing concept with examples.
+
+The data fetching guide at nextjs.org slash docs slash app slash building-your-application slash data-fetching covers server components, client components, and best practices.
+
+Practice by creating a new page in your app. Add app slash test slash page dot tsx. Make it a server component that fetches data. Pass that data to a client component. Add a loading dot tsx and error dot tsx. This will cement your understanding.
+
+NEXT WEEK: SQL AND DATABASE FUNDAMENTALS
+
+This week, you learned how Next.js structures your app with file based routing, server and client components, and API routes. Next week, you'll dive into SQL and database fundamentals. You'll understand how to query your Supabase database, how joins work, and how indexes make queries fast.
+
+For now, remember: Next.js is React plus routing, server components, and API routes. The App Router model might feel unfamiliar at first, but it's designed to make the right patterns easy and the wrong patterns hard. Trust the framework, follow the conventions, and you'll build fast, maintainable apps.
+
+
+========================================
+CHAPTER 4: SQL AND DATABASE FUNDAMENTALS
+Week 4 - Duration: 15 minutes
+========================================
+
+Welcome to Week 4 of the Camino Builder learning curriculum. This week focuses on SQL and database fundamentals, the foundation for all data operations in Camino.
+
+You use two databases: Supabase for user data and Neon for staging data. Understanding SQL means you can write migrations, debug data issues, query with confidence, and understand how your data layer works.
+
+By the end of this chapter, you'll understand tables, rows, columns, queries, joins, indexes, and how SQL powers your application.
+
+THE RELATIONAL DATABASE MENTAL MODEL
+
+A relational database organizes data into tables. Think of a table like a spreadsheet: rows are records, columns are fields.
+
+Your signals table has rows, each row is one signal. Columns are signal id, user id, name, category, value, trend, and so on.
+
+The "relational" part means tables can relate to each other. A signal has many data points. The data points table has a signal id column that references the signal. This creates a relationship: one signal to many data points.
+
+This model is powerful because you can query across relationships. "Give me all signals and their data points" becomes a simple join query.
+
+SQL, Structured Query Language, is how you talk to the database. You write queries to select, insert, update, and delete data.
+
+TABLES, ROWS, AND COLUMNS
+
+Let's start with structure. A table is defined by its schema: the columns and their types.
+
+Your signals table schema looks like:
+- id: unique identifier, text
+- user underscore id: who owns this signal, text
+- name: signal name, text
+- category: revenue, sales, marketing, text
+- value: the calculated number, float
+- trend: increasing, decreasing, stable, text
+- created underscore at: timestamp
+
+Each row is one signal. Each column holds one piece of information about that signal.
+
+Columns have types: text for strings, integer for whole numbers, float for decimals, boolean for true slash false, timestamp for dates and times. Types ensure data consistency. You can't accidentally store a string in an integer column.
+
+Columns can be nullable or not null. Not null means the column must have a value. Nullable means it can be empty.
+
+In your schema, id is not null because every signal needs an ID. Some fields like date underscore column might be nullable because not every signal needs one.
+
+SELECT: READING DATA
+
+The most common SQL operation is SELECT. It retrieves data from tables.
+
+The basic structure: SELECT columns FROM table WHERE condition.
+
+Example: SELECT asterisk FROM signals. This returns all rows and all columns from the signals table. Asterisk means "all columns."
+
+You can specify columns: SELECT id, name, value FROM signals. This returns only those three columns.
+
+Filter with WHERE: SELECT asterisk FROM signals WHERE user underscore id equals quote some-user-id quote. This returns only signals for that user.
+
+Order results: SELECT asterisk FROM signals ORDER BY created underscore at DESC. This sorts signals by created date, newest first.
+
+Limit results: SELECT asterisk FROM signals LIMIT 10. This returns only the first 10 rows.
+
+Combine them: SELECT id, name, value FROM signals WHERE user underscore id equals quote abc quote ORDER BY value DESC LIMIT 5. This gets the top 5 highest value signals for user abc.
+
+In Camino, every time you load the signals page, you're running a SELECT query to get signals for the logged in user.
+
+INSERT: ADDING DATA
+
+To add data, use INSERT.
+
+The structure: INSERT INTO table open parenthesis columns close parenthesis VALUES open parenthesis values close parenthesis.
+
+Example: INSERT INTO signals open parenthesis id, user underscore id, name, value close parenthesis VALUES open parenthesis quote sig-1 quote, quote user-abc quote, quote Total Revenue quote, 50000 close parenthesis.
+
+This creates a new signal row with those values.
+
+You can insert multiple rows at once: INSERT INTO signals open parenthesis id, name close parenthesis VALUES open parenthesis quote sig-1 quote, quote Revenue quote close parenthesis comma open parenthesis quote sig-2 quote, quote Sales quote close parenthesis.
+
+In Supabase client code, inserts look like: supabase dot from open parenthesis quote signals quote close parenthesis dot insert open parenthesis open brace id, name, value close brace close parenthesis. Supabase translates this to SQL.
+
+UPDATE: CHANGING DATA
+
+To modify existing data, use UPDATE.
+
+The structure: UPDATE table SET column equals value WHERE condition.
+
+Example: UPDATE signals SET value equals 60000 WHERE id equals quote sig-1 quote. This changes the value of signal sig-1 to 60000.
+
+You can update multiple columns: UPDATE signals SET value equals 60000 comma trend equals quote increasing quote WHERE id equals quote sig-1 quote.
+
+The WHERE clause is critical. Without it, you'd update every row in the table. Always include WHERE to target specific rows.
+
+DELETE: REMOVING DATA
+
+To remove data, use DELETE.
+
+The structure: DELETE FROM table WHERE condition.
+
+Example: DELETE FROM signals WHERE id equals quote sig-1 quote. This removes signal sig-1.
+
+Like UPDATE, the WHERE clause is critical. DELETE FROM signals without WHERE would delete every signal. Be very careful with DELETE.
+
+Often, instead of deleting, you add a deleted underscore at timestamp column and set it when "deleting." This is called soft delete. The row stays in the database but your app treats it as deleted. This lets you recover data if needed.
+
+JOINS: CONNECTING TABLES
+
+Joins let you query across relationships. This is where relational databases shine.
+
+Your signals table relates to data points table. Each data point has a signal underscore id that references a signal.
+
+To get a signal and its data points: SELECT signals dot asterisk, data underscore points dot asterisk FROM signals LEFT JOIN data underscore points ON data underscore points dot signal underscore id equals signals dot id WHERE signals dot id equals quote sig-1 quote.
+
+This joins signals and data points. For signal sig-1, it fetches the signal row and all data point rows where signal underscore id equals sig-1.
+
+LEFT JOIN means: include all rows from the left table, signals, even if there are no matching rows in the right table, data points. If a signal has no data points, you still get the signal row with null for data point columns.
+
+INNER JOIN means: only include rows that have matches in both tables. If a signal has no data points, it won't appear in the results.
+
+In Camino, your Supabase queries use implicit joins: signals dot select open parenthesis quote asterisk, data underscore points open parenthesis asterisk close parenthesis quote close parenthesis. Supabase automatically performs the join based on the foreign key relationship.
+
+AGGREGATIONS: COUNTING, SUMMING, AVERAGING
+
+Aggregation functions compute values across multiple rows.
+
+COUNT counts rows: SELECT COUNT open parenthesis asterisk close parenthesis FROM signals WHERE user underscore id equals quote abc quote. This returns how many signals user abc has.
+
+SUM adds values: SELECT SUM open parenthesis value close parenthesis FROM signals WHERE category equals quote revenue quote. This returns the total of all revenue signal values.
+
+AVG averages values: SELECT AVG open parenthesis value close parenthesis FROM signals. This returns the average signal value across all signals.
+
+MAX and MIN find extreme values: SELECT MAX open parenthesis value close parenthesis, MIN open parenthesis value close parenthesis FROM signals.
+
+GROUP BY groups rows before aggregating: SELECT category, COUNT open parenthesis asterisk close parenthesis FROM signals GROUP BY category. This counts signals in each category.
+
+In Camino, your signal calculations use aggregations. To calculate total deal value, you SUM the amount column. To calculate average deal size, you AVG the amount column.
+
+INDEXES: MAKING QUERIES FAST
+
+An index is a data structure that makes queries faster. Without an index, the database scans every row to find matches. With an index, it jumps directly to matching rows.
+
+Think of an index like a book's index. To find mentions of "SQL" without an index, you read every page. With an index, you look up SQL, see pages 42, 87, 134, and jump directly to those pages.
+
+Create an index: CREATE INDEX index underscore signals underscore user underscore id ON signals open parenthesis user underscore id close parenthesis. Now queries filtering by user underscore id are fast.
+
+Your Camino database has indexes on commonly queried columns: user underscore id, signal underscore id, created underscore at.
+
+Check if a query uses an index: EXPLAIN ANALYZE SELECT asterisk FROM signals WHERE user underscore id equals quote abc quote. The output shows whether it does an index scan, fast, or sequential scan, slow.
+
+If a query is slow, add an index on the columns in the WHERE clause.
+
+Indexes have a cost: they take up disk space and slow down inserts and updates, because the index must be updated too. Don't index every column, only the ones you query frequently.
+
+FOREIGN KEYS: ENFORCING RELATIONSHIPS
+
+A foreign key enforces referential integrity. It ensures that a value in one table matches a value in another table.
+
+In data points, signal underscore id is a foreign key referencing signals dot id. This ensures you can't create a data point for a signal that doesn't exist.
+
+If you try to insert a data point with signal underscore id equals quote nonexistent quote, the database rejects it because there's no signal with that ID.
+
+Foreign keys also prevent accidental deletes. If you try to delete a signal that has data points, the database can reject it, unless you set up cascade delete which deletes the data points too.
+
+In Camino, foreign keys ensure your data stays consistent. You can't have orphaned data points pointing to deleted signals.
+
+NULL HANDLING: DEALING WITH MISSING DATA
+
+NULL means "no value." It's different from zero or empty string. Zero is a value. NULL is the absence of a value.
+
+Checking for NULL: SELECT asterisk FROM signals WHERE date underscore column IS NULL. You can't use equals with NULL. Use IS NULL or IS NOT NULL.
+
+COALESCE returns the first non null value: SELECT COALESCE open parenthesis date underscore column, quote no date quote close parenthesis FROM signals. If date underscore column is null, it returns "no date."
+
+In your RLS policies, you might use COALESCE to provide default values when fields are null.
+
+APPLYING THIS TO CAMINO
+
+Let's trace a database operation in your app:
+
+User loads the signals page.
+Server component runs: const open brace data colon signals close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot eq open parenthesis quote user underscore id quote, userId close parenthesis dot order open parenthesis quote created underscore at quote, open brace ascending colon false close brace close parenthesis.
+
+Supabase translates this to SQL: SELECT asterisk FROM signals WHERE user underscore id equals userId ORDER BY created underscore at DESC.
+
+The database uses the index on user underscore id to find matching rows quickly.
+
+Returns the rows to Supabase, which returns them to your code as JavaScript objects.
+
+Your server component passes signals to the client component as props.
+
+User sees the signals on the page.
+
+This flow demonstrates: query construction, filtering, ordering, index usage, data flow from database to UI.
+
+EXERCISES FOR THIS WEEK
+
+First, open the Supabase SQL Editor for your Camino database. Run: SELECT asterisk FROM signals LIMIT 10. See the results.
+
+Second, run: SELECT signals dot asterisk, COUNT open parenthesis data underscore points dot id close parenthesis FROM signals LEFT JOIN data underscore points ON data underscore points dot signal underscore id equals signals dot id GROUP BY signals dot id. This counts how many data points each signal has.
+
+Third, read scripts slash 00 underscore SETUP underscore DATABASE dot sql. Understand every CREATE TABLE statement. See the column types, constraints, indexes.
+
+Fourth, try modifying data. Insert a test signal, update it, then delete it. Get comfortable with these operations.
+
+COMMON SQL PATTERNS IN CAMINO
+
+Pattern one: Select with filter and order. Get data for a specific user, ordered by date.
+
+Pattern two: Insert new records after user actions. Upload creates staged data, generate creates signals.
+
+Pattern three: Join to load related data. Signals with their data points, users with their profiles.
+
+Pattern four: Aggregations for calculations. Count total deals, sum revenue, average values.
+
+RESOURCES FOR DEEPER LEARNING
+
+SQLBolt at sqlbolt.com is an interactive tutorial. Do all 18 lessons this week. It's hands-on and thorough.
+
+The Supabase database guide at supabase.com slash docs slash guides slash database covers PostgreSQL specifics.
+
+PostgreSQL tutorial at postgresqltutorial.com has the first 10 sections covering everything you need.
+
+Practice by writing queries in the Supabase SQL Editor. Load your data, experiment, see how queries affect results.
+
+NEXT WEEK: SUPABASE AUTH AND RLS
+
+This week, you learned SQL fundamentals: tables, queries, joins, indexes, and how data flows through your app. Next week, you'll learn Supabase authentication and Row Level Security. You'll understand how users log in, how their sessions are managed, and how RLS policies prevent unauthorized data access.
+
+For now, remember: SQL is the language of data. SELECT reads, INSERT adds, UPDATE changes, DELETE removes. Joins connect tables, indexes make queries fast, foreign keys ensure consistency. Master SQL and you master your data layer.
+
+
+========================================
+CHAPTER 5: SUPABASE AUTH AND RLS
+Week 5 - Duration: 15 minutes  
+========================================
+
+Welcome to Week 5 of the Camino Builder learning curriculum. This week focuses on Supabase authentication and Row Level Security, the systems that protect your app and user data.
+
+Security isn't optional. Your app stores sensitive business data, KPIs, revenue numbers. A single security bug could leak one organization's data to another. Understanding Supabase Auth and RLS is essential for building a secure multi-tenant application.
+
+By the end of this chapter, you'll understand how authentication works, how JWT tokens identify users, and how Row Level Security enforces access control at the database level.
+
+SUPABASE AUTH FLOW
+
+Supabase provides complete authentication: sign up, sign in, password reset, email verification, social logins. You don't build auth from scratch, you configure Supabase and use their client library.
+
+Here's the sign up flow:
+User enters email and password.
+Your app calls: supabase dot auth dot signUp open parenthesis open brace email, password close brace close parenthesis.
+Supabase creates a user record, sends a verification email, returns a session.
+The session includes a JWT token that identifies the user.
+Your app stores the session in a cookie, automatically.
+Future requests include this cookie, so Supabase knows who's making the request.
+
+The sign in flow is similar: supabase dot auth dot signInWithPassword open parenthesis open brace email, password close brace close parenthesis.
+
+Supabase validates credentials, returns a session with JWT token. Your app stores it.
+
+Sign out: supabase dot auth dot signOut open parenthesis close parenthesis. Clears the session.
+
+In Camino, your authentication is handled by Supabase. Users sign up and sign in with email and password. The session is managed automatically.
+
+JWT TOKENS: HOW IDENTITY WORKS
+
+When a user signs in, Supabase generates a JWT, JSON Web Token. This token is a cryptographically signed string that proves the user's identity.
+
+The token contains claims: user ID, email, role, expiration time. It's signed with a secret key only Supabase knows. This means the token can't be forged. If someone tries to fake a token, the signature won't match and Supabase rejects it.
+
+The JWT is sent with every request in the Authorization header. Supabase validates it, extracts the user ID, and makes it available to your code via auth dot uid open parenthesis close parenthesis.
+
+This is how Row Level Security knows who the user is. When you write a policy using auth dot uid open parenthesis close parenthesis, it's reading from the JWT.
+
+TOKEN REFRESH AND EXPIRATION
+
+JWT tokens expire after a set time, usually 1 hour. This limits the damage if a token is stolen.
+
+Before the token expires, Supabase automatically refreshes it. The client library handles this transparently. Your code doesn't need to do anything.
+
+If a refresh fails, the user is logged out and must sign in again.
+
+ROW LEVEL SECURITY: DATABASE LEVEL ACCESS CONTROL
+
+Row Level Security, RLS, is a PostgreSQL feature that filters rows based on policies. Even if your application code has a bug, the database won't return unauthorized data.
+
+Without RLS: Any code that can connect to the database can read and modify any row. If your app has a bug that exposes data, users could see each other's information.
+
+With RLS: The database checks policies on every query. If the policy says "user can only see their own data," the database enforces it. Even if your app tries to fetch all signals, the database only returns signals where user underscore id equals the authenticated user's ID.
+
+RLS is your primary defense against data leaks in multi-tenant apps.
+
+ENABLING RLS
+
+To enable RLS on a table: ALTER TABLE signals ENABLE ROW LEVEL SECURITY.
+
+Now the table is locked down. No one can read or write unless a policy allows it.
+
+Without any policies, even the table owner can't query it. Policies grant access.
+
+In Camino, every table with user data has RLS enabled. Check your migration scripts, you'll see ENABLE ROW LEVEL SECURITY for signals, profiles, uploads, and others.
+
+RLS POLICIES: GRANT ACCESS
+
+A policy defines who can do what. Policies use the USING clause for SELECT and the WITH CHECK clause for INSERT, UPDATE, DELETE.
+
+Example: CREATE POLICY "Users can read own signals" ON signals FOR SELECT USING open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis.
+
+This policy says: for SELECT queries, include only rows where the authenticated user's ID matches the user underscore id column.
+
+When a user runs: SELECT asterisk FROM signals, the database automatically adds: WHERE auth dot uid open parenthesis close parenthesis equals user underscore id. The user only sees their signals.
+
+For INSERT, use WITH CHECK: CREATE POLICY "Users can insert own signals" ON signals FOR INSERT WITH CHECK open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis.
+
+This ensures users can only insert signals where user underscore id equals their own ID. If they try to insert a signal for another user, the database rejects it.
+
+USING VERSUS WITH CHECK
+
+USING controls which rows are visible on SELECT.
+WITH CHECK controls which rows can be inserted or updated.
+
+For SELECT: USING open parenthesis condition close parenthesis means: only show rows where condition is true.
+
+For INSERT: WITH CHECK open parenthesis condition close parenthesis means: only allow inserts where condition is true after the insert.
+
+For UPDATE: You can use both. USING determines which rows can be updated. WITH CHECK determines what the new values can be.
+
+DELETE uses only USING: which rows can be deleted.
+
+Example: CREATE POLICY "Users can update own signals" ON signals FOR UPDATE USING open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis WITH CHECK open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis.
+
+This says: you can update signals where you're the owner, and the update can't change user underscore id to someone else.
+
+SERVICE ROLE VERSUS ANON KEY
+
+Supabase gives you two API keys: the anon key and the service role key.
+
+The anon key is for client-side code. It has limited permissions. RLS policies apply. Even if someone steals the anon key from your frontend code, they can only access data the policies allow.
+
+The service role key bypasses RLS. It has full database access. This is for server-side admin operations where you need to override policies.
+
+Rule: Use anon key in the browser. Use service role key only on the server, in API routes or server components, and never expose it to the client.
+
+In Camino, your client components use the anon key: createClient open parenthesis process dot env dot NEXT underscore PUBLIC underscore SUPABASE underscore URL, process dot env dot NEXT underscore PUBLIC underscore SUPABASE underscore ANON underscore KEY close parenthesis.
+
+Your server code might use the service role key for admin operations: createClient open parenthesis url, process dot env dot SUPABASE underscore SERVICE underscore ROLE underscore KEY close parenthesis.
+
+AUTH HELPERS FOR NEXT DOT JS
+
+Supabase provides helpers for Next.js that handle server-side auth correctly.
+
+createBrowserClient: For client components. Uses cookies to manage the session.
+
+createServerClient: For server components and API routes. Reads the session from cookies on the server.
+
+In Camino, you have lib slash supabase slash client dot ts with createBrowserClient. This is used in client components.
+
+lib slash supabase slash server dot ts has createServerClient. This is used in server components and API routes to check authentication.
+
+The difference: browser client runs in the browser, server client runs on the server. Both access the same session stored in cookies, but the server client can read cookies server-side.
+
+CHECKING AUTHENTICATION IN SERVER COMPONENTS
+
+In a server component or API route, you check if the user is logged in:
+
+const supabase equals createClient open parenthesis close parenthesis
+const open brace data colon open brace user close brace comma error close brace equals await supabase dot auth dot getUser open parenthesis close parenthesis
+if open parenthesis error pipe pipe exclamation mark user close parenthesis open brace
+  redirect open parenthesis slash login close parenthesis
+close brace
+
+Now you know the user is authenticated and have their user object. You can use user dot id in queries.
+
+In Camino, your protected layout does this check. If the user isn't logged in, they're redirected to the login page.
+
+APPLYING THIS TO CAMINO
+
+Let's trace how authentication protects your data:
+
+User logs in with email and password.
+Supabase validates credentials, returns a JWT token in a session.
+The JWT is stored in an HTTP only cookie. JavaScript can't access it, protecting against XSS attacks.
+User navigates to slash signals.
+Next.js runs the protected layout server component.
+The server component calls supabase dot auth dot getUser open parenthesis close parenthesis. Supabase reads the JWT from the cookie, validates it, returns the user object.
+If valid, the layout renders the page.
+The page server component queries signals: supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis asterisk close parenthesis. No WHERE clause needed.
+The database checks the RLS policy on signals. The policy says: USING open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis.
+The database automatically filters: WHERE user underscore id equals the JWT's user ID.
+Only the logged in user's signals are returned.
+User sees only their data, never another user's.
+
+This demonstrates: JWT tokens identify users, RLS policies enforce access control, the combination is secure by default.
+
+COMMON RLS PATTERNS IN CAMINO
+
+Pattern one: Users can only see their own data. USING open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis.
+
+Pattern two: Public data is visible to everyone. USING open parenthesis true close parenthesis. This allows any authenticated user to read the data.
+
+Pattern three: Admin can see all data. USING open parenthesis auth dot jwt open parenthesis close parenthesis arrow arrow quote role quote equals quote admin quote OR auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis. Admins or the owner can access.
+
+Pattern four: Insert only for self. WITH CHECK open parenthesis auth dot uid open parenthesis close parenthesis equals user underscore id close parenthesis.
+
+TESTING RLS POLICIES
+
+You must test that RLS works. Log in as user A, verify you can't see user B's data.
+
+In the Supabase SQL Editor, you can test policies:
+SET LOCAL request dot jwt dot claim dot sub equals quote user-a-id quote semicolon
+SELECT asterisk FROM signals semicolon
+
+This simulates running the query as user A. You should only see user A's signals.
+
+Change the user ID to user B and run again. You should see user B's signals.
+
+If you see data you shouldn't, your policy has a bug.
+
+Also test by using your app: create two accounts, upload data to each, log in as one and verify you can't see the other's data.
+
+EXERCISES FOR THIS WEEK
+
+First, read every RLS policy in scripts slash 00 underscore SETUP underscore DATABASE dot sql. Understand what each policy allows and denies.
+
+Second, test the policies. Log in as one user, try to query another user's data via the SQL Editor. Verify the database blocks it.
+
+Third, understand the difference between the anon key and service role key. Check where each is used in your codebase. Ensure the service role key is never imported in a client component.
+
+Fourth, trace the auth flow. From sign up to JWT token to RLS policy enforcement. Map how each piece connects.
+
+COMMON SECURITY MISTAKES
+
+Mistake one: Disabling RLS during development. Never do this. If you disable RLS, you won't catch bugs where data leaks. Always develop with RLS enabled.
+
+Mistake two: Using the service role key in the browser. This gives the client full database access. Only use it on the server.
+
+Mistake three: Writing policies that are too permissive. USING open parenthesis true close parenthesis on a user data table means anyone can see all users' data. Be restrictive.
+
+Mistake four: Not testing policies. You can write a policy that looks right but has a subtle bug. Always test.
+
+RESOURCES FOR DEEPER LEARNING
+
+The Supabase Auth guide at supabase.com slash docs slash guides slash auth covers every auth feature.
+
+The RLS guide at supabase.com slash docs slash guides slash auth slash row-level-security explains policies in depth with examples.
+
+The Next.js integration guide at supabase.com slash docs slash guides slash auth slash server-side slash nextjs shows how to use Supabase Auth in Next.js server components.
+
+Practice by writing a new RLS policy. Add a table, enable RLS, write policies, test them. This cements your understanding.
+
+NEXT WEEK: SUPABASE QUERIES AND REAL TIME
+
+This week, you learned how Supabase Auth and RLS secure your app. Next week, you'll dive into Supabase queries, how to use the query builder, how to structure complex queries, and how to enable real-time subscriptions for live updates.
+
+For now, remember: Authentication identifies who the user is. Authorization, via RLS, controls what they can access. Together, they create a secure foundation. Never skip security. It's not something to add later, it's foundational.
+
+
+========================================
+CHAPTER 6: SUPABASE QUERIES AND REAL TIME
+Week 6 - Duration: 15 minutes
+========================================
+
+Welcome to Week 6 of the Camino Builder learning curriculum. This week focuses on Supabase queries and real-time subscriptions, the tools you use to read and write data efficiently.
+
+Every data operation in Camino goes through Supabase. Understanding the query builder, how to filter and join data, and how to structure queries for performance is essential for building a responsive app.
+
+By the end of this chapter, you'll understand how to construct queries, handle errors, optimize for performance, and potentially add real-time updates to your signals.
+
+THE SUPABASE QUERY BUILDER
+
+Supabase provides a query builder that lets you construct SQL queries with JavaScript. Instead of writing raw SQL strings, you chain methods.
+
+The basic pattern: supabase dot from open parenthesis table name close parenthesis dot select open parenthesis columns close parenthesis.
+
+Example: supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis asterisk close parenthesis. This is equivalent to: SELECT asterisk FROM signals.
+
+The query builder is type-safe. If you try to filter by a column that doesn't exist, TypeScript catches it.
+
+SELECTING COLUMNS
+
+You can select all columns with asterisk, or specify which columns you want: supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote id, name, value quote close parenthesis.
+
+Selecting fewer columns is faster and uses less bandwidth. If you only need the signal name and value, don't select everything.
+
+For nested relationships, use parentheses: supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk, data underscore points open parenthesis asterisk close parenthesis quote close parenthesis.
+
+This fetches signals and their related data points in one query. Supabase performs the join automatically based on the foreign key relationship.
+
+FILTERING WITH WHERE CLAUSES
+
+The query builder provides filter methods equivalent to SQL WHERE clauses.
+
+eq for equals: dot eq open parenthesis quote user underscore id quote, userId close parenthesis. WHERE user underscore id equals userId.
+
+neq for not equals: dot neq open parenthesis quote status quote, quote deleted quote close parenthesis. WHERE status not equals quote deleted quote.
+
+gt for greater than, gte for greater than or equal, lt for less than, lte for less than or equal: dot gte open parenthesis quote value quote, 1000 close parenthesis. WHERE value greater than or equal 1000.
+
+in for matching a list: dot in open parenthesis quote category quote, open bracket quote revenue quote, quote sales quote close bracket close parenthesis. WHERE category IN open parenthesis quote revenue quote, quote sales quote close parenthesis.
+
+like for pattern matching: dot like open parenthesis quote name quote, quote percent revenue percent quote close parenthesis. WHERE name LIKE quote percent revenue percent quote. Percent is the wildcard.
+
+is for null checks: dot is open parenthesis quote date underscore column quote, null close parenthesis. WHERE date underscore column IS NULL.
+
+You can chain filters: supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis asterisk close parenthesis dot eq open parenthesis quote user underscore id quote, userId close parenthesis dot gte open parenthesis quote value quote, 1000 close parenthesis. This is: WHERE user underscore id equals userId AND value greater than or equal 1000.
+
+ORDERING AND LIMITING
+
+To order results: dot order open parenthesis quote created underscore at quote, open brace ascending colon false close brace close parenthesis. This sorts by created underscore at, newest first.
+
+ascending colon true sorts ascending, oldest first. ascending colon false sorts descending, newest first.
+
+To limit results: dot limit open parenthesis 10 close parenthesis. Returns only the first 10 rows.
+
+Combine with order to get the top or bottom: supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis asterisk close parenthesis dot order open parenthesis quote value quote, open brace ascending colon false close brace close parenthesis dot limit open parenthesis 5 close parenthesis. This gets the top 5 signals by value.
+
+For pagination: dot range open parenthesis start, end close parenthesis. dot range open parenthesis 0, 19 close parenthesis gets rows 0 through 19, the first 20. dot range open parenthesis 20, 39 close parenthesis gets rows 20 through 39, the next 20.
+
+INSERTING DATA
+
+To insert: supabase dot from open parenthesis quote signals quote close parenthesis dot insert open parenthesis data close parenthesis.
+
+data is an object or array of objects: open brace id, name, value, user underscore id close brace.
+
+Example: supabase dot from open parenthesis quote signals quote close parenthesis dot insert open parenthesis open brace id colon quote sig-1 quote, name colon quote Total Revenue quote, value colon 50000, user underscore id colon userId close brace close parenthesis.
+
+Insert returns: open brace data, error close brace. Check error to see if it succeeded.
+
+To insert multiple rows: pass an array: dot insert open parenthesis open bracket open brace dot dot dot close brace, open brace dot dot dot close brace close bracket close parenthesis.
+
+UPSERT: INSERT OR UPDATE
+
+Upsert means: insert if the row doesn't exist, update if it does.
+
+supabase dot from open parenthesis quote signals quote close parenthesis dot upsert open parenthesis open brace id colon quote sig-1 quote, value colon 60000 close brace close parenthesis.
+
+If a signal with id sig-1 exists, update its value. If not, insert a new row.
+
+Upsert is useful for idempotent operations. You can run it multiple times safely without creating duplicates.
+
+In Camino, your AI interpretation caching uses upsert. If an interpretation exists, update it. If not, insert it.
+
+UPDATING DATA
+
+To update: supabase dot from open parenthesis quote signals quote close parenthesis dot update open parenthesis open brace value colon 60000 close brace close parenthesis dot eq open parenthesis quote id quote, quote sig-1 quote close parenthesis.
+
+This updates the value of signal sig-1 to 60000.
+
+The WHERE clause, the eq part, is critical. Without it, you'd update every row. Always filter updates to target specific rows.
+
+You can update multiple columns: dot update open parenthesis open brace value colon 60000, trend colon quote increasing quote close brace close parenthesis.
+
+DELETING DATA
+
+To delete: supabase dot from open parenthesis quote signals quote close parenthesis dot delete open parenthesis close parenthesis dot eq open parenthesis quote id quote, quote sig-1 quote close parenthesis.
+
+This deletes signal sig-1.
+
+Again, the WHERE clause is critical. Without it, you'd delete all signals.
+
+Often, instead of deleting, you soft delete by setting a deleted underscore at timestamp. This preserves data for recovery or audit purposes.
+
+THE DATA COMMA ERROR PATTERN
+
+Every Supabase query returns: open brace data, error close brace. This forces explicit error handling.
+
+const open brace data, error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis asterisk close parenthesis
+
+if open parenthesis error close parenthesis open brace
+  console dot error open parenthesis quote Database error quote, error dot message close parenthesis
+  return open brace error colon quote Failed to load signals quote close brace
+close brace
+
+const signals equals data
+
+This pattern ensures you check for errors before using data. If you forget, TypeScript warns you that data might be null.
+
+Compare to throwing errors: you'd need a try-catch block, and it's easy to forget. The explicit pattern is safer.
+
+HANDLING RELATIONSHIPS: NESTED SELECTS
+
+Supabase makes it easy to load related data.
+
+One to many: A signal has many data points. supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk, data underscore points open parenthesis asterisk close parenthesis quote close parenthesis.
+
+This returns signals where each signal has a data underscore points array.
+
+You can filter the nested data: dot select open parenthesis quote asterisk, data underscore points open parenthesis asterisk close parenthesis dot order open parenthesis quote created underscore at quote close parenthesis close quote close parenthesis.
+
+Many to one: A signal belongs to a user. supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk, user colon users open parenthesis asterisk close parenthesis quote close parenthesis.
+
+This returns signals where each signal has a user object.
+
+This is much faster than the N plus 1 pattern where you load signals, then loop and load each user separately.
+
+REAL-TIME SUBSCRIPTIONS: LIVE DATA UPDATES
+
+Supabase supports real-time subscriptions. Your app can listen for changes to a table and update the UI live.
+
+The pattern: supabase dot channel open parenthesis quote signals-channel quote close parenthesis dot on open parenthesis quote postgres underscore changes quote, open brace event colon asterisk, schema colon quote public quote, table colon quote signals quote close brace, payload arrow open brace handle change close brace close parenthesis dot subscribe open parenthesis close parenthesis.
+
+Now whenever a signal is inserted, updated, or deleted, your app receives a notification with the changed data.
+
+You can filter subscriptions: event colon quote INSERT quote only fires on inserts. event colon quote UPDATE quote only on updates.
+
+In Camino, you could use this to show live signal updates. If one user generates signals, another user viewing the signals page sees them appear in real time.
+
+Subscriptions require enabling real-time on the table in Supabase settings. By default, it's disabled for security and performance.
+
+OPTIMIZING QUERIES: WHAT TO SELECT
+
+Only select the columns you need. If you're displaying a list of signal names, don't select the entire signal object. dot select open parenthesis quote id, name quote close parenthesis is faster than dot select open parenthesis asterisk close parenthesis.
+
+Use indexes for frequently filtered columns. If you always filter by user underscore id, ensure there's an index on user underscore id. Check your migration scripts, you should see CREATE INDEX statements.
+
+Avoid N plus 1 queries. Instead of loading signals then loading each signal's data points in a loop, load them all at once with a nested select.
+
+Limit results when you don't need everything. Loading 1000 signals when the user can only see 20 at a time is wasteful. Use dot limit open parenthesis 20 close parenthesis or dot range for pagination.
+
+APPLYING THIS TO CAMINO
+
+Let's trace a real query from your signals page:
+
+Server component runs: const open brace data colon signals, error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk close quote close parenthesis dot eq open parenthesis quote user underscore id quote, userId close parenthesis dot order open parenthesis quote created underscore at quote, open brace ascending colon false close brace close parenthesis
+
+This query:
+- Selects all columns from signals
+- Filters where user underscore id equals the logged in user
+- Orders by created underscore at, newest first
+- Returns the result as data or an error
+
+The database applies the RLS policy, ensuring only the user's signals are returned.
+
+The server component checks for error. If none, passes signals to the client component as props.
+
+Client component renders the signals.
+
+This demonstrates: query construction, filtering, ordering, error handling, data flow from database to UI.
+
+EXERCISES FOR THIS WEEK
+
+First, search your codebase for dot from open parenthesis. Read every Supabase query. Understand what each one does.
+
+Second, find the query that loads signals for the signals page. Modify it to only select id, name, value. See if the page still works.
+
+Third, add a new query. Maybe count how many signals a user has: supabase dot from open parenthesis quote signals quote, open brace count colon quote exact quote close brace close parenthesis dot eq open parenthesis quote user underscore id quote, userId close parenthesis.
+
+Fourth, experiment with nested selects. Load signals with their data points. See the structure of the returned data.
+
+COMMON QUERY PATTERNS IN CAMINO
+
+Pattern one: Load user's data with filter and order. supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis asterisk close parenthesis dot eq open parenthesis quote user underscore id quote, userId close parenthesis dot order open parenthesis quote created underscore at quote, open brace ascending colon false close brace close parenthesis.
+
+Pattern two: Insert new data after user action. supabase dot from open parenthesis quote signals quote close parenthesis dot insert open parenthesis newSignal close parenthesis.
+
+Pattern three: Upsert for cache. supabase dot from open parenthesis quote signal underscore interpretations quote close parenthesis dot upsert open parenthesis interpretation close parenthesis.
+
+Pattern four: Nested select to avoid N plus 1. supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk, data underscore points open parenthesis asterisk close parenthesis quote close parenthesis.
+
+RESOURCES FOR DEEPER LEARNING
+
+The Supabase JavaScript reference at supabase.com slash docs slash reference slash javascript slash select documents every query method.
+
+The real-time guide at supabase.com slash docs slash guides slash realtime shows how to set up subscriptions.
+
+Practice by writing queries in your app. Load different data, filter it, sort it, join it. Experiment and see the results.
+
+NEXT WEEK: AI SDK AND PROMPT ENGINEERING
+
+This week, you learned how to query data with Supabase efficiently and handle relationships. Next week, you'll dive into the AI SDK and prompt engineering, the tools that generate your 5-section signal analyses. You'll learn how to craft prompts, structure output, and improve AI quality.
+
+For now, remember: Supabase queries are how your app talks to the database. The query builder is type-safe and easy to use. Always handle errors explicitly. Load only what you need. Avoid N plus 1 patterns. Master queries and you master your data layer.
+
+
+========================================
+CHAPTER 7: AI SDK AND PROMPT ENGINEERING  
+Week 7 - Duration: 15 minutes
+========================================
+
+Welcome to Week 7 of the Camino Builder learning curriculum. This week focuses on the AI SDK and prompt engineering, the tools that power your product's key differentiator: AI-generated signal analyses.
+
+The quality of your AI output directly impacts user value. A well-crafted prompt produces insights that change how users understand their business. A poorly crafted prompt produces generic fluff that users ignore.
+
+By the end of this chapter, you'll understand how to use the AI SDK, structure prompts for quality output, control AI behavior, and optimize for cost and speed.
+
+THE AI SDK BASICS
+
+The AI SDK by Vercel simplifies working with language models. Instead of managing API calls, tokens, and streaming manually, you use high-level functions.
+
+The core function is generateText. It takes a prompt and returns generated text.
+
+import open brace generateText close brace from quote ai quote
+
+const result equals await generateText open parenthesis open brace
+  model colon quote openai colon gpt-4 quote,
+  prompt colon quote What is the capital of France question mark quote
+close brace close parenthesis
+
+console dot log open parenthesis result dot text close parenthesis
+
+This sends the prompt to GPT-4 and returns the response.
+
+For streaming responses, use streamText. It returns text chunk by chunk as it's generated, making the UI feel faster.
+
+In Camino, you use generateText for signal interpretations. The AI reads the signal data and generates the 5-section analysis.
+
+MODEL SELECTION
+
+Different models have different trade-offs: speed, quality, cost.
+
+GPT-4 is high quality but slower and more expensive. Use it for complex reasoning and analysis.
+
+GPT-3.5 Turbo is faster and cheaper but lower quality. Use it for simple tasks.
+
+Claude by Anthropic has different strengths: long context windows, good at following instructions, strong reasoning.
+
+In the AI SDK, you specify the model: model colon quote openai colon gpt-4 quote or model colon quote anthropic colon claude-3-sonnet quote.
+
+For Camino signal interpretations, you likely use GPT-4 for quality. Users expect insightful analysis, not quick generic summaries.
+
+SYSTEM PROMPTS: SETTING THE AI'S PERSONA
+
+A system prompt sets the AI's role and constraints. It's like giving instructions to a consultant before they analyze your data.
+
+In the AI SDK:
+
+const result equals await generateText open parenthesis open brace
+  model colon quote openai colon gpt-4 quote,
+  system colon quote You are a business analyst specializing in B2B SaaS metrics period quote,
+  prompt colon quote Analyze this revenue trend period period period quote
+close brace close parenthesis
+
+The system prompt defines who the AI is. The user prompt, the prompt field, is the specific question or task.
+
+In Camino, your interpretation service has a system prompt that says: "You are a business insights analyst. Analyze signals and provide actionable insights in 5 sections: What We Found, What It Means, So What, Opportunities, Risks."
+
+This shapes the AI's output. It knows to format the response in those 5 sections and focus on actionable insights, not just data summary.
+
+STRUCTURED OUTPUT: GETTING JSON BACK
+
+For programmatic use, you want structured output, not freeform text. The AI SDK supports this with the schema parameter.
+
+import open brace generateObject close brace from quote ai quote
+import open brace z close brace from quote zod quote
+
+const result equals await generateObject open parenthesis open brace
+  model colon quote openai colon gpt-4 quote,
+  schema colon z dot object open parenthesis open brace
+    whatWeFound colon z dot string open parenthesis close parenthesis,
+    whatItMeans colon z dot string open parenthesis close parenthesis,
+    soWhat colon z dot string open parenthesis close parenthesis,
+    opportunities colon z dot string open parenthesis close parenthesis,
+    risks colon z dot string open parenthesis close parenthesis
+  close brace close parenthesis,
+  prompt colon quote Analyze this signal period period period quote
+close brace close parenthesis
+
+console dot log open parenthesis result dot object close parenthesis
+
+This ensures the AI returns an object matching your schema. If the AI tries to return something else, the SDK retries or throws an error.
+
+In Camino, your interpretSignal function uses structured output. You define the SignalInterpretation shape with Zod, and the AI SDK ensures the response matches.
+
+TEMPERATURE: CONTROLLING CREATIVITY
+
+Temperature controls randomness. Low temperature means predictable, deterministic output. High temperature means creative, varied output.
+
+Temperature ranges from 0 to 2. Typical values:
+- 0: Completely deterministic. Same input always produces same output.
+- 0.3 to 0.7: Balanced. Some variation but mostly consistent.
+- 1 and above: Creative and unpredictable.
+
+For signal analysis, you want low to medium temperature. 0.3 to 0.5. This keeps the analysis consistent and focused, not random or off-topic.
+
+In the AI SDK: temperature colon 0.5
+
+TOKEN LIMITS: UNDERSTANDING CONTEXT WINDOWS
+
+Language models have a maximum context window, the number of tokens they can process at once. Tokens are roughly words, but not exactly. A token might be a word, part of a word, or punctuation.
+
+GPT-4 has a 128K token context window in some versions. GPT-3.5 has 16K. This includes both the prompt, what you send, and the response, what it generates.
+
+If your prompt is too long, the API rejects it or truncates it.
+
+To check token count, you can use a tokenizer library or estimate: roughly 1.3 tokens per word.
+
+For Camino, your signal interpretation prompts are short. You're sending the signal name, value, trend, and maybe a few data points. Probably under 1000 tokens. Well within limits.
+
+If you add more context, like full CSV data, watch the token count. You might need to sample or summarize data before sending it to the AI.
+
+PROMPT ENGINEERING: CRAFTING EFFECTIVE PROMPTS
+
+The quality of AI output depends heavily on the prompt. Good prompts are specific, clear, and structured.
+
+Vague prompt: "Analyze this signal."
+Better prompt: "You are analyzing a business signal. The signal is called 'Total Revenue' with a value of $50,000 and an increasing trend. Provide a 5-section analysis: What We Found, What It Means, So What, Opportunities, Risks. Be specific and actionable."
+
+The better prompt gives context, role, task, format, and expectations.
+
+Key principles:
+1. Be specific. "Analyze" is vague. "Provide 5 sections with specific insights" is clear.
+2. Give context. "This is a B2B SaaS company with 20 employees" helps the AI tailor the response.
+3. Specify format. "Return JSON with these fields" or "Write 3 bullet points" or "Use this structure."
+4. Set expectations. "Be actionable, not generic" or "Focus on risks, not opportunities."
+
+In Camino, your interpretation prompt could include:
+- The signal name and value
+- The user's role, manager, executive
+- The user's desired KPIs
+- The company context, size, industry
+
+This lets the AI generate personalized, relevant insights instead of generic analysis.
+
+FEW-SHOT EXAMPLES: SHOW DON'T JUST TELL
+
+Few-shot prompting means providing examples of good output in the prompt. The AI learns from the examples and mimics the style.
+
+Prompt with few-shot examples:
+
+"Analyze this signal. Here's an example of a good analysis:
+
+Signal: Win Rate = 65%
+
+What We Found: Your sales team is closing 65% of deals that reach the proposal stage, which is above the industry average of 50-55% for B2B SaaS.
+
+What It Means: Your team is effective at qualifying leads and presenting solutions that resonate with prospects.
+
+So What: This high win rate suggests you can afford to be more selective with leads. Focus on higher-value opportunities.
+
+Opportunities: Train the team to identify high-value deals earlier in the pipeline. Consider increasing prices since your win rate indicates strong product-market fit.
+
+Risks: A win rate this high might mean you're not pursuing enough deals. Ensure pipeline volume is sufficient.
+
+Now analyze this signal: Total Revenue = $120,000, increasing trend."
+
+The AI sees the example and produces output in the same style and depth.
+
+In Camino, you could add 2-3 examples to your interpretation prompt. This dramatically improves output quality.
+
+CHAIN OF THOUGHT: ASKING THE AI TO REASON
+
+Chain of thought prompting asks the AI to explain its reasoning step by step. This improves quality for complex tasks.
+
+Prompt: "Analyze this signal. First, explain what the metric measures. Second, evaluate whether the value is good or bad. Third, identify what actions the user should take. Finally, format your analysis in the 5 sections."
+
+The AI follows the steps and produces more thoughtful output.
+
+You can also use "Let's think step by step" at the end of the prompt. This often triggers the AI to reason more carefully.
+
+ROLE PROMPTING: ACT AS AN EXPERT
+
+Tell the AI to act as a specific expert. "You are a CFO analyzing revenue metrics" or "You are a sales manager reviewing pipeline data."
+
+This primes the AI to use domain knowledge and perspective appropriate to the role.
+
+In Camino, your prompt could vary by user role. If the user is an executive, the AI acts as a board advisor. If the user is a manager, the AI acts as a peer manager providing tactical advice.
+
+ERROR HANDLING: RETRIES AND FALLBACKS
+
+AI calls can fail. The API might be down, the prompt might be too long, the model might refuse the request.
+
+Always wrap AI calls in try-catch:
+
+try open brace
+  const result equals await generateText open parenthesis open brace dot dot dot close brace close parenthesis
+  return result dot text
+close brace catch open parenthesis error close parenthesis open brace
+  console dot error open parenthesis quote AI call failed quote, error close parenthesis
+  return open brace error colon quote Failed to generate interpretation quote close brace
+close brace
+
+You can also implement retries: if the call fails, try again up to 3 times before giving up.
+
+The AI SDK handles some retries automatically, but you should have application-level error handling too.
+
+COST AND SPEED: OPTIMIZING AI CALLS
+
+AI calls cost money and take time. Optimize both:
+
+Cost: Use cheaper models when possible. GPT-3.5 is 10x cheaper than GPT-4. If quality is acceptable, use it.
+
+Speed: Shorter prompts generate faster. Remove unnecessary context. Use streaming to show partial results immediately.
+
+Caching: Don't regenerate the same analysis twice. In Camino, you cache interpretations in the database. The first user sees a 2-second wait. The second user sees instant results.
+
+Batch processing: If you need to interpret 100 signals, send them in batches or parallel requests instead of sequentially.
+
+In Camino, interpretations are expensive, 2-3 seconds and a few cents per call. Caching dramatically reduces cost and improves UX.
+
+APPLYING THIS TO CAMINO
+
+Let's trace how an interpretation is generated:
+
+User expands a signal card and requests interpretation.
+Client component calls slash api slash interpret with the signal ID.
+API route loads the signal from the database.
+API route calls interpretSignal open parenthesis signal close parenthesis from your interpretation service.
+interpretSignal constructs a prompt:
+  "You are a business analyst. The signal is 'Win Rate' with value 65%. The user is a sales manager who cares about revenue growth. Analyze in 5 sections: What We Found, What It Means, So What, Opportunities, Risks. Be specific and actionable."
+interpretSignal calls generateObject with the prompt and a Zod schema for the 5 sections.
+The AI generates the analysis and returns it as structured JSON.
+interpretSignal saves it to the signal underscore interpretations table, caching it.
+API route returns the interpretation to the client.
+Client component displays the 5 sections.
+
+This demonstrates: prompt construction, structured output, caching, error handling, data flow from API to AI to database to UI.
+
+EXERCISES FOR THIS WEEK
+
+First, open lib slash interpretation-service dot ts. Read the full prompt. Understand how it structures the AI's task.
+
+Second, modify the prompt. Add a few-shot example. Test the interpretation quality with the new prompt.
+
+Third, experiment with temperature. Try 0.2, 0.5, 1.0. See how the output changes. Find the sweet spot for your use case.
+
+Fourth, add user context to the prompt. Pass the user's role and desired KPIs. See if the AI generates more personalized insights.
+
+COMMON AI PATTERNS IN CAMINO
+
+Pattern one: System prompt sets the role. User prompt provides the task and data.
+
+Pattern two: Structured output with Zod schema ensures consistent format.
+
+Pattern three: Caching AI responses in the database to avoid redundant calls.
+
+Pattern four: Error handling with try-catch and fallback messages.
+
+RESOURCES FOR DEEPER LEARNING
+
+The AI SDK documentation at sdk.vercel.ai slash docs is comprehensive. Read the guides on generateText, generateObject, and structured output.
+
+OpenAI's prompt engineering guide at platform.openai.com slash docs slash guides slash prompt-engineering has advanced techniques and examples.
+
+Anthropic's prompt guide at anthropic.com slash research slash prompt-engineering-guide covers their Claude models and best practices.
+
+Learn Prompting at learnprompting.org is a free course with interactive examples.
+
+Practice by writing prompts for different tasks. Analyze signals, summarize data, generate recommendations. Experiment and see what works.
+
+NEXT WEEK: TAILWIND CSS AND COMPONENT DESIGN
+
+This week, you learned how to use the AI SDK, craft effective prompts, and generate structured output. Next week, you'll dive into Tailwind CSS and component design, the tools that make your UI beautiful and maintainable.
+
+For now, remember: AI is only as good as your prompts. Be specific, give context, use examples, and structure the task. With good prompts, AI generates insights that genuinely help users. With bad prompts, it generates fluff. Invest time in prompt engineering, it directly impacts product value.
+
+
+========================================
+CHAPTER 8: TAILWIND CSS AND COMPONENT DESIGN
+Week 8 - Duration: 15 minutes
+========================================
+
+Welcome to Week 8 of the Camino Builder learning curriculum. This week focuses on Tailwind CSS and component design, the foundation of your app's visual layer.
+
+Your entire UI is built with Tailwind and shadcn slash ui components. Understanding the utility-first CSS model, responsive design, and component composition lets you build and modify pages quickly without fighting CSS.
+
+By the end of this chapter, you'll understand how Tailwind works, how to use design tokens, how shadcn components are structured, and how to build custom components that fit seamlessly into your design system.
+
+UTILITY-FIRST CSS: THE TAILWIND MENTAL MODEL
+
+Traditional CSS: you write class names like dot button, then define styles in CSS: dot button open brace background colon blue semicolon padding colon 10px semicolon close brace.
+
+Tailwind: you apply utility classes directly in HTML: class Name equals quote bg-blue-500 p-4 quote. Each class does one thing: bg-blue-500 sets background color, p-4 sets padding.
+
+This feels backwards at first. Why write lots of classes instead of one semantic class? Because utility-first scales better. You never write CSS that's used once and forgotten. You compose utilities that are reused everywhere.
+
+In Camino, every component uses Tailwind classes. Open any component file and you'll see: class Name equals quote flex items-center gap-2 p-4 border rounded-lg quote. Each class is a single responsibility utility.
+
+THE TAILWIND CLASS NAMING SYSTEM
+
+Tailwind classes follow a pattern: property dash value.
+
+Background color: bg-blue-500, bg-red-300, bg-background. The last one is a design token, we'll cover that soon.
+
+Text color: text-gray-700, text-white, text-foreground.
+
+Padding: p-4 means padding 1rem on all sides. px-4 means padding-left and padding-right. py-2 means padding-top and padding-bottom.
+
+Margin: m-4, mx-2, my-6. Same pattern as padding.
+
+Width and height: w-full is width 100%. h-screen is height 100vh. w-64 is width 16rem.
+
+Flexbox: flex makes the element a flex container. items-center aligns items vertically center. justify-between spreads items with space between.
+
+Grid: grid makes the element a grid container. grid-cols-3 creates 3 columns. gap-4 adds gap between grid items.
+
+Border: border adds a border. border-2 makes it 2px. border-gray-300 sets the color. rounded-lg rounds corners.
+
+You'll memorize common classes through use. The Tailwind docs at tailwindcss.com slash docs are searchable. Need to center text? Search "text align" and find text-center.
+
+RESPONSIVE DESIGN: BREAKPOINTS
+
+Tailwind has breakpoint prefixes: sm, md, lg, xl, 2xl.
+
+Default styles apply to mobile. Prefix classes with breakpoints for larger screens.
+
+Example: class Name equals quote text-sm md colon text-base lg colon text-lg quote. On mobile, text is small. On medium screens and up, it's base size. On large screens and up, it's large.
+
+Another: class Name equals quote grid grid-cols-1 md colon grid-cols-2 lg colon grid-cols-3 quote. On mobile, 1 column. On medium screens, 2 columns. On large screens, 3 columns.
+
+Tailwind is mobile-first. Write mobile styles without prefixes, then add breakpoints for larger screens.
+
+In Camino, your signals page is responsive. On mobile, signal cards stack vertically. On desktop, they show in a grid.
+
+FLEXBOX VIA TAILWIND
+
+Flexbox is the primary layout tool. Use it for almost everything.
+
+Make a flex container: class Name equals quote flex quote.
+
+Align items vertically: items-center, items-start, items-end.
+
+Justify items horizontally: justify-start, justify-center, justify-end, justify-between, justify-around.
+
+Direction: flex-row is default, horizontal. flex-col is vertical.
+
+Gap: gap-4 adds space between flex items.
+
+Example: class Name equals quote flex items-center justify-between gap-4 quote. This creates a horizontal row with items vertically centered, spread apart with space between, and 4 units of gap.
+
+In Camino, your signal card header uses flex: flex items-center justify-between. Signal name on the left, save button on the right, vertically aligned.
+
+DESIGN TOKENS: SEMANTIC COLORS
+
+Instead of hard coding colors, Tailwind uses design tokens. These are CSS variables defined in globals dot css.
+
+bg-background: the page background color.
+text-foreground: the primary text color.
+bg-primary: the primary brand color.
+text-primary-foreground: text color on primary backgrounds.
+bg-muted: a muted background for secondary elements.
+text-muted-foreground: muted text color.
+
+These tokens adapt to light and dark mode automatically. Change the CSS variable, the whole app updates.
+
+In Camino, you use design tokens everywhere. bg-card for card backgrounds, text-foreground for text, border-border for borders. This ensures visual consistency.
+
+Never hard code colors. Use tokens. If you need a new color, define a new token in globals dot css.
+
+SHADCN SLASH UI COMPONENT ANATOMY
+
+shadcn slash ui is a collection of components built with Radix UI primitives and styled with Tailwind. You don't install it as a package. You copy the components into your codebase.
+
+Each component is just JSX with Tailwind classes. You can read and modify it.
+
+Example: Button component. Open components slash ui slash button dot tsx. You'll see variants: default, destructive, outline, ghost. Each variant has different Tailwind classes.
+
+When you use the Button: open angle bracket Button variant equals quote outline quote close angle bracket, it applies the outline variant's classes.
+
+shadcn components are composable. Card is composed of CardHeader, CardTitle, CardDescription, CardContent, CardFooter. You mix and match these to build layouts.
+
+In Camino, your signal card uses Card, CardHeader, CardContent. You customize it with additional classes and nested components.
+
+CUSTOMIZING SHADCN COMPONENTS
+
+You can override component styles by passing class Name: open angle bracket Button class Name equals quote bg-red-500 quote close angle bracket. This adds bg-red-500 to the button's classes.
+
+Tailwind's class Name merging can conflict. If Button already has bg-blue-500, adding bg-red-500 might not work as expected. Use the cn utility from lib slash utils dot ts to merge classes properly: class Name equals open brace cn open parenthesis quote bg-red-500 quote close parenthesis close brace.
+
+The cn function intelligently merges Tailwind classes, resolving conflicts.
+
+CSS VARIABLES AND TAILWIND V4
+
+Camino uses Tailwind v4, which handles configuration differently. There's no tailwind dot config dot js. Instead, you define CSS variables in globals dot css with the at theme directive.
+
+In globals dot css, you'll see:
+
+at theme inline open brace
+  two dash background colon white semicolon
+  two dash foreground colon black semicolon
+  dot dot dot
+close brace
+
+These define the design tokens. Tailwind reads them and generates utility classes automatically.
+
+To add a new token, add it to at theme: two dash my-custom-color colon red semicolon. Now you can use bg-my-custom-color in your components.
+
+ANIMATION AND TRANSITIONS
+
+Tailwind includes animation utilities.
+
+transition adds a smooth transition to property changes. transition-all transitions all properties. transition-colors only transitions colors.
+
+Duration: duration-200 makes transitions last 200ms.
+
+Hover states: hover colon bg-blue-600 applies bg-blue-600 on hover. Combine with transition for smooth color change: class Name equals quote bg-blue-500 hover colon bg-blue-600 transition-colors quote.
+
+For custom animations, define them in globals dot css with at keyframes, then use them with animate dash name.
+
+In Camino, your buttons have hover states with transitions. Your signal cards have subtle animations when expanding.
+
+BUILDING A COMPONENT FROM SCRATCH
+
+Let's build a simple component: a metric display card.
+
+The card shows a label and a value. On hover, it highlights.
+
+export function MetricCard open parenthesis open brace label comma value close brace colon open brace label colon string semicolon value colon string close brace close parenthesis open brace
+  return open parenthesis
+    open angle bracket div class Name equals quote bg-card border border-border rounded-lg p-4 hover colon bg-muted transition-colors quote close angle bracket
+      open angle bracket div class Name equals quote text-sm text-muted-foreground quote close angle bracket open brace label close brace close angle bracket slash div close angle bracket
+      open angle bracket div class Name equals quote text-2xl font-bold text-foreground quote close angle bracket open brace value close brace close angle bracket slash div close angle bracket
+    close angle bracket slash div close angle bracket
+  close parenthesis
+close brace
+
+This component:
+- Uses design tokens: bg-card, text-foreground, border-border, text-muted-foreground
+- Uses Tailwind utilities: rounded-lg, p-4, text-sm, text-2xl, font-bold
+- Has hover state: hover colon bg-muted
+- Has smooth transition: transition-colors
+
+You can now use this component anywhere: open angle bracket MetricCard label equals quote Revenue quote value equals quote $50K quote slash close angle bracket.
+
+LAYOUT PATTERNS
+
+For page layouts, use consistent patterns.
+
+Container with max width: class Name equals quote max-w-7xl mx-auto px-4 quote. This centers the content and adds padding on mobile.
+
+Two-column layout: class Name equals quote grid grid-cols-1 md colon grid-cols-2 gap-6 quote. One column on mobile, two on medium screens and up.
+
+Sidebar layout: class Name equals quote flex quote. Sidebar is flex-shrink-0 w-64. Main content is flex-1.
+
+In Camino, your signals page uses a container: max-w-6xl mx-auto. Signal cards use a grid: grid grid-cols-1 md colon grid-cols-2 lg colon grid-cols-3 gap-4.
+
+APPLYING THIS TO CAMINO
+
+Let's trace a component: SignalAccordionCard.
+
+Open components slash signal-accordion-card dot tsx.
+
+You'll see:
+- Design tokens: bg-card, text-foreground, border-border
+- Flexbox layouts: flex items-center justify-between
+- Responsive classes: none in this component, but it's wrapped in a responsive grid in the parent
+- Hover states: buttons have hover colon bg-accent
+- Transitions: transition-colors on interactive elements
+
+The component composes shadcn components: Card, CardHeader, Button. It adds custom Tailwind classes for specific styling.
+
+This is the pattern: use shadcn primitives for structure, Tailwind utilities for styling, design tokens for colors.
+
+EXERCISES FOR THIS WEEK
+
+First, open app slash globals dot css. Read every CSS variable in the at theme block. Understand what each token represents.
+
+Second, open components slash signal-accordion-card dot tsx. Identify every Tailwind class. Look up the ones you don't recognize in the Tailwind docs.
+
+Third, redesign the signal card. Change colors, spacing, layout. Use only Tailwind classes. See how easy it is to iterate.
+
+Fourth, build a new component from scratch. Maybe a stat card or a progress bar. Use design tokens and Tailwind utilities. No custom CSS.
+
+COMMON TAILWIND PATTERNS IN CAMINO
+
+Pattern one: Flexbox for layout. flex items-center justify-between is everywhere.
+
+Pattern two: Design tokens for colors. bg-background, text-foreground, border-border. This ensures consistency.
+
+Pattern three: Responsive utilities with breakpoints. grid-cols-1 md colon grid-cols-2 lg colon grid-cols-3.
+
+Pattern four: Hover states with transitions. hover colon bg-accent transition-colors.
+
+RESOURCES FOR DEEPER LEARNING
+
+The Tailwind docs at tailwindcss.com slash docs are the definitive reference. Search for any class to see what it does.
+
+The shadcn slash ui docs at ui.shadcn.com slash docs slash components have every component you've installed, with examples.
+
+YouTube has many Tailwind crash courses. Search "Tailwind CSS crash course 2024" for recent tutorials.
+
+Practice by rebuilding existing components. Pick a component from your app, delete it, and rebuild it from scratch using Tailwind. This solidifies your understanding.
+
+NEXT WEEK: GIT AND DEPLOYMENT
+
+This week, you learned how Tailwind's utility-first model works, how to use design tokens, and how to compose shadcn components. Next week, you'll learn Git and deployment, how to manage code across v0, Cursor, and GitHub, and how to deploy to production with Vercel.
+
+For now, remember: Tailwind is about composition, not abstraction. You build complex UIs by combining simple utilities. Use design tokens for colors. Use flexbox for layouts. Use responsive utilities for mobile-first design. With Tailwind, you can build and iterate on UIs faster than with traditional CSS.
+
+
+========================================
+CHAPTER 9: GIT AND DEPLOYMENT
+Week 9 - Duration: 15 minutes
+========================================
+
+${(await Deno.readTextFile('/docs/LEARNING_AUDIO_CHAPTERS/chapter-09-git-and-deployment.md')).replace(/^#.*\n/, '').replace(/\*\*Duration:.*\n/, '').replace(/\*\*Topic:.*\n/, '').replace(/---\n/, '')}
+
+
+========================================
+CHAPTER 10: ERROR HANDLING AND DEBUGGING
+Week 10 - Duration: 15 minutes
+========================================
+
+${(await Deno.readTextFile('/docs/LEARNING_AUDIO_CHAPTERS/chapter-10-error-handling-and-debugging.md')).replace(/^#.*\n/, '').replace(/\*\*Duration:.*\n/, '').replace(/\*\*Topic:.*\n/, '').replace(/---\n/, '')}
+
+
+========================================
+CHAPTER 11: TESTING AND DATA VALIDATION  
+Week 11 - Duration: 15 minutes
+========================================
+
+${(await Deno.readTextFile('/docs/LEARNING_AUDIO_CHAPTERS/chapter-11-testing-and-data-validation.md')).replace(/^#.*\n/, '').replace(/\*\*Duration:.*\n/, '').replace(/\*\*Topic:.*\n/, '').replace(/---\n/, '')}
+
+
+========================================
+CHAPTER 12: PERFORMANCE AND SECURITY
+Week 12 - Duration: 15 minutes  
+========================================
+
+${(await Deno.readTextFile('/docs/LEARNING_AUDIO_CHAPTERS/chapter-12-performance-and-security.md')).replace(/^#.*\n/, '').replace(/\*\*Duration:.*\n/, '').replace(/\*\*Topic:.*\n/, '').replace(/---\n/, '')}
+
+
+========================================
+CONCLUSION
+========================================
+
+Congratulations. You've completed all 12 weeks of the Camino Builder learning curriculum.
+
+You started with TypeScript fundamentals, understanding how types prevent bugs and make your code more reliable. You learned React's mental model, how components work, how state triggers re-renders, and how effects handle side operations.
+
+You dove into Next.js, understanding file-based routing, server versus client components, and how to structure full-stack applications. You mastered SQL and databases, learning how to query, join, and optimize data operations.
+
+You secured your app with Supabase authentication and Row Level Security, ensuring that user data stays private and protected. You learned to write efficient queries and potentially add real-time subscriptions for live updates.
+
+You harnessed AI with prompt engineering, crafting system prompts that generate insightful, actionable analyses. You built beautiful, responsive UIs with Tailwind CSS and shadcn components.
+
+You learned Git and deployment, managing code across tools and shipping to production confidently. You implemented error handling and debugging strategies to make your app resilient. You understood testing and validation to prevent bugs before they reach users. And you optimized for performance and security to protect customer data and keep the app fast.
+
+This knowledge is your foundation. As you continue building Camino, you'll encounter new challenges that require deeper expertise. When that happens, return to these chapters. Reference the concepts. Apply the patterns. Build on what you've learned.
+
+Remember: you're not just writing code. You're building a product that helps businesses understand their data and make better decisions. Every feature you ship, every bug you fix, every optimization you make, directly impacts real users and real outcomes.
+
+The technical skills matter, but they're in service of something bigger: creating value, solving problems, and building something that matters.
+
+Welcome to the builder life. You're ready. Now go build Camino. Ship features. Learn from users. Iterate. Improve. And remember: every bug is a lesson, every challenge is an opportunity, and every line of code is a step toward building something remarkable.
+
+Thank you for completing the Camino Builder learning curriculum. Now, the real work begins.
+
+End of audiobook.
