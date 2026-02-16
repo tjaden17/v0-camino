@@ -34,9 +34,9 @@ UNDERSTANDING
 DATA IN
 -------
 
-1.3  Hardcode column mappings for Locumate's Zoho data
-     Map exact column names: "Amount" (AUD prefix) to deal_value, "Stage" to stage, "Closing Date" (DD/MM/YYYY) to close_date, "Sales Cycle Duration" (integer days) to sales_cycle, "Resolution Time in Business Hours" ("X days HH:MM hrs") to resolution_time, "Is Converted" (Yes/No) to is_converted.
-     Why: The first customer's data has specific quirks. These must be handled correctly before demo day. A wrong number from a parsing error kills credibility. (Jordan, Alex)
+1.3  Build column mapping template system with Locumate as first entry
+     Create column_mappings table (org_id, source_tool, row_type, field_mappings JSON). Add first template: "Zoho CRM Deals" with mappings for deal_value → "Amount" (parse AUD prefix), stage → "Stage", close_date → "Closing Date" (DD/MM/YYYY), sales_cycle → "Sales Cycle Duration", owner → "Deal Owner Name". Add "Zoho Desk Tickets" template: resolution_time → "Resolution Time in Business Hours" (parse "X days HH:MM hrs" format). Add "Zoho CRM Leads" template: is_converted → "Is Converted" (Yes/No).
+     Why: Build the template structure once and populate it with Locumate's mappings. By Goal 3 when customer #5 arrives, you have 5 real templates. No rebuild, no throwaway code. Each new customer adds to the template library. (Jordan, CTO)
 
 1.4  Filter out non-real tickets
      Exclude 21 "Policy acknowledgment required" tickets from all ticket calculations. These are automated system messages.
@@ -121,9 +121,9 @@ UNDERSTANDING
 DATA IN
 -------
 
-2.3  Persist column mappings per org
-     Store confirmed mappings in a column_mappings table (org_id, source_name, field_name, column_name). Re-uploads auto-apply saved mappings.
-     Why: Without saved mappings, you repeat the 3-question flow every monthly re-upload. Also establishes the pattern for customer #2. (Jordan)
+2.3  Template selection on re-upload
+     Admin selects org and source ("Zoho CRM Deals"), system auto-applies saved template. Only asks 3 questions if columns changed or new source added.
+     Why: Monthly re-uploads should take 30 seconds, not 5 minutes. The template persisted in Goal 1 now pays off. (Jordan)
 
 
 SIGNAL CALCS
@@ -180,9 +180,9 @@ UNDERSTANDING
 DATA IN
 -------
 
-3.2  Pre-built column mapping templates per tool
-     Create templates: "Zoho CRM Deals", "HubSpot Deals", "Salesforce Opportunities", "Zoho Desk Tickets", "Zendesk Tickets." Admin selects a template.
-     Why: By customer #3 you've seen Zoho twice. By #5, possibly HubSpot. Templates make onboarding 2 minutes instead of 10. Each tool becomes a reusable template. (Jordan)
+3.2  Add more templates from real customer data
+     By customer #5, add templates from actual onboardings: "HubSpot Deals" (if customer #3 uses HubSpot), "Salesforce Opportunities" (if customer #4 uses Salesforce), "Zendesk Tickets". Each real customer onboarding becomes a reusable template.
+     Why: Don't guess what templates to build. Let real customer data create the template library. By Goal 3 you have 5 proven templates from 5 successful onboardings. (Jordan)
 
 3.3  Auto-detect source tool from column headers
      Zoho, HubSpot, Salesforce have distinctive column names. Auto-detect and pre-select the mapping template.
@@ -319,9 +319,9 @@ UNDERSTANDING
   Goal 4: Self-service onboarding, segment packs, role dashboards
 
 DATA IN
-  Goal 1: Hardcoded Zoho mappings, ticket filtering, admin upload
-  Goal 2: Persisted column mappings
-  Goal 3: Tool templates, auto-detection, HubSpot/Salesforce aliases, lead magnet restrictions
+  Goal 1: Column mapping template system (Locumate = first template), ticket filtering, admin upload
+  Goal 2: Template re-use on re-uploads (already persisted from Goal 1)
+  Goal 3: Add more templates from customers #2-5, auto-detection, HubSpot/Salesforce aliases, lead magnet restrictions
   Goal 4: API integrations, new entity types, custom signal builder
 
 SIGNAL CALCS
