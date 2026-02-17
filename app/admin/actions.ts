@@ -8,6 +8,9 @@ export async function createUserAndAddToOrgAction(
   fullName: string,
   orgRole: "admin" | "read-only",
   profileRole: "executive" | "manager" = "manager",
+  kpi1?: string,
+  kpi2?: string,
+  kpi3?: string,
 ) {
   try {
     const adminClient = createAdminClient()
@@ -44,6 +47,9 @@ export async function createUserAndAddToOrgAction(
         full_name: fullName,
         organization_id: orgId,
         role: profileRole,
+        kpi_1: kpi1 || null,
+        kpi_2: kpi2 || null,
+        kpi_3: kpi3 || null,
         must_change_password: true,
         updated_at: new Date().toISOString(),
       },

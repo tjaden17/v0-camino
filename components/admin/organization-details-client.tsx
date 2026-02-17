@@ -45,6 +45,9 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
   const [newMemberName, setNewMemberName] = useState("")
   const [newMemberOrgRole, setNewMemberOrgRole] = useState<"admin" | "read-only">("read-only")
   const [newMemberProfileRole, setNewMemberProfileRole] = useState<"executive" | "manager">("manager")
+  const [newMemberKpi1, setNewMemberKpi1] = useState("")
+  const [newMemberKpi2, setNewMemberKpi2] = useState("")
+  const [newMemberKpi3, setNewMemberKpi3] = useState("")
   const [creatingMember, setCreatingMember] = useState(false)
   const [tempPasswordInfo, setTempPasswordInfo] = useState<{ email: string; password: string } | null>(null)
   const [editingMember, setEditingMember] = useState<any>(null)
@@ -55,6 +58,19 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
   useEffect(() => {
     loadOrgData()
   }, [orgId])
+
+  // Set default KPIs based on profile role
+  useEffect(() => {
+    if (newMemberProfileRole === "executive") {
+      setNewMemberKpi1("win rate")
+      setNewMemberKpi2("revenue")
+      setNewMemberKpi3("pipeline value")
+    } else if (newMemberProfileRole === "manager") {
+      setNewMemberKpi1("team performance")
+      setNewMemberKpi2("leads per month")
+      setNewMemberKpi3("")
+    }
+  }, [newMemberProfileRole])
 
   const loadOrgData = async () => {
     try {
@@ -96,7 +112,16 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
 
     setCreatingMember(true)
     try {
-      const result = await createUserAndAddToOrgAction(orgId, newMemberEmail, newMemberName, newMemberOrgRole, newMemberProfileRole)
+      const result = await createUserAndAddToOrgAction(
+        orgId,
+        newMemberEmail,
+        newMemberName,
+        newMemberOrgRole,
+        newMemberProfileRole,
+        newMemberKpi1,
+        newMemberKpi2,
+        newMemberKpi3,
+      )
 
       // Show the temporary password
       setTempPasswordInfo({
@@ -111,6 +136,9 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
       setNewMemberName("")
       setNewMemberOrgRole("read-only")
       setNewMemberProfileRole("manager")
+      setNewMemberKpi1("")
+      setNewMemberKpi2("")
+      setNewMemberKpi3("")
     } catch (error: any) {
       console.error("Error creating member:", error)
       alert(`Failed to create member: ${error.message || "Unknown error"}`)
@@ -391,6 +419,35 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
                         </SelectContent>
                       </Select>
                     </div>
+                    <div className="space-y-3 pt-2 border-t">
+                      <div className="space-y-1">
+                        <Label>KPIs (Key Performance Indicators)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          These metrics will appear first on the user's signals page
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Input
+                          value={newMemberKpi1}
+                          onChange={(e) => setNewMemberKpi1(e.target.value)}
+                          placeholder="e.g., win rate, revenue, ticket volume"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Input
+                          value={newMemberKpi2}
+                          onChange={(e) => setNewMemberKpi2(e.target.value)}
+                          placeholder="e.g., sales, customer satisfaction"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Input
+                          value={newMemberKpi3}
+                          onChange={(e) => setNewMemberKpi3(e.target.value)}
+                          placeholder="Optional third KPI"
+                        />
+                      </div>
+                    </div>
                     <Button
                       onClick={handleCreateMember}
                       className="w-full"
@@ -529,6 +586,25 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
                       )}
                       {member.user_profile?.role && (
                         <div className="text-sm text-muted-foreground mt-1">Role: {member.user_profile.role}</div>
+                      )}
+                      {(member.user_profile?.kpi_1 || member.user_profile?.kpi_2 || member.user_profile?.kpi_3) && (
+                        <div className="flex gap-1 mt-2">
+                          {member.user_profile?.kpi_1 && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-primary/10 text-primary">
+                              {member.user_profile.kpi_1}
+                            </span>
+                          )}
+                          {member.user_profile?.kpi_2 && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-primary/10 text-primary">
+                              {member.user_profile.kpi_2}
+                            </span>
+                          )}
+                          {member.user_profile?.kpi_3 && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-primary/10 text-primary">
+                              {member.user_profile.kpi_3}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
