@@ -3,6 +3,32 @@ CAMINO MSS - KEY DOCUMENTATION LINKS
 
 This document provides quick access to all key MSS documentation created during the AI Expert Panel consultations.
 
+---
+
+⭐ SOURCE OF TRUTH (START HERE)
+================================
+
+/docs/SOURCE_OF_TRUTH.md
+→ Defines the documentation hierarchy and how all docs work together
+→ **Read this first before consulting other documentation**
+
+PRIMARY PLANNING DOCUMENTS:
+
+1. 📋 Plan: CAMINO Roadmap (Final)
+   user_read_only_context/text_attachments/Plan_-CAMINO-Roadmap-(Final)-9CQmG.pdf
+   → Strategic roadmap with 4 monthly goals and decision moments
+   → 5 modular areas (Understanding, Data In, Signal Calcs, Interpretation, Presentation)
+   → Critical path Gantt view
+   → When to build what and why
+
+2. 📅 Do: Weekly Sprint Plan + AC
+   user_read_only_context/text_attachments/Do_-Weekly-Sprint-plan-+-AC-YhG08.pdf
+   → Current week's 3-5 user stories with acceptance criteria
+   → Backlog, In Progress, Done columns
+   → What to build this week
+
+---
+
 
 BUILD PLAN & ROADMAP
 --------------------

@@ -1,5 +1,5 @@
 # Camino - Cursor Rules
-# Last updated: 11 Feb 2026
+# Last updated: 19 Feb 2026
 
 ## Project Overview
 
@@ -8,10 +8,26 @@ Camino is a mobile-first business intelligence platform that turns raw business 
 North Star metric: 1 upload (manager) + 1 view/week (any user)
 
 Current phase: MSS (Minimum Sellable Service) - admin-in-the-loop model.
-First customer: Uses Zoho CRM, Zoho Desk, and custom CSV data files.
-Data sources: CSV/XLSX upload (manual) + API integration (Zoho CRM/Desk, automated).
-Delivery plan: /docs/DELIVERY_PLAN_MVP_GDOC.txt
-MSS scope: /docs/MSS_SCOPE.txt
+First customer: Locumate (Surge Singh, CEO) - Uses Zoho CRM, Zoho Desk
+Goal: Reach billing decision by Mar 14, 2026
+
+## SOURCE OF TRUTH - Read These First
+
+1. **Plan: CAMINO Roadmap (Final)**
+   Location: user_read_only_context/text_attachments/Plan_-CAMINO-Roadmap-(Final)-9CQmG.pdf
+   Purpose: Strategic roadmap with 4 monthly goals and decision moments
+   Contains: 5 modular areas, critical path Gantt, backlog tradeoffs
+
+2. **Do: Weekly Sprint Plan + AC**
+   Location: user_read_only_context/text_attachments/Do_-Weekly-Sprint-plan-+-AC-YhG08.pdf
+   Purpose: Current week's 3-5 user stories with acceptance criteria
+   Updated: Weekly
+
+3. **Documentation Hub**
+   Location: /docs/SOURCE_OF_TRUTH.md
+   Purpose: Navigation guide explaining how all docs work together
+
+RULE: Before building any feature, check the Weekly Sprint Plan to confirm it's in scope for this week. If not in the sprint plan, defer it.
 
 
 ## Tech Stack
@@ -185,39 +201,53 @@ export function ExampleClient() {
 - Do NOT import from signal-discovery-service.ts in new code
 
 
-## Current Sprint Focus (Week 1-2 MSS - Tier 1 Billing Gate)
+## Current Sprint Focus (Week of Feb 16-22, 2026)
 
-Week 1 (DONE):
-- Replaced old upload flow with 3-question proto flow at /upload
-- Generate route at /api/upload/generate calculates signals from user answers
-- Raw numeric values stored in absolute_value (not formatted strings)
-- org_id sourced from profiles table (matching signals page query)
+**Goal 1 Decision:** Will Surge (Locumate CEO) pay by Mar 14, 2026?
 
-Week 2 (CURRENT):
-- Admin can input user context via Admin CP (upcoming_priorities, signal_preferences)
-- AI analysis prompt uses user/org context for personalised insights
-- Admin can upload files on behalf of a user
-- API integration: wire Zoho CRM/Desk to generate pipeline (virtual tabs, pre-filled answers)
-- Data onboarding: admin-assisted workflow (receive samples, classify, validate, set up API)
-- Definition of Billable (Tier 1): 8 criteria including upload + API data sources, 3+ signals, personalised AI
+**Week 1 Critical Path (Foundation):**
+See: /docs/SOURCE_OF_TRUTH.md and Weekly Sprint Plan PDF
 
-Weeks 3-6 (TIER 2 - BACKLOG):
-- Week 3: Org data layer persistence + API auto-refresh (US10, US11)
-- Week 4: Signal relevance scoring + partial signal identification (US12, US13)
-- Week 5: Trend charts + KPI implication + cross-signal references + admin AI review (US14, US15, US16, US17)
-- Week 6: Progressive context + upload reminders + admin dashboard + onboarding runbook (US18, US19, US20, US21)
+Current sprint user stories:
+1. ✅ DONE: Understanding - Admin create 2 user accounts with role-based profiles
+   - Admin can create users via Admin CP
+   - Users have KPI fields (kpi_1, kpi_2, kpi_3) stored in profiles table
+   - Role-based KPI defaults (executive vs manager)
 
-See /docs/DELIVERY_PLAN_MVP_GDOC.txt for the full 6-week plan with roadmap, Tier 2 user story map, and recommended sequencing.
-See /docs/MSS_SCOPE.txt for all user stories (US1-US9 Tier 1, US10-US21 Tier 2).
+2. ⏳ IN PROGRESS: Data In - Universal pattern detector for non-real tickets
+   - Filter automated tickets before signal calculation
+   - Pattern detection: bulk timestamps, automated subjects, instant close times
+   - See: /docs/AI_PANEL_CONSULTATION_TICKET_FILTERING.md
+
+3. ⏳ BACKLOG: Data In - Pre-built column mapping templates per tool
+   - Column mapping template system with database table
+   - Store Locumate's Zoho mappings as first 3 templates
+   - See: /docs/CAMINO_PRODUCT_ROADMAP.md (Task 1.3)
+
+**By Friday Feb 22, this must be true:**
+"Surge's 3 Zoho CSVs can be uploaded, non-real tickets filtered out, and 3 user accounts exist with correct KPIs."
+
+**Reference Documents:**
+- Strategic plan: Plan_-CAMINO-Roadmap-(Final)-9CQmG.pdf
+- Weekly execution: Do_-Weekly-Sprint-plan-+-AC-YhG08.pdf
+- Sprint acceptance criteria: /docs/SPRINT_ACCEPTANCE_CRITERIA_WEEK1.md
+- MSS build plan: /docs/MSS_BUILD_PLAN_LOCKED.md
 
 
-## Story Numbering Scheme
+## Planning Methodology
 
-Tier 1 (Billing Gate):   US1-US9     | MSS-01 to MSS-15  | Weeks 1-2
-Tier 2 (Backlog):        US10-US21   | MSS-16 to MSS-33  | Weeks 3-6
-Future Backlog:          FB-01 to 14 | Not estimated     | Post Week 6
+**Goals → Critical Path → Weekly Sprints**
 
-Current MSS story count: MSS-01 through MSS-33 (15 stories done/in-progress for Tier 1, 18 for Tier 2)
+Every goal = ONE decision by ONE person at ONE moment (not "build features")
+- Goal 1: Will Surge pay? (Mar 14, 2026)
+- Goal 2: Will Surge stay 3 months? (Month 2-3)
+- Goal 3: Will customers 2-5 commit? (Month 3-4)
+- Goal 4: Will strangers self-serve? (Month 5-8)
+
+**Weekly Cut Line:** "By Friday, X must be true, or we can't reach the next goal decision"
+- If it's not on the critical path, defer it
+- Build 70% done and ship (not 100% polished)
+- Exception: Don't ship if it breaks trust (wrong calculations, bad data quality)
 
 
 ## Known Issues
