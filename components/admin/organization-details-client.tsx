@@ -74,24 +74,54 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
 
   const loadOrgData = async () => {
     try {
-      const [orgData, membersData, usersData, uploadsData, signalsData] = await Promise.all([
-        getOrganizationDetails(orgId),
-        getOrganizationMembersAdmin(orgId),
-        getAllUsersNotInOrg(orgId),
-        getOrganizationUploads(orgId),
-        getOrganizationSignals(orgId),
-      ])
-      setOrg(orgData)
-      setOrgName(orgData.name)
-      setMembers(membersData || [])
-      setAvailableUsers(usersData || [])
-      setUploads(uploadsData || [])
-      setSignals(signalsData || [])
-    } catch (error) {
-      console.error("Error loading org data:", error)
-    } finally {
-      setLoading(false)
+      // Try combined Neon API first (org, members, uploads, signals, availableUsers)
+      const res = await fetch(`/api/admin/organizations/${orgId}/details`)
+      if (res.ok) {
+        const data = await res.json()
+        setOrg(data.org ?? null)
+        setOrgName(data.org?.name ?? "")
+        setMembers(Array.isArray(data.members) ? data.members : [])
+        setAvailableUsers(Array.isArray(data.availableUsers) ? data.availableUsers : [])
+        setUploads(Array.isArray(data.uploads) ? data.uploads : [])
+        setSignals(Array.isArray(data.signals) ? data.signals : [])
+        setLoading(false)
+        return
+      }
+    } catch (_) {
+      // Fall through to legacy Supabase-based loading
     }
+
+    // Fallback: load each piece separately so one failure doesn't break the page
+    try {
+      const orgData = await getOrganizationDetails(orgId)
+      setOrg(orgData)
+      setOrgName(orgData?.name ?? "")
+    } catch (e) {
+      console.error("Error loading org details:", e)
+      setOrg(null)
+      setOrgName("")
+    }
+
+    const loadOptional = async <T,>(fn: () => Promise<T>, fallback: T): Promise<T> => {
+      try {
+        return await fn()
+      } catch (e) {
+        console.error("Error loading org section:", e)
+        return fallback
+      }
+    }
+
+    const [membersData, usersData, uploadsData, signalsData] = await Promise.all([
+      loadOptional(() => getOrganizationMembersAdmin(orgId), []),
+      loadOptional(() => getAllUsersNotInOrg(orgId), []),
+      loadOptional(() => getOrganizationUploads(orgId), []),
+      loadOptional(() => getOrganizationSignals(orgId), []),
+    ])
+    setMembers(membersData || [])
+    setAvailableUsers(usersData || [])
+    setUploads(uploadsData || [])
+    setSignals(signalsData || [])
+    setLoading(false)
   }
 
   const handleUpdateOrgName = async () => {
@@ -276,6 +306,17 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
     return <div>Loading organization...</div>
   }
 
+  if (!org) {
+    return (
+      <div className="space-y-4">
+        <Button variant="ghost" size="icon" onClick={() => router.push("/admin/organisations")}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <p className="text-muted-foreground">Organization not found.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -284,7 +325,7 @@ export default function OrganizationDetailsClient({ orgId }: { orgId: string }) 
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">{org?.name}</h1>
+          <h1 className="text-3xl font-bold">{org.name}</h1>
           <p className="text-muted-foreground">Manage organization details and members</p>
         </div>
       </div>

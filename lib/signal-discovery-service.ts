@@ -331,6 +331,29 @@ const FIELD_ALIASES: Record<string, string[]> = {
 // UTILITY FUNCTIONS
 // ============================================
 
+/** Map a column name to a normalized field name (e.g. for FIELD_ALIASES keys). */
+export function normalizeFieldName(colName: string): string {
+  const normalized = colName.toLowerCase().trim().replace(/[\s_-]+/g, "_")
+  for (const [key, aliases] of Object.entries(FIELD_ALIASES)) {
+    const allNames = [key, ...aliases].map((a) => a.toLowerCase().replace(/[\s_-]+/g, "_"))
+    if (allNames.some((a) => a === normalized || normalized.includes(a) || a.includes(normalized))) {
+      return key
+    }
+  }
+  return normalized
+}
+
+/** Infer data source type from file name and optional column names. */
+export function detectSourceType(fileName: string, columns?: string[]): string {
+  const nameLower = fileName.toLowerCase()
+  const colStr = (columns ?? []).join(" ").toLowerCase()
+  if (nameLower.includes("zoho") && (nameLower.includes("crm") || nameLower.includes("potential") || nameLower.includes("deal"))) return "zoho_crm"
+  if (nameLower.includes("zoho") && (nameLower.includes("desk") || nameLower.includes("ticket"))) return "zoho_desk"
+  if (nameLower.includes("hubspot") || colStr.includes("hs_")) return "hubspot"
+  if (nameLower.includes("salesforce") || colStr.includes("opportunity")) return "salesforce"
+  return "csv"
+}
+
 function findMatchingColumn(field: DataField, columns: DetectedColumn[]): DetectedColumn | null {
   const fieldNameLower = field.name.toLowerCase().replace(/[_\s-]/g, "")
   
@@ -420,7 +443,7 @@ function generateRecommendations(
   return recommendations
 }
 
-function detectColumns(data: ParsedCSVRow[]): DetectedColumn[] {
+export function detectColumns(data: ParsedCSVRow[]): DetectedColumn[] {
   if (data.length === 0) return []
 
   const columns: DetectedColumn[] = []

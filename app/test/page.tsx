@@ -13,11 +13,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Upload, RefreshCw, Play, CheckCircle, Clock, Circle, AlertTriangle } from "lucide-react"
 import { parseCSV, autoSuggestMapping, type ColumnMapping } from "@/lib/csv-parser"
 
-// Only show in development
-if (process.env.NODE_ENV === "production") {
-  throw new Error("Test page is not available in production")
-}
-
 interface Organization {
   id: string
   name: string
@@ -48,6 +43,13 @@ interface FlowStep {
 }
 
 export default function DevTestPage() {
+  if (process.env.NODE_ENV === "production") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <p className="text-muted-foreground">Test page is not available in production.</p>
+      </div>
+    )
+  }
   // State
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [selectedOrg, setSelectedOrg] = useState<string>("")

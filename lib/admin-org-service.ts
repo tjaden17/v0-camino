@@ -1,73 +1,59 @@
 import { createBrowserClient } from "./supabase/client"
 
+/** List organizations from Neon (via API). Supabase is auth-only; app data is in Neon. */
 export async function getAllOrganizations() {
-  console.log("[v0] getAllOrganizations called")
-  const supabase = createBrowserClient()
-
-  const { data, error } = await supabase
-    .from("organizations")
-    .select(`
-      id,
-      name,
-      created_at,
-      updated_at
-    `)
-    .order("created_at", { ascending: false })
-
-  console.log("[v0] getAllOrganizations result:", { data, error })
-
-  if (error) throw error
-  return data
+  const res = await fetch("/api/admin/organizations")
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err?.error ?? "Failed to load organizations")
+  }
+  const data = await res.json()
+  return Array.isArray(data) ? data : []
 }
 
+/** Create organization in Neon (via API). Avoids hang from writing to Supabase when data lives in Neon. */
 export async function createOrganizationAsAdmin(name: string) {
-  const supabase = createBrowserClient()
-
-  const { data: org, error: orgError } = await supabase.from("organizations").insert({ name }).select().single()
-
-  if (orgError) throw orgError
-
-  return org
+  const res = await fetch("/api/admin/organizations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err?.error ?? "Failed to create organization")
+  }
+  return res.json()
 }
 
+/** Update organization in Neon (via API). */
 export async function updateOrganization(orgId: string, name: string) {
-  const supabase = createBrowserClient()
-
-  const { data, error } = await supabase
-    .from("organizations")
-    .update({ name, updated_at: new Date().toISOString() })
-    .eq("id", orgId)
-    .select()
-    .single()
-
-  if (error) throw error
-  return data
+  const res = await fetch(`/api/admin/organizations/${orgId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err?.error ?? "Failed to update organization")
+  }
+  return res.json()
 }
 
+/** Delete organization in Neon (via API). */
 export async function deleteOrganization(orgId: string) {
-  const supabase = createBrowserClient()
-
-  const { error } = await supabase.from("organizations").delete().eq("id", orgId)
-
-  if (error) throw error
+  const res = await fetch(`/api/admin/organizations/${orgId}`, { method: "DELETE" })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err?.error ?? "Failed to delete organization")
+  }
 }
 
+/** Get one organization from Neon (via list). Returns null if not found so the UI can show a message. */
 export async function getOrganizationDetails(orgId: string) {
-  const supabase = createBrowserClient()
-
-  const { data, error } = await supabase
-    .from("organizations")
-    .select(`
-      id,
-      name,
-      created_at,
-      updated_at
-    `)
-    .eq("id", orgId)
-    .single()
-
-  if (error) throw error
-  return data
+  const list = await getAllOrganizations()
+  const norm = (id: unknown) => String(id ?? "").toLowerCase().trim()
+  const org = list.find((o: { id: unknown }) => norm(o.id) === norm(orgId))
+  return org ?? null
 }
 
 export async function getOrganizationMembersAdmin(orgId: string) {

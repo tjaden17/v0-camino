@@ -20,6 +20,17 @@ export default function AdminLayout({
   const supabase = createBrowserClient()
 
   useEffect(() => {
+    let cancelled = false
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+    const ADMIN_AUTH_TIMEOUT_MS = 10_000
+
+    const clearAuthTimeout = () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
+    }
+
     const checkAdminAuth = async () => {
       try {
         const {
@@ -27,7 +38,10 @@ export default function AdminLayout({
           error,
         } = await supabase.auth.getUser()
 
+        if (cancelled) return
         if (error || !user) {
+          clearAuthTimeout()
+          setIsLoading(false)
           router.push("/dashboard")
           return
         }
@@ -35,30 +49,49 @@ export default function AdminLayout({
         const masterAdmin = user.email === "admin@admin.com"
         setIsMasterAdmin(masterAdmin)
 
-        // Check if user is org admin
+        // Check if user is org admin (only for non–master admin; org data may be in Neon)
         if (!masterAdmin) {
           const { data: membership } = await supabase
             .from("organization_members")
             .select("role")
             .eq("user_id", user.id)
             .eq("role", "admin")
-            .single()
+            .maybeSingle()
 
+          if (cancelled) return
           if (!membership) {
+            clearAuthTimeout()
+            setIsLoading(false)
             router.push("/dashboard")
             return
           }
         }
 
+        clearAuthTimeout()
         setUser(user)
         setIsLoading(false)
       } catch (error) {
         console.error("[v0] Admin layout - error checking auth:", error)
+        clearAuthTimeout()
+        if (!cancelled) setIsLoading(false)
         router.push("/dashboard")
       }
     }
 
     checkAdminAuth()
+
+    // Only redirect if auth check is still pending after timeout (e.g. network hang)
+    timeoutId = setTimeout(() => {
+      if (cancelled) return
+      timeoutId = null
+      setIsLoading(false)
+      router.push("/dashboard")
+    }, ADMIN_AUTH_TIMEOUT_MS)
+
+    return () => {
+      cancelled = true
+      clearAuthTimeout()
+    }
   }, [router, supabase])
 
   if (isLoading) {

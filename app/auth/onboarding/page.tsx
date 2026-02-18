@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -124,13 +124,14 @@ const goalCategories = [
 
 const TOTAL_STEPS = 3
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   // Form state
@@ -156,12 +157,14 @@ export default function OnboardingPage() {
       } else {
         setUserId(user.id)
         
-        // Check if already onboarded
+        // Check if already onboarded – send back to intended page (e.g. /upload) if passed
         const response = await fetch("/api/user/onboarding-status")
         if (response.ok) {
           const data = await response.json()
           if (data.onboardingCompleted) {
-            router.push("/dashboard")
+            const redirect = searchParams.get("redirect")
+            const target = redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/dashboard"
+            router.push(target)
             return
           }
         }
@@ -226,7 +229,9 @@ export default function OnboardingPage() {
         throw new Error(data.error || "Failed to complete onboarding")
       }
 
-      router.push("/dashboard")
+      const redirect = searchParams.get("redirect")
+      const target = redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/dashboard"
+      router.push(target)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
@@ -502,5 +507,24 @@ export default function OnboardingPage() {
         </Card>
       </main>
     </div>
+  )
+}
+
+function OnboardingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<OnboardingFallback />}>
+      <OnboardingContent />
+    </Suspense>
   )
 }

@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { BottomNav } from "@/components/bottom-nav"
 import { ChangePasswordModal } from "@/components/change-password-modal"
@@ -13,12 +13,24 @@ export default function ProtectedLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [isLoading, setIsLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [mustChangePassword, setMustChangePassword] = useState(false)
   const supabase = createBrowserClient()
 
   useEffect(() => {
+    let cancelled = false
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+    const AUTH_TIMEOUT_MS = 10_000
+
+    const clearAuthTimeout = () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
+    }
+
     const checkAuth = async () => {
       try {
         const {
@@ -26,7 +38,10 @@ export default function ProtectedLayout({
           error: sessionError,
         } = await supabase.auth.getSession()
 
+        if (cancelled) return
         if (sessionError || !session) {
+          clearAuthTimeout()
+          setIsLoading(false)
           router.push("/auth/login")
           return
         }
@@ -36,50 +51,69 @@ export default function ProtectedLayout({
           error,
         } = await supabase.auth.getUser()
 
+        if (cancelled) return
         if (error || !user) {
-          router.push("/auth/login")
-        } else {
-          setUser(user)
-
-          // Check onboarding status
-          try {
-            const onboardingResponse = await fetch("/api/user/onboarding-status")
-            if (onboardingResponse.ok) {
-              const onboardingData = await onboardingResponse.json()
-              if (!onboardingData.onboardingCompleted) {
-                router.push("/auth/onboarding")
-                return
-              }
-            }
-          } catch (onboardingError) {
-            // If onboarding check fails, continue (might be first-time setup)
-            console.log("Onboarding check skipped:", onboardingError)
-          }
-
-          // Check password change requirement
-          try {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("must_change_password, password_changed_at")
-              .eq("id", user.id)
-              .single()
-
-            if (profile?.must_change_password && !profile?.password_changed_at) {
-              setMustChangePassword(true)
-            }
-          } catch (profileError) {
-            // If profile or columns don't exist, skip password check
-          }
-
+          clearAuthTimeout()
           setIsLoading(false)
+          router.push("/auth/login")
+          return
         }
+
+        setUser(user)
+
+        // Check onboarding status
+        try {
+          const onboardingResponse = await fetch("/api/user/onboarding-status")
+          if (cancelled) return
+          if (onboardingResponse.ok) {
+            const onboardingData = await onboardingResponse.json()
+            if (!onboardingData.onboardingCompleted) {
+              clearAuthTimeout()
+              setIsLoading(false)
+              const redirectTo = pathname && pathname !== "/" ? pathname : "/mission"
+              router.push("/auth/onboarding?redirect=" + encodeURIComponent(redirectTo))
+              return
+            }
+          }
+        } catch (onboardingError) {
+          if (cancelled) return
+          console.log("Onboarding check skipped:", onboardingError)
+        }
+
+        // Check password change requirement
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("must_change_password, password_changed_at")
+            .eq("id", user.id)
+            .maybeSingle()
+
+          if (!cancelled && profile?.must_change_password && !profile?.password_changed_at) {
+            setMustChangePassword(true)
+          }
+        } catch (profileError) {
+          // If profile or columns don't exist, skip password check
+        }
+
+        clearAuthTimeout()
+        if (!cancelled) setIsLoading(false)
       } catch (error) {
         console.error("Protected layout auth error:", error)
+        clearAuthTimeout()
+        if (!cancelled) setIsLoading(false)
         router.push("/auth/login")
       }
     }
 
     checkAuth()
+
+    // Only redirect if auth check is still pending after timeout (e.g. network hang)
+    timeoutId = setTimeout(() => {
+      if (cancelled) return
+      timeoutId = null
+      setIsLoading(false)
+      router.push("/auth/login")
+    }, AUTH_TIMEOUT_MS)
 
     // Listen for auth changes
     const {
@@ -92,8 +126,12 @@ export default function ProtectedLayout({
       }
     })
 
-    return () => subscription.unsubscribe()
-  }, [router, supabase])
+    return () => {
+      cancelled = true
+      if (timeoutId !== null) clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
+  }, [router, supabase, pathname])
 
   if (isLoading) {
     return (

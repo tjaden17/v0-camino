@@ -52,7 +52,13 @@ export default function AdminLoginPage() {
       router.push("/admin/organisations")
     } catch (error: unknown) {
       console.log("[v0] Admin login error:", error)
-      setError(error instanceof Error ? error.message : "An error occurred")
+      const message = error instanceof Error ? error.message : "An error occurred"
+      const isInvalidCreds = /invalid login credentials/i.test(message)
+      setError(
+        isInvalidCreds
+          ? "Invalid login credentials. Ensure the user admin@admin.com exists in Supabase Auth (Dashboard → Authentication → Users) and the password is correct. You can create or reset the user there."
+          : message
+      )
     } finally {
       setIsLoading(false)
     }

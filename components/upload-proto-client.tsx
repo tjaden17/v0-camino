@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -29,6 +29,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { applyTemplateToColumns, type ColumnMappingTemplateShape } from "@/lib/column-mapping-utils"
 import * as XLSX from "xlsx"
 
 // ============================================
@@ -339,12 +340,16 @@ function TabQuestionnaire({
   onUpdateAnswers,
   isActive,
   onToggle,
+  mappingTemplates,
+  onApplyTemplate,
 }: {
   tab: TabData
   answers: TabAnswers
   onUpdateAnswers: (answers: Partial<TabAnswers>) => void
   isActive: boolean
   onToggle: () => void
+  mappingTemplates: ColumnMappingTemplateShape[]
+  onApplyTemplate: (template: ColumnMappingTemplateShape) => void
 }) {
   const inferredType = inferRowType(tab)
   const currentType = answers.rowType
@@ -415,6 +420,34 @@ function TabQuestionnaire({
               Columns: number = value to sum/average · date = for trends · text = for grouping (e.g. owner, stage).
             </p>
           </div>
+
+          {mappingTemplates.length > 0 && (
+            <div className="mb-4">
+              <label className="text-sm font-medium text-foreground mb-2 block">
+                Pre-built template (optional)
+              </label>
+              <Select
+                onValueChange={(value) => {
+                  const template = mappingTemplates.find((t) => t.id === value)
+                  if (template) onApplyTemplate(template)
+                }}
+              >
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Choose a template to auto-fill mapping…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mappingTemplates.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.display_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Match your file to a known tool to pre-fill row type and columns.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-4">
             {/* Q1: Row type */}
@@ -569,7 +602,15 @@ export function UploadProtoClient() {
   const [isParsing, setIsParsing] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [generateResult, setGenerateResult] = useState<{ success: boolean; count: number; errors?: string[] } | null>(null)
+  const [mappingTemplates, setMappingTemplates] = useState<ColumnMappingTemplateShape[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetch("/api/upload/templates")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => data?.templates && setMappingTemplates(data.templates))
+      .catch(() => {})
+  }, [])
 
   // All tabs across all files
   const allTabs = parsedFiles.flatMap(f => f.tabs)
@@ -874,6 +915,15 @@ export function UploadProtoClient() {
                       onUpdateAnswers={(partial) => updateTabAnswers(tab.key, partial)}
                       isActive={activeTab === tab.key}
                       onToggle={() => setActiveTab(activeTab === tab.key ? null : tab.key)}
+                      mappingTemplates={mappingTemplates}
+                      onApplyTemplate={(template) => {
+                        const applied = applyTemplateToColumns(template, tab.columns)
+                        updateTabAnswers(tab.key, {
+                          rowType: applied.rowType as RowType,
+                          metricColumn: applied.metricColumn,
+                          dateColumn: applied.dateColumn,
+                        })
+                      }}
                     />
                   ))}
                 </div>

@@ -8,7 +8,6 @@ import {
   type DetectedColumn,
   type DiscoveredSignal,
   normalizeFieldName,
-  detectColumnType,
   detectColumns,
 } from "@/lib/signal-discovery-service"
 import type { ParsedCSVRow } from "@/lib/csv-parser"
