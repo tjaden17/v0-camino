@@ -23,12 +23,12 @@ Camino generates signals across four primary domains based on the data source:
 **Definition:** Total monetary value of all deals in non-terminal stages.
 
 **Formula:**
-```
+\`\`\`
 Pipeline Value = SUM(deal_amount) 
 WHERE deal_status NOT IN ('Closed Won', 'Closed Lost')
 AND deal_amount IS NOT NULL
 AND deal_amount > 0
-```
+\`\`\`
 
 **Test Case:**
 - Input: 10 deals, 3 Closed Won ($50K each), 2 Closed Lost ($40K each), 5 Open ($20K each)
@@ -46,12 +46,12 @@ AND deal_amount > 0
 **Definition:** Percentage of deals closed won in the current period.
 
 **Formula:**
-```
+\`\`\`
 Win Rate = (COUNT(deals WHERE status = 'Closed Won' AND close_date IN current_period) / 
             COUNT(deals WHERE status IN ('Closed Won', 'Closed Lost') AND close_date IN current_period)) * 100
 
 WHERE close_date is not null
-```
+\`\`\`
 
 **Test Case:**
 - Input: 8 closed deals in period, 5 won, 3 lost
@@ -69,12 +69,12 @@ WHERE close_date is not null
 **Definition:** Average monetary value per deal in the current period.
 
 **Formula:**
-```
+\`\`\`
 Avg Deal Size = SUM(deal_amount) / COUNT(deal_id)
 WHERE deal_status IN ('Closed Won', 'Closed Lost')
 AND close_date IN current_period
 AND deal_amount > 0
-```
+\`\`\`
 
 **Test Case:**
 - Input: 4 closed deals ($10K, $20K, $15K, $25K)
@@ -92,13 +92,13 @@ AND deal_amount > 0
 **Definition:** Average number of days from deal creation to close.
 
 **Formula:**
-```
+\`\`\`
 Deal Velocity = AVG(close_date - created_date)
 WHERE deal_status IN ('Closed Won', 'Closed Lost')
 AND close_date IN current_period
 AND close_date IS NOT NULL
 AND created_date IS NOT NULL
-```
+\`\`\`
 
 **Test Case:**
 - Input: 3 deals closed with durations of 30, 45, 60 days
@@ -118,13 +118,13 @@ AND created_date IS NOT NULL
 **Definition:** Average time to resolve support tickets.
 
 **Formula:**
-```
+\`\`\`
 Resolution Time = AVG(resolved_date - created_date)
 WHERE ticket_status = 'Resolved'
 AND resolved_date IN current_period
 AND resolved_date IS NOT NULL
 AND created_date IS NOT NULL
-```
+\`\`\`
 
 **Test Case:**
 - Input: 5 resolved tickets with durations of 4hr, 2hr, 6hr, 3hr, 5hr
@@ -142,10 +142,10 @@ AND created_date IS NOT NULL
 **Definition:** Percentage of resolved tickets that are reopened.
 
 **Formula:**
-```
+\`\`\`
 Reopen Rate = (COUNT(tickets WHERE status = 'Reopened' AND reopened_date IN current_period) / 
                COUNT(tickets WHERE status IN ('Resolved', 'Reopened') AND resolved_date IN current_period)) * 100
-```
+\`\`\`
 
 **Test Case:**
 - Input: 20 tickets resolved in period, 3 reopened
@@ -163,12 +163,12 @@ Reopen Rate = (COUNT(tickets WHERE status = 'Reopened' AND reopened_date IN curr
 **Definition:** Average customer satisfaction score.
 
 **Formula:**
-```
+\`\`\`
 CSAT = AVG(satisfaction_score)
 WHERE satisfaction_score IS NOT NULL
 AND satisfaction_score BETWEEN 1 AND 5
 AND survey_date IN current_period
-```
+\`\`\`
 
 **Test Case:**
 - Input: 10 surveys with scores [5,4,5,3,4,5,4,5,4,3]
@@ -186,13 +186,13 @@ AND survey_date IN current_period
 **Definition:** Average time from ticket creation to first response.
 
 **Formula:**
-```
+\`\`\`
 First Response Time = AVG(first_response_date - created_date)
 WHERE ticket_status IN ('Open', 'Resolved', 'Reopened')
 AND first_response_date IS NOT NULL
 AND created_date IS NOT NULL
 AND first_response_date IN current_period
-```
+\`\`\`
 
 **Test Case:**
 - Input: 8 tickets with first response times of 15min, 20min, 10min, 25min, 12min, 18min, 22min, 16min
@@ -212,13 +212,13 @@ AND first_response_date IN current_period
 **Definition:** Count of qualifying activities per lead in the current period.
 
 **Formula:**
-```
+\`\`\`
 Activity Score = COUNT(activity_id)
 WHERE contact_id = lead_id
 AND activity_type IN ('Email', 'Call', 'Meeting', 'Demo')
 AND activity_date IN current_period
 AND activity_status = 'Completed'
-```
+\`\`\`
 
 **Test Case:**
 - Input: Lead with 2 emails, 1 call, 1 meeting, 1 failed call (in period)
@@ -236,12 +236,12 @@ AND activity_status = 'Completed'
 **Definition:** Percentage of sent emails that are opened.
 
 **Formula:**
-```
+\`\`\`
 Email Open Rate = (COUNT(emails WHERE was_opened = true) / 
                    COUNT(emails WHERE was_sent = true)) * 100
 WHERE email_date IN current_period
 AND was_sent = true
-```
+\`\`\`
 
 **Test Case:**
 - Input: 50 emails sent, 35 opened
@@ -259,12 +259,12 @@ AND was_sent = true
 **Definition:** Percentage of scheduled meetings that were attended.
 
 **Formula:**
-```
+\`\`\`
 Attendance Rate = (COUNT(meetings WHERE status = 'Completed') / 
                    COUNT(meetings WHERE status IN ('Scheduled', 'Completed'))) * 100
 WHERE scheduled_date IN current_period
 AND scheduled_date IS NOT NULL
-```
+\`\`\`
 
 **Test Case:**
 - Input: 10 meetings scheduled, 8 completed, 2 cancelled
@@ -280,21 +280,21 @@ AND scheduled_date IS NOT NULL
 ## 4. TREND CALCULATION RULES
 
 ### Trend Direction
-```
+\`\`\`
 IF current_period_value > previous_period_value
   THEN trend = "UP"
 ELSE IF current_period_value < previous_period_value
   THEN trend = "DOWN"
 ELSE
   THEN trend = "FLAT"
-```
+\`\`\`
 
 ### Trend Magnitude
-```
+\`\`\`
 Trend_Percent = ((current - previous) / previous) * 100
 IF ABS(Trend_Percent) > 20%
   THEN flag as "Significant Trend"
-```
+\`\`\`
 
 ### Period Definition
 - **Daily:** Last 24 hours vs. 24-48 hours prior

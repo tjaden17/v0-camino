@@ -82,23 +82,23 @@ Here's a typical scenario: You're working on the signals page in Cursor, improvi
 
 Git marks the conflict in your file like this:
 
-```
+\`\`\`
 <<<<<<< HEAD
 const filteredSignals = signals.filter(s => s.status === 'active')
 =======
 const filteredSignals = signals.filter(s => s.category === filterCategory)
 >>>>>>> feature-add-button
-```
+\`\`\`
 
 The section between `<<<<<<< HEAD` and `=======` is your version. The section between `=======` and `>>>>>>> feature-add-button` is the incoming version.
 
 To resolve it, you edit the file to keep what you want:
 
-```
+\`\`\`
 const filteredSignals = signals.filter(s => 
   s.status === 'active' && s.category === filterCategory
 )
-```
+\`\`\`
 
 Then you remove the conflict markers, save the file, stage it with `git add`, and complete the merge with `git commit`.
 
@@ -206,11 +206,11 @@ Congratulations - you've completed the full workflow. This is the process you'll
 **Mistake 1: Committed to main by accident**
 
 If you haven't pushed yet, you can move the commit to a new branch:
-```
+\`\`\`
 git branch feature-oops
 git reset --hard HEAD~1
 git checkout feature-oops
-```
+\`\`\`
 
 This creates a branch at your current commit, resets main to the previous commit, and switches to the new branch.
 

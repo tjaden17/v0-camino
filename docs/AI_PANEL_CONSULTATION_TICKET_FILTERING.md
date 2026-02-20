@@ -21,7 +21,7 @@ Common patterns across Zoho, Zendesk, Freshdesk, HubSpot Service Hub:
 
 My recommendation for Goal 1:
 
-```typescript
+\`\`\`typescript
 function isNonRealTicket(ticket: Row, allTickets: Row[]): boolean {
   const subject = (ticket['Subject'] || '').toLowerCase().trim()
   const createdTime = new Date(ticket['Created Time'] || '')
@@ -60,7 +60,7 @@ function isNonRealTicket(ticket: Row, allTickets: Row[]): boolean {
   
   return false
 }
-```
+\`\`\`
 
 This catches Locumate's "Policy acknowledgment required" tickets AND will catch similar patterns for customer #2-5 without any configuration.
 
@@ -89,14 +89,14 @@ From a data validation perspective, here's what matters:
    The admin needs to see what was excluded to catch false positives.
 
 2. NEVER silently filter. Log every exclusion:
-   ```
+   \`\`\`
    Table: filtered_tickets_log
    - org_id
    - ticket_id
    - subject
    - filtered_reason: "bulk_creation" | "automated_subject" | "zero_threads"
    - filtered_at
-   ```
+   \`\`\`
    This creates an audit trail. If the CS Manager says "Why is my ticket count wrong?" you can show them exactly what was excluded.
 
 3. Add a confidence score to each filter:
@@ -160,7 +160,7 @@ Build the universal pattern detector in Goal 1. It's the 80/20 solution—80% ef
 
 The code lives in the generate route, before signal calculation:
 
-```typescript
+\`\`\`typescript
 // Filter tickets based on universal patterns
 if (tab.name.toLowerCase().includes('ticket')) {
   const originalCount = rows.length
@@ -173,7 +173,7 @@ if (tab.name.toLowerCase().includes('ticket')) {
   metadata.ticketsFiltered = filteredCount
   metadata.ticketsTotal = originalCount
 }
-```
+\`\`\`
 
 The exclusion rules table (Goal 2) is a 2-hour addition when you need it. The AI approach (Goal 4) is optional—you might never need it.
 

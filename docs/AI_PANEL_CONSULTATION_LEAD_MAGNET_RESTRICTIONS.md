@@ -244,21 +244,21 @@ The worst thing you can do is surprise the user with a restriction after they've
 ### At the Upload Screen
 
 **Show a dropdown first:**
-```
+\`\`\`
 What data are you uploading?
 ○ Deals / Opportunities (Win rate, pipeline value, sales cycle)
 ○ Leads / Prospects (Lead volume, conversion rate)
 ○ Support Tickets (Resolution time, ticket volume, SLA compliance)
-```
+\`\`\`
 
 This primes the user for which file to upload. If they're a sales leader, they'll choose "Deals" and go export their Zoho deals.
 
 **Then show the file picker:**
-```
+\`\`\`
 [Drop your CSV or Excel file here, or click to browse]
 
 Need help? → "How to export from Zoho CRM" | "How to export from HubSpot"
-```
+\`\`\`
 
 ### During Processing (If Edge Cases Occur)
 
@@ -298,11 +298,11 @@ This makes it feel like a clarification, not a failure.
 
 If a signal has medium or low confidence, show it but with context:
 
-```
+\`\`\`
 Win Rate: 75% ⚠️
 
 Calculated from 8 closed deals. For more reliable insights, we recommend at least 20 closed deals. Try exporting a longer date range.
-```
+\`\`\`
 
 This says "we gave you a number, but you'd get better value if you gave us more data" which is a retention hook.
 

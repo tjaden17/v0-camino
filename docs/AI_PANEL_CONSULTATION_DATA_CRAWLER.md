@@ -31,12 +31,12 @@ CSVs have none of this. A column called "Amount" could be deal value, invoice am
 
 **What you already have:** FIELD_ALIASES dictionary with 300+ column name variations
 
-```typescript
+\`\`\`typescript
 deal_value: [
   "amount", "deal amount", "value", "expected revenue", "amount",
   "hs_closed_amount", "opportunity amount", "contract value", ...
 ]
-```
+\`\`\`
 
 This is your "crawler." It indexes known patterns from Zoho, HubSpot, Salesforce, Pipedrive, Monday.com, etc.
 
@@ -70,7 +70,7 @@ This is your "crawler." It indexes known patterns from Zoho, HubSpot, Salesforce
 **What this does:** Pass the CSV headers + 5 sample rows to an LLM and ask it to map columns to your schema.
 
 **Example prompt:**
-```
+\`\`\`
 You are a data mapping assistant. Here are the columns from an uploaded CSV:
 
 Columns: ["Opp Name", "Account", "ARR", "Close Date", "Forecast Category", "Rep"]
@@ -85,7 +85,7 @@ Map these columns to our normalized schema:
 - owner: person responsible
 
 Return JSON: { "Opp Name": "deal_id", "Account": "customer_name", ... }
-```
+\`\`\`
 
 **Accuracy:** In testing with GPT-4, this achieves ~85-90% accuracy on first attempt, ~95% with validation prompts.
 
@@ -119,7 +119,7 @@ Return JSON: { "Opp Name": "deal_id", "Account": "customer_name", ... }
 4. Customer #20 uploads CSV with "Expected Close" → auto-maps instantly
 
 **Data structure:**
-```sql
+\`\`\`sql
 CREATE TABLE column_mappings (
   id UUID PRIMARY KEY,
   source_column VARCHAR NOT NULL,      -- "Expected Close"
@@ -131,7 +131,7 @@ CREATE TABLE column_mappings (
   created_at TIMESTAMP,
   last_used_at TIMESTAMP
 );
-```
+\`\`\`
 
 **Crowdsourcing rules:**
 - If confirmation_count >= 3 and rejection_count = 0 → add to FIELD_ALIASES permanently

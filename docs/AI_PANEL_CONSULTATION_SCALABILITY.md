@@ -43,7 +43,7 @@ The universal schema is a set of **normalized field names** that represent busin
 ### How it Enables Scale
 
 **With universal schema:**
-```typescript
+\`\`\`typescript
 // Signal definition (universal)
 {
   signalId: "pipeline_value",
@@ -61,10 +61,10 @@ The universal schema is a set of **normalized field names** that represent busin
 // HubSpot: "amount" → deal_value
 // Salesforce: "Amount" → deal_value
 // Custom spreadsheet: "Revenue" → deal_value
-```
+\`\`\`
 
 **Without universal schema:**
-```typescript
+\`\`\`typescript
 // Would need tool-specific signal definitions
 {
   signalId: "pipeline_value_zoho",
@@ -75,18 +75,18 @@ The universal schema is a set of **normalized field names** that represent busin
   calcSpec: { valueField: "amount", filters: [{ field: "dealstage", ... }] }
 }
 // ← Every signal needs 3+ versions. Unmaintainable.
-```
+\`\`\`
 
 ### How It Works in Practice
 
 **Layer 1: Tool-specific raw data**
-```csv
+\`\`\`csv
 Amount,Stage,Closing Date,Deal Owner Name
 AUD 54000.00,Closed Won,11-Oct-2025,Surge Singh
-```
+\`\`\`
 
 **Layer 2: FIELD_ALIASES mapping (automatic)**
-```typescript
+\`\`\`typescript
 FIELD_ALIASES = {
   deal_value: ["amount", "deal amount", "revenue", "deal value", "value", "total value"],
   stage: ["stage", "dealstage", "deal stage", "status", "opportunity stage"],
@@ -97,23 +97,23 @@ FIELD_ALIASES = {
 // System searches for "Amount" in all aliases
 // Finds "amount" in deal_value aliases
 // Maps: "Amount" → deal_value
-```
+\`\`\`
 
 **Layer 3: Normalized data (what the calc engine sees)**
-```json
+\`\`\`json
 {
   "deal_value": 54000.00,
   "stage": "closed won",
   "close_date": "2025-10-11",
   "owner": "Surge Singh"
 }
-```
+\`\`\`
 
 **Layer 4: Calculation (universal, works for any tool)**
-```typescript
+\`\`\`typescript
 // SUM(deal_value) WHERE stage NOT IN ["closed won", "closed lost"]
 // This formula never changes regardless of source tool
-```
+\`\`\`
 
 ### Why This Matters for Scale
 

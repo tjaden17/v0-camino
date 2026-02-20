@@ -45,7 +45,7 @@ Why this shape? Unit tests are fast and stable - they rarely fail due to unrelat
 
 Let's start with unit tests because they're the easiest to understand and write. A unit test for a pure function looks like this:
 
-```typescript
+\`\`\`typescript
 import { describe, it, expect } from 'vitest'
 import { calculateWinRate } from '@/lib/signal-calculation-service'
 
@@ -85,7 +85,7 @@ describe('calculateWinRate', () => {
     expect(result).toBe(100)
   })
 })
-```
+\`\`\`
 
 Let's break down the structure:
 
@@ -99,10 +99,10 @@ The pattern is: Arrange (set up test data), Act (call the function), Assert (che
 
 To run this test, you'd use Vitest (a testing framework):
 
-```bash
+\`\`\`bash
 npm install --save-dev vitest
 npm run test
-```
+\`\`\`
 
 If the function works, you see green checkmarks. If it fails, you see exactly which assertion failed and why.
 
@@ -110,7 +110,7 @@ If the function works, you see green checkmarks. If it fails, you see exactly wh
 
 Let's write a real test for your codebase. Create `lib/__tests__/parse-number.test.ts`:
 
-```typescript
+\`\`\`typescript
 import { describe, it, expect } from 'vitest'
 
 // Function to test
@@ -151,7 +151,7 @@ describe('parseNumber', () => {
     expect(parseNumber(undefined)).toBeNull()
   })
 })
-```
+\`\`\`
 
 Run this test with `npm run test` and you'll see if your `parseNumber` function handles all these cases. If a test fails, you know exactly which case broke.
 
@@ -163,7 +163,7 @@ Integration tests are more realistic - they test how components work together. F
 
 Here's an integration test for your upload discover endpoint:
 
-```typescript
+\`\`\`typescript
 import { describe, it, expect } from 'vitest'
 import { POST } from '@/app/api/upload/discover/route'
 
@@ -210,7 +210,7 @@ Deal 3,AUD 2000,closed won,2024-02-01`
     expect(response.status).toBe(400)
   })
 })
-```
+\`\`\`
 
 Integration tests are slower because they touch the database and file system. But they catch bugs that unit tests miss - like forgetting to await a promise, or passing data in the wrong format between functions.
 
@@ -220,7 +220,7 @@ The best way to prevent errors is to validate data at the boundaries of your sys
 
 Zod is a TypeScript schema validation library. You define the shape of your data, and Zod checks that incoming data matches:
 
-```typescript
+\`\`\`typescript
 import { z } from 'zod'
 
 const SignalSchema = z.object({
@@ -239,29 +239,29 @@ function createSignal(data: unknown): Signal {
   const validated = SignalSchema.parse(data)
   return validated
 }
-```
+\`\`\`
 
 If the data doesn't match, Zod throws an error with details about what's wrong:
 
-```typescript
+\`\`\`typescript
 createSignal({ name: '', value: -5 })
 // Error: name must be at least 1 character, value must be positive
-```
+\`\`\`
 
 You can also use `safeParse` for non-throwing validation:
 
-```typescript
+\`\`\`typescript
 const result = SignalSchema.safeParse(data)
 if (result.success) {
   const signal = result.data
 } else {
   console.error("Validation errors:", result.error.errors)
 }
-```
+\`\`\`
 
 Let's add Zod validation to your upload endpoint:
 
-```typescript
+\`\`\`typescript
 import { z } from 'zod'
 
 const UploadQuestionsSchema = z.object({
@@ -291,7 +291,7 @@ export async function POST(request: Request) {
     // Handle error
   }
 }
-```
+\`\`\`
 
 This guarantees that by the time you use `rowType`, it exists and isn't empty. No more "cannot read property of undefined" errors from bad input.
 
@@ -301,7 +301,7 @@ Zod schemas also serve as documentation - you can see exactly what shape the API
 
 You can also use Zod to validate CSV structure. Before processing uploaded data, check that it has the expected columns:
 
-```typescript
+\`\`\`typescript
 const CSVRowSchema = z.object({
   'Deal Name': z.string(),
   'Amount': z.string(), // Will be parsed to number later
@@ -323,7 +323,7 @@ function validateCSVStructure(rows: unknown[]) {
   
   return true
 }
-```
+\`\`\`
 
 Now when a user uploads a CSV without an Amount column, they get a helpful error immediately instead of a confusing failure during calculation.
 
@@ -375,40 +375,40 @@ Test each item after every significant change. Once you have automated tests cov
 **Mistake 1: Testing implementation instead of behavior**
 
 Bad:
-```typescript
+\`\`\`typescript
 it('calls calculateSum with the right arguments', () => {
   const spy = vi.spyOn(utils, 'calculateSum')
   processSignals(data)
   expect(spy).toHaveBeenCalledWith([1, 2, 3])
 })
-```
+\`\`\`
 
 Good:
-```typescript
+\`\`\`typescript
 it('returns correct sum of signal values', () => {
   const result = processSignals(data)
   expect(result.totalValue).toBe(6)
 })
-```
+\`\`\`
 
 The first test checks how the code works (internal implementation). If you refactor to use a different function, it breaks. The second checks what the code does (external behavior). Refactoring doesn't break it as long as the behavior stays the same.
 
 **Mistake 2: Testing too much in one test**
 
 Bad:
-```typescript
+\`\`\`typescript
 it('handles the entire upload flow', () => {
   // 50 lines testing upload, discovery, calculation, display
 })
-```
+\`\`\`
 
 Good:
-```typescript
+\`\`\`typescript
 it('parses uploaded CSV')
 it('discovers signals from parsed data')
 it('calculates signal values')
 it('stores signals in database')
-```
+\`\`\`
 
 One concept per test. When a test fails, you should immediately know what broke.
 
@@ -426,13 +426,13 @@ Most bugs happen at the edges: empty arrays, null values, very large numbers, bo
 **Mistake 4: Brittle tests that break on unrelated changes**
 
 Avoid hardcoding values that might change:
-```typescript
+\`\`\`typescript
 // Brittle
 expect(signal.name).toBe("Total deals")
 
 // Better
 expect(signal.name).toMatch(/deals/i)
-```
+\`\`\`
 
 The first breaks if you change the exact wording. The second checks the intent (signal name relates to deals).
 
@@ -463,22 +463,22 @@ Start with high priority. Write tests for your signal calculation logic, your CS
 To add testing to Camino:
 
 1. Install Vitest:
-```bash
+\`\`\`bash
 npm install --save-dev vitest @vitest/ui
-```
+\`\`\`
 
 2. Add test script to `package.json`:
-```json
+\`\`\`json
 {
   "scripts": {
     "test": "vitest",
     "test:ui": "vitest --ui"
   }
 }
-```
+\`\`\`
 
 3. Create `vitest.config.ts`:
-```typescript
+\`\`\`typescript
 import { defineConfig } from 'vitest/config'
 import path from 'path'
 
@@ -492,7 +492,7 @@ export default defineConfig({
     },
   },
 })
-```
+\`\`\`
 
 4. Write your first test in `lib/__tests__/parse-number.test.ts`
 

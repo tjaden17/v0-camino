@@ -90,14 +90,14 @@ BUILD SEQUENCE I'D RECOMMEND:
 TECHNICAL ARCHITECTURE:
 
 Your current upload flow:
-```
+\`\`\`
 CSV upload → parse → normalize via FIELD_ALIASES → store → calculate signals
-```
+\`\`\`
 
 API integration flow (same downstream):
-```
+\`\`\`
 API pull → parse JSON → normalize via FIELD_ALIASES → store → calculate signals
-```
+\`\`\`
 
 The key insight: everything after "normalize" is identical. The signal calculation engine doesn't know or care whether the data came from CSV or API. You've already built 80% of what you need. The API integration is just a different data ingestion path that feeds into the same pipeline.
 
@@ -177,7 +177,7 @@ You've already built this:
 This means: once you fetch data from an API, you just need to map the JSON keys to the same normalized fields, and the rest of the system works unchanged.
 
 EXAMPLE - Zoho CRM Deals API Response:
-```json
+\`\`\`json
 {
   "data": [
     {
@@ -189,17 +189,17 @@ EXAMPLE - Zoho CRM Deals API Response:
     }
   ]
 }
-```
+\`\`\`
 
 Your normalization step:
-```typescript
+\`\`\`typescript
 const normalized = {
   deal_value: record.Amount,
   stage: record.Stage,
   close_date: record.Closing_Date,
   owner: record.Owner.name
 }
-```
+\`\`\`
 
 That's it. The same `calculateSignal` function that works on CSV rows works on these normalized records.
 
@@ -234,7 +234,7 @@ IMPLEMENTATION SEQUENCE:
 STORING API CREDENTIALS:
 
 You'll need an `integrations` table:
-```sql
+\`\`\`sql
 CREATE TABLE integrations (
   id UUID PRIMARY KEY,
   org_id UUID REFERENCES orgs(id),
@@ -246,7 +246,7 @@ CREATE TABLE integrations (
   sync_status TEXT, -- 'pending', 'syncing', 'success', 'error'
   created_at TIMESTAMP DEFAULT NOW()
 );
-```
+\`\`\`
 
 Store the OAuth tokens here after the OAuth callback completes.
 

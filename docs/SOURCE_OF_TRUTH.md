@@ -51,7 +51,7 @@ These two documents are the definitive source for what we're building and when:
 
 **Roadmap → Sprint → Code**
 
-```
+\`\`\`
 Plan: CAMINO Roadmap (Final)
     ↓
 Defines Goal 1: Will Surge pay by Mar 14?
@@ -63,7 +63,7 @@ Do: Weekly Sprint Plan + AC
 3-5 user stories with acceptance criteria
     ↓
 Code implementation (what you're building now)
-```
+\`\`\`
 
 ---
 

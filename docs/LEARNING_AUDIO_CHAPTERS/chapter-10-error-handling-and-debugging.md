@@ -29,7 +29,7 @@ The goal is to turn as many unexpected errors into expected errors as you gain e
 
 The fundamental error handling pattern in JavaScript and TypeScript is try/catch. Here's the basic structure:
 
-```typescript
+\`\`\`typescript
 try {
   // Code that might throw an error
   const result = await riskyOperation()
@@ -39,13 +39,13 @@ try {
   console.error("Operation failed:", error)
   return null
 }
-```
+\`\`\`
 
 Let's break this down. The `try` block contains code that might fail. If any line inside throws an error, execution immediately jumps to the `catch` block. The `catch` block receives the error object and decides what to do with it.
 
 In TypeScript, the caught error is typed as `unknown` by default, so you need to narrow it to use it safely:
 
-```typescript
+\`\`\`typescript
 catch (error) {
   if (error instanceof Error) {
     console.error("Error message:", error.message)
@@ -54,11 +54,11 @@ catch (error) {
     console.error("Unknown error:", error)
   }
 }
-```
+\`\`\`
 
 This pattern is everywhere in your Camino codebase. Let's look at a real example from your upload API:
 
-```typescript
+\`\`\`typescript
 try {
   const parsedData = await parseCSV(file)
   const signals = await discoverSignals(parsedData)
@@ -70,7 +70,7 @@ try {
     { status: 500 }
   )
 }
-```
+\`\`\`
 
 Notice what this does: attempts the operation, logs any error, and returns a proper HTTP error response. The user sees "Failed to process upload" - not helpful yet, but better than a crash.
 
@@ -98,7 +98,7 @@ Here's how to write helpful error messages:
 
 Let's rewrite that upload error handler:
 
-```typescript
+\`\`\`typescript
 catch (error) {
   console.error("[Upload API] Error:", error)
   
@@ -125,7 +125,7 @@ catch (error) {
     details: "Our team has been notified. Please try again or contact support."
   }, { status: 500 })
 }
-```
+\`\`\`
 
 Notice the HTTP status codes: 400 for client errors (bad input), 500 for server errors (our fault). This distinction helps with debugging.
 
@@ -137,7 +137,7 @@ React components can throw errors. Maybe you tried to render `signal.name` but `
 
 In your app, create `app/error.tsx`:
 
-```typescript
+\`\`\`typescript
 'use client'
 
 export default function Error({
@@ -160,7 +160,7 @@ export default function Error({
     </div>
   )
 }
-```
+\`\`\`
 
 Now if any component on any page throws an error, React shows this fallback UI instead of crashing. The `reset` function lets users try again - it re-renders the component tree.
 
@@ -168,7 +168,7 @@ You can add `error.tsx` at any level of your route structure. For example, `app/
 
 For loading states, Next.js also supports `loading.tsx`:
 
-```typescript
+\`\`\`typescript
 export default function Loading() {
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -176,7 +176,7 @@ export default function Loading() {
     </div>
   )
 }
-```
+\`\`\`
 
 This shows while the page is fetching data. Combined with `error.tsx`, you have loading, success, and error states covered.
 
@@ -184,16 +184,16 @@ This shows while the page is fetching data. Combined with `error.tsx`, you have 
 
 Supabase queries use a pattern that makes error handling explicit:
 
-```typescript
+\`\`\`typescript
 const { data, error } = await supabase
   .from('signals')
   .select('*')
   .eq('user_id', userId)
-```
+\`\`\`
 
 Instead of throwing errors, Supabase returns an object with two properties: `data` (the results) or `error` (what went wrong). You check which one is present:
 
-```typescript
+\`\`\`typescript
 if (error) {
   console.error("Database error:", error.message)
   return { error: "Failed to load signals" }
@@ -201,13 +201,13 @@ if (error) {
 
 // data is guaranteed to exist here
 const signals = data
-```
+\`\`\`
 
 This pattern forces you to handle errors explicitly. You can't forget - if you don't check for `error`, TypeScript yells at you when you try to use `data` (which might be null).
 
 Compare this to throwing errors:
 
-```typescript
+\`\`\`typescript
 // With throwing (implicit)
 try {
   const signals = await getSignals(userId)
@@ -222,7 +222,7 @@ if (error) {
   // Must handle immediately
 }
 // Use signals
-```
+\`\`\`
 
 The explicit pattern is safer because you can't forget. It's also easier to read - you see the error handling right where the call is made.
 
@@ -233,13 +233,13 @@ Logging is how you understand what your app is doing in production. But `console
 **Structured logging** means logging with consistent format and useful context. Here's the difference:
 
 Bad:
-```typescript
+\`\`\`typescript
 console.log("error")
 console.log(error)
-```
+\`\`\`
 
 Good:
-```typescript
+\`\`\`typescript
 console.error("[Upload API] Failed to parse CSV", {
   userId,
   fileName: file.name,
@@ -247,7 +247,7 @@ console.error("[Upload API] Failed to parse CSV", {
   error: error.message,
   timestamp: new Date().toISOString()
 })
-```
+\`\`\`
 
 The structured log tells you what operation failed, who triggered it, what file they uploaded, and when. With the bad log, you'd have no idea.
 
@@ -289,10 +289,10 @@ Symptoms: Error says "Cannot read property 'name' of undefined"
 Diagnosis: The data hasn't loaded yet or wasn't found.
 
 Fix: Add a loading state or null check:
-```typescript
+\`\`\`typescript
 if (!signal) return <div>Loading...</div>
 {signal?.name}
-```
+\`\`\`
 
 **Race conditions:** Two async operations happening at once with unexpected interaction.
 
@@ -354,7 +354,7 @@ When you encounter a bug, follow this systematic approach:
 
 Let's apply all this to your upload pipeline. Currently, if any step fails, the user sees a generic error. Let's make it better:
 
-```typescript
+\`\`\`typescript
 // app/api/upload/generate/route.ts
 export async function POST(request: Request) {
   try {
@@ -422,7 +422,7 @@ export async function POST(request: Request) {
     )
   }
 }
-```
+\`\`\`
 
 Notice how this handles different error scenarios with specific messages, logs context for debugging, and uses appropriate HTTP status codes.
 

@@ -238,14 +238,14 @@ ACCEPTANCE CRITERIA
 
 5. FILTER APPLIED BEFORE SIGNAL CALCULATION
    ✓ In /app/api/upload/generate/route.ts, before calculateSignal() is called:
-     ```
+     \`\`\`
      if (tab.name.toLowerCase().includes('ticket')) {
        const originalCount = rows.length
        rows = rows.filter(ticket => !isNonRealTicket(ticket, rows))
        const filteredCount = originalCount - rows.length
        console.log(`[v0] Filtered ${filteredCount} non-real tickets`)
      }
-     ```
+     \`\`\`
    ✓ Filtered rows never reach signal calculations
 
 6. LOCUMATE DATA TEST CASES
@@ -267,7 +267,7 @@ ACCEPTANCE CRITERIA
 
 7. METADATA LOGGING
    ✓ After filtering, store in metadata:
-     ```
+     \`\`\`
      metadata.ticketsFiltered = filteredCount
      metadata.ticketsTotal = originalCount
      metadata.filterReasons = [
@@ -275,7 +275,7 @@ ACCEPTANCE CRITERIA
        { reason: "bulk_creation", count: 21 },
        { reason: "instant_close_zero_threads", count: 0 }
      ]
-     ```
+     \`\`\`
    ✓ This data shown to admin during verification
 
 8. ADMIN VERIFICATION SCREEN

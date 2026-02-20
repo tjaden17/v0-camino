@@ -76,7 +76,7 @@ Alright, let's assess what exists vs what's needed.
 
 If I were to build a self-service lead magnet, here's the architecture:
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Public Route: /try (no auth required)                  │
 │  - Upload CSV files                                     │
@@ -120,7 +120,7 @@ If I were to build a self-service lead magnet, here's the architecture:
 │  - Add to CRM / email list                             │
 │  - Redirect to /try/results/[session_id]              │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ### Time estimate to build
 
@@ -206,7 +206,7 @@ Let me think through what the lead magnet flow would look like.
 
 ### Ideal flow (5 minutes to value)
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────┐
 │  Step 1: Landing (15 seconds)                           │
 │  "See your business metrics in 5 minutes"              │
@@ -254,7 +254,7 @@ Let me think through what the lead magnet flow would look like.
 │  Promise: "We'll send you a PDF and check back monthly"│
 │  Or: "Want to track this over time? Sign up."         │
 └─────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 **Total time: 5 minutes from landing to results**
 

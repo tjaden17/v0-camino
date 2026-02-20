@@ -300,7 +300,7 @@ This document defines the AI expert personas you can call on for specialized adv
 
 **When you need expert advice, use this format:**
 
-```
+\`\`\`
 @[Expert Role]: [Your question or scenario]
 
 Context:
@@ -312,20 +312,20 @@ Looking for:
 - Recommendations
 - Best practices
 - Potential issues to avoid
-```
+\`\`\`
 
 ### Multi-Expert Consultation
 
 For complex decisions, consult multiple experts:
 
-```
+\`\`\`
 I'm implementing user authentication for the Camino app.
 
 @Head of Tech: What's the most scalable architecture?
 @Security Engineer: What security measures are essential?
 @Product Manager: What auth features do users expect?
 @UX Designer: How should the login flow work?
-```
+\`\`\`
 
 ---
 

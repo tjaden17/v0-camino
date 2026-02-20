@@ -32,7 +32,7 @@ Your app's performance bottleneck is likely database queries. Supabase is fast, 
 
 **EXPLAIN ANALYZE** is your best debugging tool. It shows you exactly how PostgreSQL executes a query and how long each part takes. Run it in the Supabase SQL Editor:
 
-```sql
+\`\`\`sql
 EXPLAIN ANALYZE
 SELECT s.*, COUNT(dp.id) as data_point_count
 FROM signals s
@@ -40,7 +40,7 @@ LEFT JOIN data_points dp ON dp.signal_id = s.id
 WHERE s.user_id = '123e4567-e89b-12d3-a456-426614174000'
 GROUP BY s.id
 ORDER BY s.created_at DESC;
-```
+\`\`\`
 
 The output shows:
 
@@ -51,9 +51,9 @@ The output shows:
 If you see "Seq Scan" on a large table, you need an index. An index is like a book's index - instead of reading every page to find "signals," you look it up in the index which tells you exactly which pages to read.
 
 Create an index:
-```sql
+\`\`\`sql
 CREATE INDEX idx_signals_user_id ON signals(user_id);
-```
+\`\`\`
 
 Now queries filtering by `user_id` use the index and run 10-100x faster.
 
@@ -63,7 +63,7 @@ Your Camino database already has indexes on common filter columns. Check your mi
 
 This is the most common performance bug in web apps. Here's how it happens:
 
-```typescript
+\`\`\`typescript
 // Load all signals for a user
 const { data: signals } = await supabase
   .from('signals')
@@ -78,13 +78,13 @@ for (const signal of signals) {
     .eq('signal_id', signal.id)
   signal.dataPoints = dataPoints
 }
-```
+\`\`\`
 
 If you have 20 signals, this makes 21 queries: 1 for signals, then 20 more for data points. That's the "N+1" - one initial query plus N additional queries in a loop.
 
 The fix: load everything in one query with a join:
 
-```typescript
+\`\`\`typescript
 const { data: signals } = await supabase
   .from('signals')
   .select(`
@@ -92,7 +92,7 @@ const { data: signals } = await supabase
     data_points (*)
   `)
   .eq('user_id', userId)
-```
+\`\`\`
 
 Supabase automatically performs the join and nests the data_points array inside each signal. One query instead of 21.
 
@@ -116,7 +116,7 @@ Here's when to cache:
 
 Your caching strategy for interpretations:
 
-```typescript
+\`\`\`typescript
 // Check if interpretation exists
 const { data: cached } = await supabase
   .from('signal_interpretations')
@@ -137,7 +137,7 @@ await supabase
   .upsert({ signal_id: signalId, ...interpretation })
 
 return interpretation
-```
+\`\`\`
 
 This pattern: check cache, return if found, otherwise compute and save. Simple and effective.
 
@@ -149,7 +149,7 @@ Your app is currently lightweight - mostly text and simple UI. But if you add im
 
 **Next.js Image Component** automatically optimizes images:
 
-```typescript
+\`\`\`typescript
 import Image from 'next/image'
 
 <Image
@@ -159,7 +159,7 @@ import Image from 'next/image'
   height={50}
   priority // Load immediately for above-the-fold images
 />
-```
+\`\`\`
 
 This automatically:
 - Resizes images to the exact size needed
@@ -175,7 +175,7 @@ For charts and data visualizations, consider server-side rendering. Generate the
 
 Your signals page might eventually show hundreds of signals. Loading and rendering them all at once is slow and wasteful. Instead, use lazy loading:
 
-```typescript
+\`\`\`typescript
 import { Suspense, lazy } from 'react'
 
 const SignalCard = lazy(() => import('@/components/signal-card'))
@@ -191,7 +191,7 @@ export function SignalsList({ signals }) {
     </div>
   )
 }
-```
+\`\`\`
 
 Or use virtual scrolling with a library like `react-virtual` to only render signals visible in the viewport. If you have 500 signals but only 10 fit on screen, why render 490 that the user can't see?
 
@@ -202,17 +202,17 @@ For now, your signal list is small enough that this doesn't matter. But keep it 
 Every JavaScript file you import increases your bundle size - the amount of code the browser downloads. Larger bundles = slower page loads.
 
 Check your bundle size:
-```bash
+\`\`\`bash
 npm run build
-```
+\`\`\`
 
 Look for the output:
-```
+\`\`\`
 Route (app)                Size     First Load JS
 ┌ ○ /                      1.2 kB    85 kB
 ├ ○ /signals               5.4 kB    120 kB
 └ ○ /upload                3.8 kB    95 kB
-```
+\`\`\`
 
 "First Load JS" is what users download on first visit. Aim to keep this under 200 kB for fast loading.
 
@@ -233,7 +233,7 @@ This is your primary defense. RLS is a PostgreSQL feature that enforces access c
 
 Your RLS policies look like this:
 
-```sql
+\`\`\`sql
 -- Users can only read their own signals
 CREATE POLICY "Users can read own signals"
   ON signals FOR SELECT
@@ -243,7 +243,7 @@ CREATE POLICY "Users can read own signals"
 CREATE POLICY "Users can insert own signals"
   ON signals FOR INSERT
   WITH CHECK (auth.uid() = user_id);
-```
+\`\`\`
 
 `USING` controls which rows are visible (SELECT). `WITH CHECK` controls which rows can be inserted/updated.
 
@@ -257,7 +257,7 @@ Check your RLS policies in the Supabase dashboard under "Authentication" > "Poli
 
 Never trust user input. Always validate with Zod before using it:
 
-```typescript
+\`\`\`typescript
 const UploadSchema = z.object({
   file: z.instanceof(File),
   rowType: z.enum(['deals', 'leads', 'tickets']),
@@ -267,7 +267,7 @@ const result = UploadSchema.safeParse(input)
 if (!result.success) {
   return { error: "Invalid input" }
 }
-```
+\`\`\`
 
 This prevents SQL injection, script injection, and other attacks where malicious input exploits your code.
 
@@ -275,20 +275,20 @@ This prevents SQL injection, script injection, and other attacks where malicious
 
 SQL injection happens when user input is concatenated into SQL:
 
-```typescript
+\`\`\`typescript
 // DANGEROUS - user could input "'; DROP TABLE signals; --"
 const query = `SELECT * FROM signals WHERE name = '${userInput}'`
-```
+\`\`\`
 
 The solution: parameterized queries. Supabase does this automatically:
 
-```typescript
+\`\`\`typescript
 // SAFE - userInput is escaped properly
 const { data } = await supabase
   .from('signals')
   .select('*')
   .eq('name', userInput)
-```
+\`\`\`
 
 Never construct SQL strings with user input. Always use the query builder or parameterized queries.
 
@@ -296,7 +296,7 @@ Never construct SQL strings with user input. Always use the query builder or par
 
 Every API route that handles sensitive data should verify the user is authenticated:
 
-```typescript
+\`\`\`typescript
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
@@ -312,7 +312,7 @@ export async function GET(request: Request) {
   const signals = await getSignals(user.id)
   return Response.json({ signals })
 }
-```
+\`\`\`
 
 Don't rely on client-side checks - they can be bypassed. Always verify on the server.
 
@@ -333,9 +333,9 @@ Your app has two types of environment variables:
 The service role key has unlimited database access, bypassing RLS. If it leaks, anyone can read/modify all your data. Never import it in a "use client" file.
 
 Check your imports:
-```bash
+\`\`\`bash
 grep -r "SUPABASE_SERVICE_ROLE_KEY" components/
-```
+\`\`\`
 
 If this finds anything in client components, you have a security bug. Move that code to a server action or API route.
 
@@ -350,10 +350,10 @@ Good news: Vercel and Next.js handle many security concerns automatically.
 **XSS (Cross-Site Scripting):** React escapes all variables by default. Writing `<div>{userInput}</div>` is safe - React turns `<script>alert('xss')</script>` into the literal text, not executable code.
 
 However, be careful with `dangerouslySetInnerHTML`:
-```typescript
+\`\`\`typescript
 // DANGEROUS - don't do this with user input
 <div dangerouslySetInnerHTML={{ __html: userInput }} />
-```
+\`\`\`
 
 This bypasses React's escaping. Only use it with trusted content, or sanitize with a library like DOMPurify first.
 
@@ -361,7 +361,7 @@ This bypasses React's escaping. Only use it with trusted content, or sanitize wi
 
 Your upload endpoint should have rate limiting to prevent abuse:
 
-```typescript
+\`\`\`typescript
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 
@@ -380,7 +380,7 @@ export async function POST(request: Request) {
   
   // Process upload
 }
-```
+\`\`\`
 
 This prevents a malicious user from uploading thousands of files and overloading your server or exceeding API quotas.
 
@@ -393,12 +393,12 @@ You can't improve what you don't measure. Track these metrics:
 **Page Load Time:** How long until the page is interactive. Check in Chrome DevTools > Network tab > Disable cache > Reload. Aim for under 3 seconds on fast connections, under 10 seconds on slow connections.
 
 **API Response Time:** How long do your API routes take? Add logging:
-```typescript
+\`\`\`typescript
 const start = Date.now()
 const result = await expensiveOperation()
 const duration = Date.now() - start
 console.log(`[API] Operation took ${duration}ms`)
-```
+\`\`\`
 
 Aim for under 1 second for most endpoints, under 5 seconds for AI-heavy ones.
 
@@ -452,7 +452,7 @@ Let's apply these concepts to optimize your signals page:
 **Problem:** If user has 100 signals and expands 5, we're making 6 queries (1 for signals, 5 for interpretations).
 
 **Optimization 1:** Eager load interpretations for signals that have them:
-```typescript
+\`\`\`typescript
 const { data: signals } = await supabase
   .from('signals')
   .select(`
@@ -461,22 +461,22 @@ const { data: signals } = await supabase
   `)
   .eq('user_id', userId)
   .order('created_at', { ascending: false })
-```
+\`\`\`
 
 Now it's one query instead of 6.
 
 **Optimization 2:** Add pagination - only load 20 signals at a time:
-```typescript
+\`\`\`typescript
 const { data: signals } = await supabase
   .from('signals')
   .select('*')
   .eq('user_id', userId)
   .order('created_at', { ascending: false })
   .range(0, 19) // First 20
-```
+\`\`\`
 
 **Optimization 3:** Cache the query on the client - if user goes to another page and comes back, don't refetch:
-```typescript
+\`\`\`typescript
 import useSWR from 'swr'
 
 const { data: signals } = useSWR(
@@ -484,7 +484,7 @@ const { data: signals } = useSWR(
   () => fetchSignals(),
   { revalidateOnFocus: false }
 )
-```
+\`\`\`
 
 SWR caches in memory and only refetches when you explicitly invalidate.
 
