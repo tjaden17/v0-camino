@@ -1,246 +1,73 @@
-CAMINO PUBLIC ROADMAP
-User Problems We're Solving
-
+CAMINO PUBLIC ROADMAP — User Problems We're Solving
 Last Updated: February 22, 2026
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INSTRUCTIONS FOR GOOGLE DOCS:
+1. Copy the table below (from "Status" through the last row)
+2. In Google Docs: Table → Insert table from clipboard
+3. Format: Make header row bold, add alternating row colors for readability
+4. Adjust column widths as needed
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-
-ABOUT THIS ROADMAP
-
-This roadmap shows the real problems we're solving for business leaders, not a list of features. We organize by status (Live, Building, Researching, Backlog) rather than dates, because your feedback shapes our priorities.
-
-Want to influence what we build? Email us at feedback@camino.app
+MAIN ROADMAP TABLE
 
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-🟢 LIVE — Available Now
-
-These problems are solved. You can use these features today.
-
-
-Problem 1: "I spend hours every week pulling reports from different tools"
-
-The Pain:
-You manually export CSVs from Zoho, HubSpot, or other tools every week. It's repetitive busywork that takes time away from actually running your business.
-
-What We Built:
-Upload your data once, and Camino instantly analyzes it. No more manual exports every week—just upload when you have new data, and we'll show you what matters.
-
-Status: Live ✓
-
-
-Problem 2: "I see numbers but don't know what they mean for my business"
-
-The Pain:
-Your tools show you raw metrics—"143 open tickets" or "$47K pipeline"—but they don't explain if that's good, bad, or what to do about it.
-
-What We Built:
-AI-powered interpretations that explain what each number means for YOUR role and goals. No more guessing—Camino tells you if a metric is healthy, concerning, or critical, and why.
-
-Status: Live ✓
-
-
-Problem 3: "My team wastes time in meetings trying to understand the same data"
-
-The Pain:
-Everyone interprets metrics differently. Your sales manager sees "pipeline growing" while you see "close rates dropping." Meetings turn into debates about what the numbers mean.
-
-What We Built:
-Role-based views so each person sees metrics that matter to them. Executives see high-level trends, managers see team performance, and everyone's looking at the same truth.
-
-Status: Live ✓
+Status	Problem Statement	The Pain	Our Solution	Timeline
+LIVE	"I spend hours every week pulling reports from different tools"	Manually exporting CSVs from Zoho, HubSpot, Salesforce. Copy-pasting into spreadsheets. By the time you're done, the insights are stale.	Upload once, see signals immediately. Camino automatically maps your columns, calculates key metrics, and surfaces what matters. No more manual data wrangling.	Available now
+LIVE	"I see numbers but don't know what they mean for my business"	Raw metrics without context. "Pipeline value is $2.3M" — is that good? Compared to what? What should I do about it?	AI explains what each signal means for YOUR role and goals. "Pipeline is 15% below target and trending down. This impacts Q1 revenue forecasts."	Available now
+LIVE	"My team wastes time in meetings trying to understand the same data"	Sales sees pipeline, CS sees tickets, executives want both connected. Everyone interprets metrics differently. Meetings become data debates.	Role-based views. Executives see high-level signals, managers see their team's metrics, reps see their individual performance. Everyone looking at the same truth.	Available now
+BUILDING	"I have to manually re-upload data every month"	You solved the problem once by uploading a CSV. Next month, you do it all over again. Manual, repetitive work that should be automated.	API integration with Zoho, HubSpot, Salesforce. Connect once, data syncs automatically. Set it and forget it.	March 2026
+BUILDING	"The data has errors and inconsistencies I have to clean manually"	Duplicate records, test accounts, automated tickets, bad formatting. You can't trust the numbers without hours of cleaning.	Smart filtering removes noise automatically. Learns what's signal vs noise in your data. One-click cleanup that gets smarter over time.	March 2026
+BUILDING	"I don't know if my metrics are getting better or worse"	Point-in-time numbers with no trend context. "21 open tickets" — is that up or down? Improving or deteriorating?	Period-over-period comparisons (vs last week/month/quarter). Trend indicators show direction and velocity. Catch problems early.	March 2026
+RESEARCHING	"I use multiple tools and can't see the full picture"	Deals in HubSpot, tickets in Zendesk, revenue in Stripe. Each tool shows part of the story. You manually connect the dots in your head.	Cross-source signals that connect the dots automatically. See how sales affects support, support affects retention, retention affects revenue.	Mid 2026
+RESEARCHING	"I want custom metrics specific to my business"	Standard reports don't match how you measure success. Your KPIs are unique to your business model.	Flexible signal builder for your unique KPIs. Define custom formulas, thresholds, and interpretations that match your business.	Mid-Late 2026
+RESEARCHING	"My data changes constantly and insights get stale"	By the time you analyze data, it's outdated. Business moves faster than your reporting cycle.	Daily/weekly automated updates. Fresh signals delivered on your schedule. Always working from current data.	Late 2026
+BACKLOG	"I need to share insights with my board/investors"	Manual screenshot and email process. No control over what they see or when.	Shareable reports and scheduled digests. Automated delivery on your timeline.	TBD
+BACKLOG	"I want to benchmark against similar companies"	Don't know if your metrics are good or bad in context. No comparison point.	Anonymous peer benchmarks from our customer base. See how you compare to similar businesses.	TBD
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+WHAT WE WON'T BUILD (OPTIONAL SECOND TABLE)
 
-🟡 BUILDING — In Progress
-
-We're actively building these solutions. They'll be available in the next 1-3 months.
-
-
-Problem 4: "I have to manually re-upload data every month"
-
-The Pain:
-Once you've uploaded your data, you need to do it again next month. And the month after. Manual uploads become a recurring tax on your time.
-
-What We're Building:
-Direct API integration with Zoho, HubSpot, and other tools for automatic data sync. Set it once, and Camino automatically updates with your latest data—daily, weekly, or monthly.
-
-Why This Matters:
-Your insights stay current without any manual work. No more stale data or forgotten uploads.
-
-Target: Goal 1 (March 2026)
-
-
-Problem 5: "The data has errors and inconsistencies I have to clean manually"
-
-The Pain:
-Duplicate records, automated system tickets mixed with customer issues, test data polluting your metrics. You spend time cleaning data before you can trust it.
-
-What We're Building:
-Smart filtering that automatically removes noise—duplicates, automated tickets, test records. Camino learns what's signal and what's noise for your business.
-
-Why This Matters:
-Trustworthy metrics from day one. No manual cleanup required.
-
-Target: Goal 1 (March 2026)
-
-
-Problem 6: "I don't know if my metrics are getting better or worse"
-
-The Pain:
-Point-in-time numbers don't tell you the story. "143 tickets" means nothing without knowing if that's up, down, or stable compared to last week.
-
-What We're Building:
-Period-over-period comparisons built into every signal. See this week vs last week, this month vs last month, this quarter vs last quarter—automatically.
-
-Why This Matters:
-Understand trends at a glance. Know if things are improving, declining, or stable without building spreadsheets.
-
-Target: Goal 1 (March 2026)
-
+Focus Area	What We Won't Do	Why
+Visualization	Complex dashboards with 20+ charts, Tableau/Power BI features	We focus on "what does this mean?" not "how many ways can we show it?"
+Target User	SQL query builders, data warehouse connectors, complex ETL pipelines	We serve small business operators, not data analysts. Keep it simple enough for a CEO to use without training.
+Philosophy	Show everything, 80+ generic metrics	We'd rather have 8 perfect signals than 80 mediocre ones. We curate what matters.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+KEY INFORMATION (TEXT SECTIONS)
 
-🔵 RESEARCHING — Validating with Customers
+How We Prioritize:
+• Customer feedback drives priorities — If 5 customers need Problem 7 before Problem 6, we adapt
+• We validate before building — Problems move from Backlog → Research → Building only after customer validation
+• Transparency matters — We update this quarterly and explain why priorities shifted
 
-We're exploring these problems with early customers. Build timing depends on your feedback.
+Your Voice Matters:
+Email feedback@camino.app to influence what we build next. We read every message and many features above came from customer conversations.
 
-
-Problem 7: "I use multiple tools and can't see the full picture"
-
-The Pain:
-Deals in HubSpot, tickets in Zendesk, revenue in Stripe. You need to mentally connect the dots across tools to understand what's really happening.
-
-What We're Exploring:
-Cross-source signals that automatically connect related data. See how support tickets correlate with deal closures, or how customer health impacts revenue—without manual analysis.
-
-Why This Matters:
-Understand cause and effect across your entire business, not just within one tool.
-
-Research Phase: Goals 2-3 (April-June 2026)
-
-
-Problem 8: "I want custom metrics specific to my business"
-
-The Pain:
-Standard reports don't match how you measure success. You have unique KPIs that matter to your industry or business model.
-
-What We're Exploring:
-Flexible signal builder that lets you define custom metrics using your data. Track what matters to YOU, not just what's pre-built.
-
-Why This Matters:
-Every business measures success differently. Generic dashboards force you into someone else's framework.
-
-Research Phase: Goals 2-3 (April-June 2026)
-
-
-Problem 9: "My data changes constantly and insights get stale"
-
-The Pain:
-By the time you analyze data and make a decision, it's outdated. You're always looking at last week's or last month's picture.
-
-What We're Exploring:
-Daily or weekly automated updates so your insights are always current. No more analyzing stale data.
-
-Why This Matters:
-Make decisions based on what's happening now, not what happened two weeks ago.
-
-Research Phase: Goals 2-3 (April-June 2026)
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-⚪ BACKLOG — Considering for Future
-
-These are problems we hear about but haven't prioritized yet. Your feedback helps us decide what to build next.
-
-
-Problem 10: "I need to share insights with my board or investors"
-
-The Pain:
-You screenshot dashboards, paste into slides, and email manually. Updating your board deck is busywork.
-
-Potential Solution:
-Shareable reports with scheduled delivery. Generate a board-ready view and have it automatically emailed to stakeholders weekly or monthly.
-
-Status: Evaluating demand
-
-
-Problem 11: "I want to benchmark against similar companies"
-
-The Pain:
-You don't know if your metrics are good or bad compared to other businesses like yours. Is 8% churn high? Is 23% close rate competitive?
-
-Potential Solution:
-Anonymous peer benchmarks from our customer base (with your permission). See how your performance compares to similar-sized businesses in your industry.
-
-Status: Evaluating demand
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-HOW WE PRIORITIZE
-
-We build based on three factors:
-
-1. Customer Impact — Does this solve a painful problem for multiple customers?
-2. Technical Feasibility — Can we build this well with our current architecture?
-3. Strategic Fit — Does this move us toward our long-term vision?
-
-Your feedback directly influences what moves from Backlog → Researching → Building → Live.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-FEEDBACK & FEATURE REQUESTS
-
-See a problem we should solve? Have a use case we haven't considered?
-
-Email us: feedback@camino.app
-
-We read every message and respond to every feature request. Many of the problems above came directly from customer conversations.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-WHAT WE WON'T BUILD
-
-Some things intentionally aren't on our roadmap:
-
-❌ Complex BI tools — We're focused on executives who need quick insights, not analysts who need pivot tables.
-
-❌ Custom visualizations — Stock ticker format is proven for quick comprehension. We won't add chart builders or custom graphs.
-
-❌ Workflow automation — We show you what matters; your other tools handle the actions.
-
-Our focus: Make business data understandable for busy leaders in under 60 seconds.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-ABOUT CAMINO
-
+About Camino:
 Camino helps small business executives understand their data without becoming data analysts. Upload your exports, get instant insights in a format designed for quick daily reviews.
 
-Learn more: camino.app
-Questions: hello@camino.app
-
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+FORMATTING TIPS FOR GOOGLE DOCS:
+
+Main Table:
+1. Select the table and apply "Header row" formatting (bold, background color)
+2. Apply alternating row colors: Table properties → Cell background color → Alternating colors
+3. Suggested colors: Header (dark blue), Odd rows (light gray), Even rows (white)
+4. Add borders: Table properties → Table border (1pt solid)
+5. Adjust column widths: Status (narrow), Problem (medium), Pain (wide), Solution (wide), Timeline (narrow)
+
+Status Colors (optional):
+• LIVE rows → Light green background
+• BUILDING rows → Light yellow background  
+• RESEARCHING rows → Light blue background
+• BACKLOG rows → Light gray background
 
 Document Version: 1.0
 Last Updated: February 22, 2026
-Next Review: March 15, 2026
