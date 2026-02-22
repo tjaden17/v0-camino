@@ -1,0 +1,271 @@
+Chapter 3: Next.js App Router
+
+Duration: approximately 15 minutes
+Topic: File-based routing, server versus client components, and how your app structure maps to URLs.
+
+Introduction
+
+Welcome to Week 3 of the Camino Builder learning curriculum. This week, we're focusing on Next dot js App Router, the framework that powers your application's structure and routing.
+
+Your app runs on Next dot js 16. Understanding the routing model explains why some code runs on the server and some on the client, how URLs map to files, and how authentication wrapping works. By the end of this chapter, you'll understand the app directory structure, server and client components, layouts, and API routes.
+
+The App Directory: File-Based Routing
+
+Next dot js uses file-based routing. The structure of your app directory determines your URL structure. This is different from traditional routing where you define routes in a config file. In Next dot js, creating a file creates a route.
+
+Here's how it works. A file at app slash page dot tsx creates the route at slash, your homepage. A file at app slash signals slash page dot tsx creates the route at slash signals.
+
+Folders create path segments. app slash settings slash profile slash page dot tsx creates slash settings slash profile.
+
+This is powerful because you can see your entire route structure just by looking at the file tree. No need to search through route config files.
+
+In your Camino app, you have app slash open parenthesis protected close parenthesis slash signals slash page dot tsx. The signals part creates the slash signals route. But what about open parenthesis protected close parenthesis?
+
+Route Groups: Organization Without URL Impact
+
+Folders wrapped in parentheses are route groups. They organize your files but don't affect the URL.
+
+Your app has open parenthesis protected close parenthesis as a route group. Files inside it require authentication, but the group name doesn't appear in URLs. app slash open parenthesis protected close parenthesis slash signals slash page dot tsx creates slash signals, not slash protected slash signals.
+
+Why use route groups? To share layouts. All routes inside open parenthesis protected close parenthesis share the layout at open parenthesis protected close parenthesis slash layout dot tsx. This layout checks authentication and redirects unauthenticated users.
+
+You could have multiple groups: open parenthesis marketing close parenthesis for public pages, open parenthesis dashboard close parenthesis for user pages. Each group gets its own layout and behavior.
+
+Server Components Versus Client Components
+
+This is the most important concept in Next dot js 16. By default, all components are server components. They run on the server, not in the browser.
+
+Server components can directly query the database, access environment variables, and perform expensive operations. They render to HTML on the server and send that HTML to the browser. The browser receives fully rendered content.
+
+Client components run in the browser. They handle interactivity, use hooks like use state and use effect, and respond to user events. You mark a component as a client component with quote use client quote at the top of the file.
+
+Here's the key difference. Your signals page at app slash open parenthesis protected close parenthesis slash signals slash page dot tsx is a server component. It fetches signals from the database directly:
+
+const open brace data colon signals close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis
+
+No API route needed. The component runs on the server, has access to the database, and returns rendered HTML.
+
+But the signal accordion card component needs interactivity. It has expand collapse logic. So it's marked quote use client quote. It receives the signals as props from the server component and handles the interactive parts in the browser.
+
+This is the Next dot js model: server components fetch data and do heavy lifting, client components handle interactivity.
+
+When to Use Server Versus Client
+
+Use server components when:
+- You need to fetch data from a database or API.
+- You need to access environment variables that should stay secret.
+- You don't need interactivity like buttons or forms.
+- You want to reduce JavaScript sent to the browser.
+
+Use client components when:
+- You need state with use state or effects with use effect.
+- You need event handlers like on click.
+- You use browser only APIs like local storage or window.
+- You want interactivity.
+
+The common pattern: server component fetches data, passes it to client component, client component makes it interactive.
+
+Layouts: Shared UI Across Routes
+
+Layouts wrap pages and provide shared UI. Your app has two key layouts.
+
+Root layout at app slash layout dot tsx wraps everything. It includes the HTML and body tags, global styles, and metadata like the page title. This layout applies to every page in your app.
+
+Protected layout at app slash open parenthesis protected close parenthesis slash layout dot tsx wraps all protected routes. It checks if the user is authenticated. If not, it redirects to the login page. If yes, it renders the child page.
+
+This means every page inside open parenthesis protected close parenthesis automatically gets authentication. You don't repeat auth logic in every page. The layout handles it once.
+
+Layouts can nest. A page at app slash open parenthesis protected close parenthesis slash settings slash billing slash page dot tsx is wrapped by three layouts: root layout, protected layout, and settings layout if one exists.
+
+Each layout renders its children, which could be another layout or the final page. This creates a nesting structure that lets you compose complex UIs from simple pieces.
+
+Loading and Error States
+
+Next dot js has special files for loading and error states.
+
+Create a file called loading dot tsx in any folder. While the page is loading, Next dot js shows this component. When the page finishes loading, it swaps in the real content.
+
+app slash open parenthesis protected close parenthesis slash signals slash loading dot tsx might show a skeleton of signal cards. When the signals load, the real page replaces it.
+
+Create a file called error dot tsx in any folder. If the page throws an error, Next dot js shows this component instead. You can show a friendly error message and a retry button.
+
+These special files make loading and error states easy without prop drilling or complex state management.
+
+API Routes: Backend Endpoints
+
+API routes let you create backend endpoints without a separate server. They live in app slash API and handle HTTP requests.
+
+Your upload route at app slash API slash upload slash route dot ts handles file uploads. It's a file called route dot ts or route dot js that exports functions named after HTTP methods.
+
+export async function POST open parenthesis request colon Request close parenthesis open brace
+  const body equals await request dot json open parenthesis close parenthesis
+  process upload open parenthesis body close parenthesis
+  return Next Response dot json open parenthesis open brace success colon true close brace close parenthesis
+close brace
+
+This creates a POST endpoint at slash API slash upload. When your client code sends a POST request to that URL, this function runs.
+
+API routes run on the server. They can access the database, call external APIs, and use secret environment variables. They return JSON or other responses.
+
+Use API routes for operations that can't happen in server components, like handling webhooks from external services or performing operations that don't fit the render cycle.
+
+Server Actions: Functions Called from the Client
+
+Server actions are a newer pattern. They're functions that run on the server but can be called directly from client components.
+
+You define a server action by marking a file or function with quote use server quote:
+
+quote use server quote
+
+export async function delete signal open parenthesis signal id colon string close parenthesis open brace
+  const supabase equals create server client open parenthesis close parenthesis
+  await supabase dot from open parenthesis quote signals quote close parenthesis dot delete open parenthesis close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis
+close brace
+
+In a client component, you import and call it like a normal function:
+
+import open brace delete signal close brace from quote at slash lib slash actions quote
+
+function Handle Delete open parenthesis close parenthesis open brace
+  await delete signal open parenthesis signal dot id close parenthesis
+close brace
+
+Behind the scenes, Next dot js turns this into an API call. But from your perspective, it's just a function. This is simpler than creating API routes and fetching them manually.
+
+Middleware: Code that Runs Before Every Request
+
+Middleware is code that runs before a request is processed. It's defined in a file at the root called middleware dot ts.
+
+Your app uses middleware for authentication. Before any protected route loads, the middleware checks if the user is authenticated. If not, it redirects to login.
+
+Middleware can modify requests, rewrite URLs, set headers, or return early responses. It's powerful for cross-cutting concerns like auth, logging, or redirects.
+
+Understanding Your Camino App Structure
+
+Let's map your app directory to understand the full structure.
+
+app slash layout dot tsx: Root layout, wraps everything, includes global styles and fonts.
+
+app slash page dot tsx: Homepage at slash, probably your landing or login page.
+
+app slash open parenthesis protected close parenthesis slash layout dot tsx: Protected layout, checks authentication for all routes inside.
+
+app slash open parenthesis protected close parenthesis slash signals slash page dot tsx: Signals page at slash signals, server component that fetches signals.
+
+app slash open parenthesis protected close parenthesis slash upload slash page dot tsx: Upload page at slash upload, likely renders a client component for interactivity.
+
+app slash API slash upload slash route dot ts: API endpoint at slash API slash upload, handles file upload POST requests.
+
+This structure gives you authentication protected routes that fetch data on the server and make it interactive in the client.
+
+Data Fetching Patterns
+
+In Next dot js app router, data fetching happens in server components. You don't use use effect. You just await directly in the component.
+
+async function Signals Page open parenthesis close parenthesis open brace
+  const signals equals await fetch signals open parenthesis close parenthesis
+  return open angle bracket div close angle bracket render signals open angle bracket slash div close angle bracket
+close brace
+
+This runs on the server. When a user visits slash signals, Next dot js calls this function, waits for the data, renders the component, and sends HTML.
+
+This is simpler than the old pattern where you'd fetch in use effect and manage loading state manually. Server components handle that automatically.
+
+If you need dynamic data that changes on every request, fetch it in the component. If you need static data that rarely changes, you can cache it.
+
+Caching in Next dot js 16
+
+Next dot js 16 introduces the use cache directive for explicit caching. You can mark functions or components to cache their results.
+
+quote use cache quote
+
+async function get signals open parenthesis close parenthesis open brace
+  const signals equals await fetch from database open parenthesis close parenthesis
+  return signals
+close brace
+
+Now the first call fetches data, subsequent calls return the cached result. This improves performance for expensive operations.
+
+You control cache duration with cache life profiles. quote use cache quote with a profile like quote max quote or quote hours quote determines how long data is cached.
+
+This is advanced and you don't need it yet. But know it exists for when your app needs optimization.
+
+Metadata: SEO and Page Titles
+
+Layouts and pages can export metadata for SEO. Your layout might have:
+
+export const metadata equals open brace
+  title colon quote Camino - Business Intelligence Dashboard quote comma
+  description colon quote Understand your business data in seconds quote
+close brace
+
+Next dot js uses this to set the page title and meta tags. Every page can override or extend the parent's metadata.
+
+For the signals page, you might override:
+
+export const metadata equals open brace
+  title colon quote Signals - Camino quote
+close brace
+
+Now the browser tab shows quote Signals dash Camino quote.
+
+Dynamic Routes
+
+Sometimes you need URLs with dynamic segments, like slash signal slash 123 where 123 is a signal ID.
+
+You create this with square brackets. A file at app slash signal slash open square bracket id close square bracket slash page dot tsx creates a route that matches any ID.
+
+The component receives the ID as a parameter:
+
+async function Signal Page open parenthesis open brace params close brace colon open brace params colon open brace id colon string close brace close brace close parenthesis open brace
+  const id equals params dot id
+  const signal equals await fetch signal by id open parenthesis id close parenthesis
+  return open angle bracket div close angle bracket render signal open angle bracket slash div close angle bracket
+close brace
+
+This pattern lets you create detail pages for any item in your database.
+
+Parallel Routes and Intercepting Routes
+
+Advanced features you might not need yet but should know exist.
+
+Parallel routes let you render multiple pages in the same layout simultaneously. Like a dashboard with multiple widgets, each widget is a separate route but they all render together.
+
+Intercepting routes let you show a route in a modal while the URL changes. Like clicking a signal to open a detail modal, the URL changes to slash signal slash 123 but the modal opens over the current page instead of navigating away.
+
+These are powerful for complex UIs but you probably won't need them in early Camino development.
+
+Practical Exercise: Create a New Page
+
+Let's practice. You're going to create a new page in your app.
+
+Create a new file: app slash open parenthesis protected close parenthesis slash settings slash page dot tsx.
+
+Add this code:
+
+export default async function Settings Page open parenthesis close parenthesis open brace
+  return open parenthesis
+    open angle bracket div class name equals quote p dash 8 quote close angle bracket
+      open angle bracket h1 class name equals quote text dash 2 xl font dash bold quote close angle bracket Settings open angle bracket slash h1 close angle bracket
+      open angle bracket p close angle bracket Configure your Camino experience open angle bracket slash p close angle bracket
+    open angle bracket slash div close angle bracket
+  close parenthesis
+close brace
+
+Save and start your dev server. Navigate to slash settings. You'll see your new page.
+
+This teaches you: file structure creates routes, server components render on the server, layouts wrap your page automatically.
+
+Now try making part of it interactive. Create a new component file: components slash settings form dot tsx. Mark it quote use client quote at the top. Add a button with an on click handler. Import and render it in your settings page.
+
+This teaches you: server components can render client components, client components handle interactivity, you compose pages from multiple components.
+
+Next Steps
+
+This week, practice mapping your app structure to URLs. Look at each page dot tsx file and determine what URL it creates. Identify which components are server versus client and understand why.
+
+Try creating a new page, a new API route, and a new server action. Build intuition for when to use each pattern.
+
+Next week, we'll dive into SQL and databases. You'll learn how to query your Supabase tables, understand joins, and write your own migrations. But everything will be accessed through Next dot js server components or API routes, so this week's routing knowledge matters.
+
+For now, remember: Next dot js connects your file structure to URLs, runs some code on the server and some on the client, and makes it easy to fetch data and add interactivity. Keep this mental model and Next dot js makes sense.

@@ -1,0 +1,267 @@
+Chapter 2: React Fundamentals
+
+Duration: approximately 15 minutes
+Topic: Components, props, state, and effects. Understanding how your UI updates and why.
+
+Introduction
+
+Welcome to Week 2 of the Camino Builder learning curriculum. This week, we're focusing on React fundamentals, the library that powers your entire user interface.
+
+Your entire UI is React components. Understanding the mental model prevents those frustrating "why isn't this updating?" bugs. By the end of this chapter, you'll understand how components work, how data flows through props, when state causes re-renders, and when effects run.
+
+The React Mental Model: UI as a Function of State
+
+React has a simple core idea: your UI is a function of your state. When state changes, React re-renders the component to reflect the new state.
+
+Think of a component as a function that takes data and returns UI. Every time the data changes, React calls the function again and updates what's on screen.
+
+Here's a simple example. You have a counter component. The state is: count equals zero. The UI shows: count. When you click a button and set count to 1, React re-renders the component. The function runs again, this time with count equals 1, and the UI updates to show 1.
+
+This is different from traditional UI frameworks where you manually update the DOM. In React, you never touch the DOM directly. You update state, and React figures out what needs to change.
+
+Components: Functions that Return JSX
+
+In React, components are just functions. They take props as input and return JSX as output. JSX looks like HTML but it's JavaScript.
+
+Here's a simple component:
+
+function Greeting open parenthesis props close parenthesis open brace
+  return open angle bracket div close angle bracket Hello comma props dot name exclamation mark open angle bracket slash div close angle bracket
+close brace
+
+This function takes props, which is an object, and returns JSX. You'd use it like this: open angle bracket Greeting name equals quote Alice quote slash close angle bracket.
+
+In your Camino codebase, your components are more complex but follow the same pattern. Open components slash signal accordion card dot tsx. It's a function that takes props and returns JSX.
+
+The props include: signal, interpretation, is expanded, on expand, and so on. The function uses those props to decide what to render: the signal name, the interpretation sections, whether the card is expanded or collapsed.
+
+Props: How Data Flows Parent to Child
+
+Props are how you pass data from a parent component to a child component. Data in React flows one way: down the tree.
+
+If your signals page has a list of signal cards, the page is the parent and each card is a child. The page passes the signal data to each card via props.
+
+You write: open angle bracket Signal Accordion Card signal equals open brace signal close brace interpretation equals open brace interpretation close brace slash close angle bracket. The child component receives these as props dot signal and props dot interpretation.
+
+Props are read only. The child component can read them but can't modify them. If the child needs to communicate back to the parent, it does so via callback props.
+
+For example, your signal card has an on expand prop. This is a function passed from the parent. When the user clicks to expand the card, the child calls on expand open parenthesis signal dot id close parenthesis. The parent handles the expansion logic.
+
+This pattern keeps data flow predictable. Changes flow down via props, events flow up via callbacks.
+
+State: Data that Changes Over Time
+
+State is data that belongs to a component and can change. When state changes, React re-renders the component.
+
+You create state with the use state hook. In your upload page client component, you have:
+
+const open square bracket file comma set file close square bracket equals use state open angle bracket File pipe null close angle bracket open parenthesis null close parenthesis
+
+This creates a state variable called file, initially null. The set file function updates it.
+
+When the user selects a file, you call: set file open parenthesis selected file close parenthesis. React re-renders the component with the new file value, and the UI updates to show the file name.
+
+State is local to a component unless you lift it up. If two components need to share state, you move the state to their common parent and pass it down via props.
+
+In your signals page, the expanded card state might live in the page component. Each card receives is expanded and on expand as props. The cards don't own the state, they just display it and trigger changes.
+
+When to Use State Versus Props
+
+Use state when:
+- The data changes over time based on user interaction.
+- The data is local to this component.
+- The data controls what the component displays.
+
+Use props when:
+- The data is passed from a parent.
+- The data doesn't change within this component.
+- The data is shared across multiple components.
+
+A common pattern: a parent has state, children have props. The parent manages the state, children display it.
+
+Effects: Running Code After Render
+
+Sometimes you need to run code after a component renders. Maybe you need to fetch data, set up a subscription, or update the document title. That's what the use effect hook is for.
+
+Your upload page client component uses use effect to handle file upload logic:
+
+use effect open parenthesis open parenthesis close parenthesis equals close angle bracket open brace
+  if file open brace
+    upload file open parenthesis file close parenthesis
+  close brace
+close brace comma open square bracket file close square bracket close parenthesis
+
+This reads as: after the component renders, if file exists, upload it. The array at the end, open square bracket file close square bracket, is the dependency array. It tells React: only run this effect when file changes.
+
+Without the dependency array, the effect runs after every render. With an empty array, open square bracket close square bracket, it runs only once after the first render. With open square bracket file close square bracket, it runs whenever file changes.
+
+Effects are for side effects, things that happen outside the component like API calls, subscriptions, or DOM manipulation.
+
+A common mistake: using effects when you don't need them. If you can compute something from props or state, do it during render. Don't use an effect to copy props to state.
+
+Conditional Rendering: Showing and Hiding UI
+
+React components often need to show different UI based on conditions. You do this with JavaScript logic.
+
+The simplest pattern: if statement. In your signal card, you might have:
+
+if not interpretation open brace
+  return open angle bracket div close angle bracket No interpretation yet open angle bracket slash div close angle bracket
+close brace
+
+If there's no interpretation, show a message and return early.
+
+Another pattern: ternary operator. Show the interpretation if it exists, otherwise show a placeholder:
+
+open brace interpretation question mark interpretation dot what underscore we underscore found colon quote Loading dot dot dot quote close brace
+
+Another pattern: logical AND operator. Only show the details section if the card is expanded:
+
+open brace is expanded and and open angle bracket div close angle bracket Details here open angle bracket slash div close angle bracket close brace
+
+This reads as: if is expanded is true, render the div. Otherwise, render nothing.
+
+Lists and Keys: Rendering Arrays of Data
+
+When you have an array of data, you render it with the map function. Your signals page has an array of signals and renders each one as a card:
+
+signals dot map open parenthesis signal equals close angle bracket open angle bracket Signal Accordion Card key equals open brace signal dot id close brace signal equals open brace signal close brace slash close angle bracket close parenthesis
+
+The key prop is required when rendering lists. React uses keys to track which items have changed, been added, or been removed. Without keys, React can't optimize updates efficiently.
+
+Keys must be unique among siblings. Use a stable identifier like an ID, never use the array index. If you reorder the list, index based keys cause bugs because the index changes but the data doesn't.
+
+Event Handlers: Responding to User Actions
+
+Event handlers let you respond to user actions like clicks, form submissions, and input changes.
+
+In JSX, you attach event handlers with props like on click, on change, on submit. Your upload button might have:
+
+on click equals open brace handle upload close brace
+
+The handle upload function runs when the user clicks. It's defined in the component:
+
+function handle upload open parenthesis close parenthesis open brace
+  if file open brace
+    set is uploading open parenthesis true close parenthesis
+    upload file open parenthesis file close parenthesis
+  close brace
+close brace
+
+Event handlers receive an event object as their first parameter. For form submissions, you often need to prevent the default behavior:
+
+function handle submit open parenthesis event close parenthesis open brace
+  event dot prevent default open parenthesis close parenthesis
+  process form data open parenthesis close parenthesis
+close brace
+
+This stops the form from triggering a page reload, which is the default browser behavior.
+
+Applying React to Your Camino Codebase
+
+Let's walk through a real component and understand every piece. Open components slash upload page client dot tsx.
+
+At the top, you'll see imports:
+
+import open brace use state comma use effect close brace from quote react quote
+
+These are the hooks you'll use for state and effects.
+
+Then the component definition:
+
+export function Upload Page Client open parenthesis close parenthesis open brace
+
+This is a client component, marked with quote use client quote at the top. It runs in the browser, not on the server.
+
+Inside, state declarations:
+
+const open square bracket file comma set file close square bracket equals use state open angle bracket File pipe null close angle bracket open parenthesis null close parenthesis
+const open square bracket is uploading comma set is uploading close square bracket equals use state open parenthesis false close parenthesis
+
+Two pieces of state: the selected file and a loading flag.
+
+Event handlers:
+
+function handle file select open parenthesis event colon React dot Change Event open angle bracket HTML Input Element close angle bracket close parenthesis open brace
+  const selected file equals event dot target dot files question mark open square bracket zero close square bracket
+  if selected file open brace
+    set file open parenthesis selected file close parenthesis
+  close brace
+close brace
+
+When the user selects a file, this handler grabs it from the event and updates state.
+
+JSX return statement:
+
+return open parenthesis
+  open angle bracket div class name equals quote container quote close angle bracket
+    open angle bracket h1 close angle bracket Upload Data open angle bracket slash h1 close angle bracket
+    open brace file question mark open parenthesis
+      open angle bracket p close angle bracket Selected colon open brace file dot name close brace open angle bracket slash p close angle bracket
+    close parenthesis colon open parenthesis
+      open angle bracket p close angle bracket No file selected open angle bracket slash p close angle bracket
+    close parenthesis close brace
+  open angle bracket slash div close angle bracket
+close parenthesis
+
+This is conditional rendering. If there's a file, show its name. Otherwise, show a message.
+
+This component follows the standard React pattern: hooks at the top, event handlers in the middle, JSX at the bottom. Every component in your codebase follows this structure.
+
+Common React Patterns in Camino
+
+Here are patterns you'll see throughout your components:
+
+Pattern 1: Controlled components.
+Your form inputs are controlled, meaning their value comes from state. You have: value equals open brace input value close brace on change equals open brace handle change close brace. When the user types, on change updates state, which updates value, which updates what's displayed.
+
+Pattern 2: Lifting state up.
+When two components need to share state, you move the state to their common parent. If the signals page and a filter component both need the filter state, the state lives in the page and both children receive it as props.
+
+Pattern 3: Component composition.
+Your signal card is composed of smaller pieces: the card wrapper, the header, the content sections. Each piece is a separate component or a well-defined JSX block. This makes the code easier to read and maintain.
+
+Pattern 4: Early returns.
+If a component can't render yet, maybe data is loading, return early with a loading state. Don't try to render incomplete data.
+
+Debugging React Issues
+
+When something doesn't update, ask these questions:
+
+Is the data in state? If it's just a variable, changing it won't trigger a re-render. It must be state created with use state.
+
+Are you mutating state directly? Don't do: state dot value equals new value. Do: set state open parenthesis open brace dot dot dot state comma value colon new value close brace close parenthesis. State must be immutable.
+
+Is the key prop stable? If you're using array index as key and reordering the array, React gets confused. Use a stable identifier.
+
+Is the component re-rendering but the UI not updating? Check if you're comparing objects by reference. React's re-render optimization might think nothing changed if you mutate an object instead of creating a new one.
+
+React DevTools: Your Best Friend
+
+Install the React DevTools browser extension. It adds a Components tab to your browser's developer tools. You can inspect the component tree, see props and state for each component, and even edit values to test different scenarios.
+
+When debugging, open DevTools, find the component that's not working, and check its props and state. Often the issue is: the data isn't what you think it is.
+
+Practical Exercise: Add a Loading State
+
+Let's practice. You're going to add a loading state to a component.
+
+Open components slash upload page client dot tsx. Find where you call the upload function. Before the call, add: set is uploading open parenthesis true close parenthesis. After the call completes, add: set is uploading open parenthesis false close parenthesis.
+
+Now in the JSX, conditionally show a loading spinner:
+
+open brace is uploading and and open angle bracket Spinner slash close angle bracket close brace
+
+Save and test. When you upload a file, you'll see the spinner appear then disappear.
+
+This teaches you: state controls UI, set state triggers re-renders, conditional rendering shows different UI based on state.
+
+Next Steps
+
+This week, practice identifying state and props in your components. Open any component and list: what's state, what's props, what's computed from props?
+
+Try adding a small piece of state, like a toggle button. Create state with use state, update it with an event handler, display it in the UI.
+
+Next week, we'll dive into Next dot js App Router. You'll learn about file based routing, server components versus client components, and how your app structure maps to URLs. But everything will use React components, so this week's foundation matters.
+
+For now, remember: React is about state and rendering. Update state, React updates the UI. Keep this mental model clear and React makes sense.

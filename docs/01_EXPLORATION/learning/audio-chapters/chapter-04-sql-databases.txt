@@ -1,0 +1,295 @@
+Chapter 4: SQL and Database Fundamentals
+
+Duration: approximately 15 minutes
+Topic: Understanding tables, queries, joins, and how your data is structured in Supabase.
+
+Introduction
+
+Welcome to Week 4 of the Camino Builder learning curriculum. This week, we're focusing on SQL and database fundamentals, the foundation of how your data is stored and retrieved.
+
+You use two databases: Supabase for primary app data and Neon for specific use cases. Understanding SQL means you can write queries, debug data issues, understand migrations, and optimize performance. By the end of this chapter, you'll understand tables, SELECT queries, joins, indexes, and foreign keys.
+
+The Database Mental Model: Tables, Rows, and Columns
+
+A database is a collection of tables. Each table stores a specific type of data. Think of a table like a spreadsheet: rows are records, columns are fields.
+
+Your signals table has rows for each signal. Each row has columns: id, name, description, user underscore id, created underscore at, and so on.
+
+When you query the database, you're asking for specific rows and columns. quote Give me all signals where user underscore id equals this value quote or quote Give me the signal with id equals 123 quote.
+
+The power of a relational database is tables can relate to each other. Your signals table relates to your data underscore points table. Each data point belongs to a signal. The relationship is defined by the signal underscore id column in data underscore points, which references the id column in signals.
+
+This is why it's called a relational database. Tables relate to each other through foreign keys.
+
+SELECT: Reading Data
+
+The most common SQL operation is SELECT. You use it to read data from tables.
+
+The basic syntax: SELECT columns FROM table WHERE conditions.
+
+Example: SELECT asterisk FROM signals. This reads all columns from all rows in the signals table. Asterisk means quote all columns quote.
+
+Example: SELECT name comma description FROM signals. This reads only the name and description columns.
+
+Example: SELECT asterisk FROM signals WHERE user underscore id equals quote user 123 quote. This reads all columns but only rows where user underscore id matches.
+
+In your Camino code, you don't write raw SQL often. You use the Supabase client, which generates SQL for you:
+
+const open brace data close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot eq open parenthesis quote user underscore id quote comma user id close parenthesis
+
+Behind the scenes, this becomes: SELECT asterisk FROM signals WHERE user underscore id equals quote user 123 quote.
+
+Understanding the SQL helps you understand what the Supabase query does and how to optimize it.
+
+WHERE: Filtering Rows
+
+The WHERE clause filters which rows are returned. You specify conditions.
+
+Example: WHERE user underscore id equals quote user 123 quote. Only rows with that user ID.
+
+Example: WHERE created underscore at greater than quote 2026 dash 01 dash 01 quote. Only rows created after January 1st 2026.
+
+Example: WHERE status IN open parenthesis quote active quote comma quote pending quote close parenthesis. Only rows where status is active or pending.
+
+Example: WHERE name LIKE quote percent support percent quote. Only rows where name contains the word support. The percent signs are wildcards.
+
+You can combine conditions with AND and OR.
+
+Example: WHERE user underscore id equals quote user 123 quote AND status equals quote active quote. Must match both conditions.
+
+Example: WHERE status equals quote active quote OR status equals quote pending quote. Must match at least one condition.
+
+In Supabase client, these become method calls:
+
+dot eq open parenthesis quote user underscore id quote comma user id close parenthesis
+dot gte open parenthesis quote created underscore at quote comma quote 2026 dash 01 dash 01 quote close parenthesis
+dot in open parenthesis quote status quote comma open square bracket quote active quote comma quote pending quote close square bracket close parenthesis
+dot like open parenthesis quote name quote comma quote percent support percent quote close parenthesis
+
+Knowing the SQL equivalents helps you understand what each method does.
+
+ORDER BY: Sorting Results
+
+ORDER BY controls the order of results. By default, order is unpredictable. To get consistent ordering, specify ORDER BY.
+
+Example: SELECT asterisk FROM signals ORDER BY created underscore at DESC. This sorts by created underscore at with newest first. DESC means descending. Without DESC, or with ASC, it's oldest first.
+
+Example: ORDER BY name ASC. Sort alphabetically by name.
+
+You can order by multiple columns: ORDER BY status ASC comma created underscore at DESC. First sort by status, then by date within each status.
+
+In Supabase: dot order open parenthesis quote created underscore at quote comma open brace ascending colon false close brace close parenthesis.
+
+LIMIT and OFFSET: Pagination
+
+LIMIT restricts how many rows are returned. OFFSET skips rows.
+
+Example: SELECT asterisk FROM signals LIMIT 10. Returns only 10 rows.
+
+Example: SELECT asterisk FROM signals LIMIT 10 OFFSET 20. Skips the first 20 rows, then returns the next 10. This is page 3 if you're showing 10 per page.
+
+In Supabase: dot limit open parenthesis 10 close parenthesis dot range open parenthesis 20 comma 29 close parenthesis. Range is an alternative way to specify limit and offset.
+
+Use LIMIT for pagination. Don't load thousands of rows at once. Load 10 or 20, show them, let the user request more.
+
+INSERT: Creating Rows
+
+INSERT adds new rows to a table.
+
+Example: INSERT INTO signals open parenthesis name comma description comma user underscore id close parenthesis VALUES open parenthesis quote New Signal quote comma quote Description here quote comma quote user 123 quote close parenthesis.
+
+This creates a new row with those values. Columns not specified get their default values or NULL.
+
+In Supabase:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot insert open parenthesis open brace name colon quote New Signal quote comma description colon quote Description here quote comma user underscore id colon user id close brace close parenthesis
+
+The Supabase client handles converting your object into SQL.
+
+If the insert succeeds, data contains the new row. If it fails, error contains the error message, like a constraint violation or missing required field.
+
+UPDATE: Modifying Rows
+
+UPDATE changes existing rows.
+
+Example: UPDATE signals SET status equals quote archived quote WHERE id equals quote signal 123 quote. This sets the status column to quote archived quote for the row with that ID.
+
+You can update multiple columns: UPDATE signals SET status equals quote archived quote comma updated underscore at equals NOW open parenthesis close parenthesis WHERE id equals quote signal 123 quote.
+
+Always include a WHERE clause unless you really want to update every row. Without WHERE, every row gets updated, which is usually not what you want.
+
+In Supabase:
+
+await supabase dot from open parenthesis quote signals quote close parenthesis dot update open parenthesis open brace status colon quote archived quote close brace close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis
+
+The eq method provides the WHERE condition.
+
+DELETE: Removing Rows
+
+DELETE removes rows from a table.
+
+Example: DELETE FROM signals WHERE id equals quote signal 123 quote. This deletes the row with that ID.
+
+Like UPDATE, always include a WHERE clause. DELETE FROM signals without WHERE deletes everything.
+
+In Supabase:
+
+await supabase dot from open parenthesis quote signals quote close parenthesis dot delete open parenthesis close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis
+
+Be careful with DELETE. Once a row is deleted, it's gone unless you have backups. Often, it's better to add a deleted underscore at timestamp column and set it instead of actually deleting. This is called soft delete.
+
+JOINS: Combining Tables
+
+Joins let you combine data from multiple tables. This is where SQL becomes powerful.
+
+Your signals table and data underscore points table are related. Each data point has a signal underscore id column that references a signal's id. To get a signal and its data points in one query, you use a join.
+
+Example: SELECT signals dot name comma data underscore points dot value FROM signals JOIN data underscore points ON data underscore points dot signal underscore id equals signals dot id WHERE signals dot user underscore id equals quote user 123 quote.
+
+This reads as: Get the name from signals and value from data underscore points, matching rows where signal underscore id equals id, for signals belonging to user 123.
+
+The result includes rows with data from both tables.
+
+There are different types of joins:
+
+INNER JOIN: Only rows where the relationship exists. If a signal has no data points, it's not included.
+
+LEFT JOIN: All rows from the left table, even if there's no match in the right table. If a signal has no data points, the signal appears but data point columns are NULL.
+
+RIGHT JOIN: Like LEFT JOIN but reversed.
+
+In Supabase, you use select with nested objects:
+
+const open brace data close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk comma data underscore points open parenthesis asterisk close parenthesis quote close parenthesis
+
+This automatically joins signals and data underscore points and returns nested data: each signal has a data underscore points array.
+
+This is simpler than writing raw SQL joins. Supabase handles the complexity.
+
+Aggregations: COUNT, SUM, AVG
+
+Aggregation functions compute values across multiple rows.
+
+COUNT: How many rows. Example: SELECT COUNT open parenthesis asterisk close parenthesis FROM signals WHERE user underscore id equals quote user 123 quote. Returns the number of signals for that user.
+
+SUM: Total of a numeric column. Example: SELECT SUM open parenthesis value close parenthesis FROM data underscore points WHERE signal underscore id equals quote signal 123 quote. Returns the total value of all data points for that signal.
+
+AVG: Average of a numeric column. Example: SELECT AVG open parenthesis value close parenthesis FROM data underscore points WHERE signal underscore id equals quote signal 123 quote.
+
+You can combine aggregations with GROUP BY to compute values per group:
+
+SELECT signal underscore id comma COUNT open parenthesis asterisk close parenthesis FROM data underscore points GROUP BY signal underscore id.
+
+This returns one row per signal with the count of data points for each.
+
+In Supabase, some aggregations are built-in:
+
+const open brace count close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote comma open brace count colon quote exact quote close brace close parenthesis
+
+For more complex aggregations, you might write a custom SQL query or use a Postgres function.
+
+Indexes: Making Queries Fast
+
+Indexes make queries faster by creating a fast lookup structure. Without an index, the database scans every row. With an index, it jumps directly to the relevant rows.
+
+Your signals table has an index on user underscore id: idx underscore signals underscore user underscore id. This makes WHERE user underscore id equals quote user 123 quote fast, even if there are millions of signals.
+
+Indexes have a cost: they take up storage and slow down inserts and updates. You create indexes on columns you query frequently.
+
+In your scripts slash 00 underscore SETUP underscore DATABASE dot sql file, you'll see:
+
+CREATE INDEX idx underscore signals underscore user underscore id ON signals open parenthesis user underscore id close parenthesis semicolon
+
+This creates the index. You don't interact with indexes in application code. They work automatically behind the scenes.
+
+Foreign Keys: Enforcing Relationships
+
+A foreign key is a constraint that enforces relationships between tables. In data underscore points, the signal underscore id column has a foreign key constraint:
+
+FOREIGN KEY open parenthesis signal underscore id close parenthesis REFERENCES signals open parenthesis id close parenthesis ON DELETE CASCADE.
+
+This means: signal underscore id must be an id that exists in the signals table. You can't insert a data point with a signal underscore id that doesn't exist. The database will reject it.
+
+ON DELETE CASCADE means: if you delete a signal, all its data points are automatically deleted. This keeps the database consistent.
+
+Foreign keys prevent orphaned data. Without them, you could delete a signal but leave its data points, which would reference a nonexistent signal.
+
+NULL: The Absence of Value
+
+NULL is a special value that means quote no value quote. It's not zero, not an empty string, not false. It's the absence of a value.
+
+A column can be nullable or not nullable. If nullable, it can have NULL. If not nullable, it must have a value.
+
+Example: created underscore at timestamp NOT NULL. This column must have a value. You can't insert a row without providing created underscore at.
+
+Example: deleted underscore at timestamp. No NOT NULL, so it's nullable. It's NULL for active rows, set to a timestamp for deleted rows.
+
+When querying, NULL requires special syntax. WHERE column equals NULL doesn't work. You write WHERE column IS NULL or WHERE column IS NOT NULL.
+
+In Supabase: dot is open parenthesis quote deleted underscore at quote comma null close parenthesis.
+
+Use NULL for optional values. Use NOT NULL for required values. Be explicit in your schema design.
+
+Understanding Your Camino Database Schema
+
+Let's walk through the key tables in your Supabase database.
+
+signals: Stores signal definitions. Columns include id, name, description, user underscore id, created underscore at. Each row is one signal configured by a user.
+
+data underscore points: Stores raw data for signals. Columns include id, signal underscore id, value, recorded underscore at. Each row is one data point belonging to a signal. Related to signals via signal underscore id foreign key.
+
+signal underscore interpretations: Stores AI generated interpretations. Columns include id, signal underscore id, what underscore we underscore found, what underscore it underscore means, and so on. One interpretation per signal. Related to signals via signal underscore id.
+
+profiles: Stores user profile data. Columns include id, email, full underscore name, organisation underscore id. Each row is one user. Related to Supabase auth users.
+
+organisations: Stores organisation data. Columns include id, name, created underscore at. Each row is one organisation. Users belong to organisations via profiles dot organisation underscore id.
+
+This structure is typical for a SaaS app: users belong to organisations, users create signals, signals have data points and interpretations. Everything ties back to users and organisations.
+
+Writing Migrations
+
+Migrations are SQL scripts that change your database schema. When you add a new table or column, you write a migration.
+
+Your scripts slash 00 underscore SETUP underscore DATABASE dot sql file is a migration. It creates all your tables from scratch.
+
+A migration to add a column might look like:
+
+ALTER TABLE signals ADD COLUMN priority text NOT NULL DEFAULT quote medium quote semicolon
+
+This adds a priority column to the signals table. Existing rows get the default value quote medium quote.
+
+Migrations should be idempotent when possible, meaning you can run them multiple times without error. You do this with IF NOT EXISTS checks:
+
+CREATE TABLE IF NOT EXISTS signals open parenthesis dot dot dot close parenthesis semicolon
+
+If the table exists, this does nothing. If it doesn't, it creates it.
+
+Always test migrations on a development database before running them in production. A bad migration can corrupt data or bring down your app.
+
+Practical Exercise: Write a Query
+
+Let's practice writing a SQL query. Open the Supabase SQL Editor for your camino dash dev project.
+
+Write this query:
+
+SELECT asterisk FROM signals WHERE user underscore id equals quote your user id quote ORDER BY created underscore at DESC LIMIT 5 semicolon
+
+Replace quote your user id quote with an actual user ID from your database. Run it. You'll see the 5 most recent signals for that user.
+
+Now try a join:
+
+SELECT signals dot name comma COUNT open parenthesis data underscore points dot id close parenthesis as data underscore point underscore count FROM signals LEFT JOIN data underscore points ON data underscore points dot signal underscore id equals signals dot id GROUP BY signals dot id comma signals dot name semicolon
+
+This shows each signal and how many data points it has. Signals with no data points show 0.
+
+This teaches you: how to filter, sort, limit, and join tables. These are the fundamental SQL skills you'll use constantly.
+
+Next Steps
+
+This week, practice reading your database schema. Open scripts slash 00 underscore SETUP underscore DATABASE dot sql and understand every CREATE TABLE statement. Look at the columns, the constraints, the indexes.
+
+Try writing queries in the SQL editor. Experiment with WHERE conditions, ORDER BY, and joins. Build intuition for how data flows through your tables.
+
+Next week, we'll dive into Supabase Auth and Row Level Security. You'll learn how authentication works, how RLS policies protect data, and how your app enforces multi-tenancy. But everything will query the database structure you learned this week, so this foundation matters.
+
+For now, remember: databases store data in tables, SQL lets you query and modify that data, relationships connect tables, and constraints keep data consistent. Keep this mental model and SQL makes sense.
