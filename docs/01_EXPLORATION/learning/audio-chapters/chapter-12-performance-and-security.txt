@@ -1,0 +1,199 @@
+Chapter 12: Performance and Security
+
+Welcome to Week 12, the final chapter of the Camino Builder learning curriculum. This week focuses on performance and security, the foundations that let you confidently serve paying customers.
+
+Performance matters because every extra second of wait time loses users. Security matters because a single data breach destroys trust forever. These aren't optional polish. They're essential from day one.
+
+By the end of this chapter, you'll know how to optimize database queries, implement caching strategies, secure your app with Row Level Security, and follow security best practices to protect customer data.
+
+Performance: Why It Matters
+
+Users don't consciously notice when your app is fast. They just use it. But they very consciously notice when it's slow. Research shows that a 100 millisecond delay makes users perceive the app as sluggish. A 1 second delay makes users lose their flow of thought. A 3 second delay makes users consider leaving. A 10 second delay makes users leave and don't come back.
+
+Your Tier 1 pipeline involves multiple steps: upload CSV, parse data, discover signals, calculate values, generate AI interpretation, display results. If each step takes 2 seconds, that's 10 seconds total, right at the threshold where users abandon.
+
+The goal isn't to make everything instant. That's impossible. The goal is to make the app feel responsive. Show loading states. Give feedback. Let users do other things while background tasks run.
+
+Database Query Optimization
+
+Your app's performance bottleneck is likely database queries. Supabase is fast, but slow queries can still happen. Let's understand how to optimize them.
+
+EXPLAIN ANALYZE is your best debugging tool. It shows you exactly how PostgreSQL executes a query and how long each part takes. Run it in the Supabase SQL Editor.
+
+The output shows whether you're doing a sequential scan, which means scanning every row and is slow for large tables, or an index scan, which means using an index to jump to relevant rows and is fast. It also shows execution time in actual milliseconds.
+
+If you see sequential scan on a large table, you need an index. An index is like a book's index. Instead of reading every page to find "signals," you look it up in the index which tells you exactly which pages to read.
+
+Create an index with CREATE INDEX followed by the index name ON the table name with the column in parentheses. Now queries filtering by that column use the index and run 10 to 100 times faster.
+
+Your Camino database already has indexes on common filter columns. Check your migration scripts. You'll see indexes on user underscore id, signal underscore id, and created underscore at.
+
+The N+1 Query Problem
+
+This is the most common performance bug in web apps. Here's how it happens.
+
+You load all signals for a user with one query. Then for each signal, you load its data points with another query inside a loop. If you have 20 signals, this makes 21 queries: 1 for signals, then 20 more for data points. That's the N plus 1: one initial query plus N additional queries in a loop.
+
+The fix is to load everything in one query with a join. In Supabase, you select signals and use nested syntax to also select data underscore points. Supabase automatically performs the join and nests the data points array inside each signal. One query instead of 21.
+
+Always watch for loops that make database calls. If you find one, there's usually a way to do it in a single query with a join or a subquery.
+
+Caching: When and How
+
+Caching means storing the result of an expensive operation so you don't have to repeat it. Your app already uses caching for AI interpretations. Once generated, they're saved in the signal interpretations table.
+
+Here's when to cache. Cache when the data is expensive to compute, like AI calls or complex calculations. Cache when the data doesn't change often, like signal interpretations or user profiles. Cache when multiple users request the same data, like public signals or shared analyses.
+
+Don't cache when the data changes frequently, like real time metrics or live dashboards. Don't cache when the cache becomes stale quickly, like current user session or temporary state. Don't cache when fetching fresh data is already fast, like simple database queries.
+
+Your caching strategy for interpretations follows a simple pattern. First, check if an interpretation exists in the database. If it does and the user didn't request a force refresh, return the cached version. Otherwise, generate a new interpretation, save it to the cache table, and return it.
+
+This pattern is simple and effective: check cache, return if found, otherwise compute and save.
+
+For even faster caching, you could use Redis via Upstash to cache in memory instead of the database. But for AI interpretations that take 2 to 3 seconds to generate, database caching is plenty fast.
+
+Image and Asset Optimization
+
+Your app is currently lightweight, mostly text and simple UI. But if you add images, charts, or large assets, optimization matters.
+
+The Next.js Image component automatically optimizes images. It resizes images to the exact size needed, converts to modern formats like WebP and AVIF, lazy loads images below the fold, and serves from CDN for fast delivery.
+
+Never use a plain img tag with src. Always use the Next.js Image component.
+
+For charts and data visualizations, consider server side rendering. Generate the chart on the server and send a static image instead of sending all the data and rendering on the client. This is faster for complex charts with thousands of data points.
+
+Lazy Loading: Only Load What's Visible
+
+Your signals page might eventually show hundreds of signals. Loading and rendering them all at once is slow and wasteful. Instead, use lazy loading.
+
+You can use React's lazy function to dynamically import components. Wrap them in Suspense with a fallback. This delays loading the component until it's needed.
+
+Or use virtual scrolling with a library like react dash virtual to only render signals visible in the viewport. If you have 500 signals but only 10 fit on screen, why render 490 that the user can't see?
+
+For now, your signal list is small enough that this doesn't matter. But keep it in mind as you scale.
+
+Bundle Size: What Ships to the Browser
+
+Every JavaScript file you import increases your bundle size, the amount of code the browser downloads. Larger bundles equal slower page loads.
+
+Check your bundle size by running npm run build. Look for the output showing each route with its size and first load JavaScript size. First load JS is what users download on first visit. Aim to keep this under 200 kilobytes for fast loading.
+
+If a page is too large, use dynamic imports for heavy components, remove unused dependencies, and minimize third party libraries.
+
+Your Camino bundle is likely fine. Next.js automatically code splits by route and only loads what's needed. But watch it as you add features.
+
+Security: The Fundamentals
+
+Security is about layers. No single technique makes you secure. You need multiple defenses so if one fails, others catch it.
+
+Layer one is Row Level Security, or RLS. This is your primary defense. RLS is a PostgreSQL feature that enforces access control at the database level. Even if your application code has a bug, the database won't return unauthorized data.
+
+Your RLS policies control who can read and modify data. For example, users can only read signals where the user ID matches their authenticated user ID. Users can only insert signals for themselves. The USING clause controls which rows are visible for SELECT. The WITH CHECK clause controls which rows can be inserted or updated.
+
+The key is auth dot uid. This is the user ID from their JWT token. Supabase validates the token and injects the user ID automatically. You can't fake it.
+
+Every table that stores user data should have RLS policies. Otherwise, anyone can read anyone's data by querying the database directly.
+
+Check your RLS policies in the Supabase dashboard under Authentication, then Policies. Every table should show green checkmarks for RLS enabled.
+
+Layer two is input validation. Never trust user input. Always validate with Zod before using it. This prevents SQL injection, script injection, and other attacks where malicious input exploits your code.
+
+Layer three is parameterized queries. SQL injection happens when user input is concatenated into SQL strings. The solution is parameterized queries. Supabase does this automatically with the query builder. Never construct SQL strings with user input. Always use the query builder or parameterized queries.
+
+Layer four is authentication checks in API routes. Every API route that handles sensitive data should verify the user is authenticated. Get the user from Supabase auth. If there's an error or no user, return a 401 unauthorized response. Only proceed if the user is authenticated.
+
+Don't rely on client side checks. They can be bypassed. Always verify on the server.
+
+Environment Variables: Never Expose Secrets
+
+Your app has two types of environment variables.
+
+Public variables are prefixed with NEXT underscore PUBLIC underscore. They can be used on the client. Example: NEXT underscore PUBLIC underscore SUPABASE underscore URL. These are not secret. They're visible in browser source.
+
+Private variables have no prefix. They're only available on the server. Example: SUPABASE underscore SERVICE underscore ROLE underscore KEY. These are secret and never sent to the browser.
+
+The service role key has unlimited database access, bypassing RLS. If it leaks, anyone can read and modify all your data. Never import it in a use client file.
+
+Check your imports by searching your components folder for the service role key. If this finds anything in client components, you have a security bug. Move that code to a server action or API route.
+
+HTTPS, CSRF, and XSS: Handled by Vercel and Next.js
+
+Good news: Vercel and Next.js handle many security concerns automatically.
+
+HTTPS: all Vercel deployments use HTTPS by default. Your data is encrypted in transit.
+
+CSRF, or Cross Site Request Forgery: Next.js server actions include CSRF protection automatically. You don't need to do anything.
+
+XSS, or Cross Site Scripting: React escapes all variables by default. Writing user input in JSX is safe. React turns script tags into literal text, not executable code.
+
+However, be careful with dangerously set inner HTML. This bypasses React's escaping. Only use it with trusted content, or sanitize with a library like DOMPurify first.
+
+Rate Limiting: Preventing Abuse
+
+Your upload endpoint should have rate limiting to prevent abuse. Use a library like Upstash Ratelimit with Redis. Set a limit like 10 requests per minute per IP address. If the limit is exceeded, return a 429 too many requests error.
+
+This prevents a malicious user from uploading thousands of files and overloading your server or exceeding API quotas.
+
+For now, Vercel's default rate limiting is probably sufficient. But as you scale, add explicit rate limiting to expensive endpoints.
+
+Measuring Performance: What to Track
+
+You can't improve what you don't measure. Track these metrics.
+
+Page load time: how long until the page is interactive. Check in Chrome DevTools Network tab with cache disabled. Aim for under 3 seconds on fast connections, under 10 seconds on slow connections.
+
+API response time: how long do your API routes take? Add logging to measure duration. Aim for under 1 second for most endpoints, under 5 seconds for AI heavy ones.
+
+Database query time: check slow queries with EXPLAIN ANALYZE. Anything over 100 milliseconds deserves investigation.
+
+Bundle size: run npm run build and check the output. Keep pages under 200 kilobytes first load JavaScript.
+
+Error rate: what percentage of requests fail? Track this in Vercel logs. Aim for under 1% error rate.
+
+Set up monitoring with Vercel Analytics or a tool like Sentry to track these automatically.
+
+Security Checklist Before Launch
+
+Before your first paying customer uses Camino, go through this checklist. RLS enabled on all tables with user data. RLS policies tested: can user A access user B's data? The answer should be no. All API routes check authentication. Service role key never imported in client components. All user input validated with Zod. Environment variables correctly set, public versus private. HTTPS enabled, which is automatic on Vercel. No secrets committed to repository. No console dot log with sensitive data. Error messages don't leak sensitive information. File uploads limited to reasonable sizes. Rate limiting on expensive endpoints. Database backups configured, which Supabase does automatically.
+
+Go through this checklist. Fix any gaps. Security isn't something to add later. It's foundational.
+
+Performance Checklist Before Launch
+
+All pages load in under 3 seconds on fast connection. Loading states shown for operations over 500 milliseconds. Database queries use indexes, check with EXPLAIN ANALYZE. No N plus 1 query patterns, no loops making database calls. Expensive operations cached, like AI interpretations and complex calculations. Images optimized using Next.js Image component. Bundle size under 200 kilobytes per page. No blocking operations on the client, use server actions. Error boundaries catch component failures. 404 and 500 error pages exist and are helpful.
+
+Real World Example: Optimizing the Signals Page
+
+Let's apply these concepts to optimize your signals page.
+
+Current approach: load all signals for the user, then for each signal that's expanded, load AI interpretation. Problem: if user has 100 signals and expands 5, we're making 6 queries, 1 for signals and 5 for interpretations.
+
+Optimization one: eager load interpretations for signals that have them. Use Supabase nested select to join signal interpretations. Now it's one query instead of 6.
+
+Optimization two: add pagination. Only load 20 signals at a time using the range function.
+
+Optimization three: cache the query on the client. If user goes to another page and comes back, don't refetch. Use a library like SWR with revalidate on focus set to false.
+
+These three optimizations together make the signals page load faster and use fewer resources.
+
+Conclusion: Shipping with Confidence
+
+You've completed all 12 weeks of the Camino Builder learning curriculum. Let's review what you've learned.
+
+Weeks 1 through 4, the foundations: TypeScript type system and how it prevents bugs, React component model and state management, Next.js App Router and server versus client components, SQL fundamentals and database design.
+
+Weeks 5 through 8, your stack: Supabase authentication and Row Level Security, Supabase query builder and real time subscriptions, AI SDK and prompt engineering for quality output, Tailwind CSS and component driven UI design.
+
+Weeks 9 through 12, production skills: Git workflow and deployment with Vercel, error handling and debugging techniques, testing strategies and data validation with Zod, performance optimization and security best practices.
+
+You now understand not just how to write code, but why it works, how to debug it, and how to ship it confidently.
+
+What's Next
+
+Your learning doesn't stop here. As you build Camino, you'll encounter new challenges that require deeper knowledge. When that happens, reference these chapters as a foundation, consult the official docs for Next.js, Supabase, and Tailwind, search for specific solutions to specific problems, ask AI tools for explanations of unfamiliar code, and read the code you've written. It's your best teacher.
+
+The goal was never to make you an expert in 12 weeks. The goal was to give you enough knowledge to learn effectively, debug systematically, and ship confidently.
+
+You're ready. Build Camino. Ship features. Learn from real users. And remember: every bug is a lesson, every slowdown is an optimization opportunity, and every security concern is a chance to build trust.
+
+Welcome to the builder life. Now go build something that matters.

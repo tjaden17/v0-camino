@@ -1,0 +1,185 @@
+Chapter 10: Error Handling and Debugging
+
+Welcome to Week 10 of the Camino Builder learning curriculum. This week focuses on error handling and debugging, the skills that separate apps that crash from apps that gracefully handle problems and guide users to solutions.
+
+Your customer will encounter errors. A malformed CSV. A database timeout. A network failure. An AI API that's temporarily down. Your job isn't to prevent every error. That's impossible. Your job is to handle errors gracefully, provide helpful feedback, and make debugging straightforward when something unexpected happens.
+
+By the end of this chapter, you'll understand try catch patterns, React error boundaries, structured logging, and debugging techniques you'll use every day.
+
+The Philosophy of Error Handling
+
+Before we dive into code, let's establish the right mindset. Errors are not failures. They're expected events that your code needs to handle.
+
+There are two categories of errors: expected and unexpected.
+
+Expected errors are scenarios you know will happen sometimes. A user uploads a CSV with the wrong format. The database connection times out. A required field is missing. For these, you write explicit code to catch the error, show a helpful message, and guide the user to fix it.
+
+Unexpected errors are things you didn't anticipate. A third party API returns an unexpected response. A null pointer exception in a calculation. A Vercel deployment fails. For these, you use error boundaries and logging to capture what happened, show a generic error message, and collect enough information to debug later.
+
+The goal is to turn as many unexpected errors into expected errors as you gain experience. Every bug you fix should teach you to add better error handling for that scenario.
+
+Try Catch Patterns in TypeScript
+
+The fundamental error handling pattern in JavaScript and TypeScript is try catch. Here's the basic structure.
+
+You have a try block that contains code that might throw an error. If any line inside throws an error, execution immediately jumps to the catch block. The catch block receives the error object and decides what to do with it.
+
+In TypeScript, the caught error is typed as unknown by default, so you need to narrow it to use it safely. You check if error is an instance of Error, and if so, you can access properties like error dot message and error dot stack.
+
+This pattern is everywhere in your Camino codebase. Let's look at a real example from your upload API. You try to parse the CSV, discover signals, and return the response. If anything fails, you catch the error, log it with context, and return a proper HTTP error response with status 500.
+
+Notice what this does. It attempts the operation, logs any error, and returns a proper HTTP error response. The user sees "Failed to process upload." Not helpful yet, but better than a crash.
+
+Making Error Messages Helpful
+
+The worst error message is a technical stack trace shown to the user. The best error message tells the user what went wrong and how to fix it.
+
+Compare these two messages. Bad: "Error: Cannot read property Amount of undefined." Good: "We couldn't find an Amount column in your CSV. Please ensure your file has a column named Amount or Deal Value."
+
+The difference is context. The bad message describes what failed in the code. The good message describes what's wrong with the user's input and how to fix it.
+
+Here's how to write helpful error messages. First, describe the problem in user terms. "Your CSV is missing required columns," not "Column validation failed." Second, suggest a solution. "Please include columns: Deal Name, Amount, Close Date." Third, explain what we expected. "We found 5 rows but expected at least 10 for meaningful analysis." Fourth, provide next steps. "Try uploading a different file or contact support if this error persists."
+
+Let's rewrite that upload error handler with specific error types. If the error is a CSV parse error, return a 400 status with a message explaining the file format is invalid and suggesting they save as CSV again in Excel. If the error is a missing column error, tell them exactly which column is missing and what alternatives we accept. For unknown errors, log details for your team but show a generic message to the user.
+
+Notice the HTTP status codes: 400 for client errors, meaning bad input, and 500 for server errors, meaning our fault. This distinction helps with debugging.
+
+Error Boundaries in React
+
+React components can throw errors. Maybe you tried to render signal dot name but signal was null. Maybe a calculation failed. If unhandled, one component's error would crash your entire app.
+
+Error boundaries catch React errors and show a fallback UI instead of a blank screen. Next.js makes this easy with error dot tsx files.
+
+In your app, create app slash error dot tsx. This is a client component that receives the error and a reset function. You return a div with a friendly message, the error message, and a button that calls reset to try again.
+
+Now if any component on any page throws an error, React shows this fallback UI instead of crashing. The reset function lets users try again. It re renders the component tree.
+
+You can add error dot tsx at any level of your route structure. For example, app slash parenthesis protected slash signals slash error dot tsx catches errors only on the signals page.
+
+For loading states, Next.js also supports loading dot tsx. This shows a spinner while the page is fetching data. Combined with error dot tsx, you have loading, success, and error states covered.
+
+The Data Error Pattern in Supabase
+
+Supabase queries use a pattern that makes error handling explicit. Instead of throwing errors, Supabase returns an object with two properties: data, which contains the results, or error, which contains what went wrong.
+
+You destructure the response to get data and error. Then you check if error exists. If it does, you handle it. Otherwise, you know data is guaranteed to exist and you can use it safely.
+
+This pattern forces you to handle errors explicitly. You can't forget. If you don't check for error, TypeScript yells at you when you try to use data, which might be null.
+
+Compare this to throwing errors. With throwing, it's implicit. You wrap the call in a try catch, but it's easy to forget error handling. With the data error pattern, it's explicit. You must handle immediately because the error is right there in your face at the call site.
+
+The explicit pattern is safer because you can't forget. It's also easier to read. You see the error handling right where the call is made.
+
+Structured Logging versus console dot log
+
+Logging is how you understand what your app is doing in production. But console dot log with just the word "error" doesn't help when you're debugging a production issue at 2 AM.
+
+Structured logging means logging with consistent format and useful context. Here's the difference.
+
+Bad: console dot log quote error, then console dot log error.
+
+Good: console dot error with a prefix in square brackets like Upload API, followed by the message "Failed to parse CSV," then an object with userId, fileName, fileSize, the error message, and a timestamp.
+
+The structured log tells you what operation failed, who triggered it, what file they uploaded, and when. With the bad log, you'd have no idea.
+
+Use consistent prefixes like square brackets Upload API or square brackets Signal Discovery so you can filter logs by component. Include relevant context: user IDs, file names, signal IDs, anything that helps you reproduce the issue.
+
+For different severity levels, use the appropriate method. console dot log for general information, the least important. console dot info for informational messages. console dot warn for warnings about potential issues. console dot error for actual errors, the most important.
+
+In production, you'd use a logging service like Axiom or Datadog to aggregate logs. For now, Vercel captures all console output in the Functions tab of your dashboard.
+
+Debugging Tools: Browser DevTools
+
+Your browser's DevTools is the most powerful debugging tool you have. Let's walk through the essential features.
+
+The Console tab shows all console dot log, error, and warning messages. You can also run JavaScript directly to inspect state. Type document dot querySelector followed by a CSS selector to find an element.
+
+The Network tab shows every API request your app makes. Click a request to see the request headers, request body, response, and timing. This is essential for debugging API issues. If your upload is failing, check the Network tab to see what the server actually received and what error it returned.
+
+The Elements tab lets you inspect the DOM tree and see which CSS is applied to each element. Right click any element on the page and select Inspect to jump right to it. You can edit CSS live to test changes.
+
+The Sources tab lets you debug JavaScript with breakpoints. Click a line number to set a breakpoint. Execution will pause there and let you inspect variables. Use step over to execute one line at a time.
+
+The Application tab shows localStorage, cookies, and service workers. If you're storing data in the browser, this is where you'd inspect it.
+
+For React, install the React DevTools browser extension. It adds a Components tab that shows your component tree with props and state for every component. This is invaluable for understanding why a component isn't updating as expected.
+
+Common Bugs and How to Spot Them
+
+Let's walk through bugs you'll encounter in Camino and how to diagnose them.
+
+Null or undefined access is the most common React error. You tried to access signal dot name but signal was undefined. Symptoms: error says "Cannot read property name of undefined." Diagnosis: the data hasn't loaded yet or wasn't found. Fix: add a loading state or null check. If signal doesn't exist, return a loading div. Or use the optional chaining operator, signal question mark dot name.
+
+Race conditions happen when two async operations happen at once with unexpected interaction. Symptoms: data appears then disappears, stale data shown, errors that only happen sometimes. Diagnosis: look for multiple useEffect hooks or async calls without proper cleanup. Fix: use cleanup functions in useEffect and debounce rapid updates.
+
+Missing environment variable means your code expects process dot env dot SUPABASE underscore URL but it's not defined. Symptoms: error says "Cannot read property SUPABASE underscore URL of undefined" or API calls fail with invalid URL. Diagnosis: check the Vercel dashboard. Is the variable set? Check spelling. Is it exactly the same in your code and in Vercel? Fix: add the variable in Vercel settings and redeploy.
+
+CORS errors happen when your API route returns data but the browser blocks it. Symptoms: Network tab shows the request succeeded but console says CORS policy blocked. Diagnosis: this happens when your frontend and backend are on different domains. Fix: in Next.js API routes, this shouldn't happen because they're same origin. If you see it, you're probably calling an external API that doesn't allow your domain.
+
+Database constraint violations happen when you try to insert data that violates a database constraint. Symptoms: error says "duplicate key value violates unique constraint" or "foreign key constraint violation." Diagnosis: check your database schema. Maybe you're inserting a signal with an ID that already exists, or referencing a user ID that doesn't exist. Fix: handle the constraint in code. Check if the record exists first, or use upsert instead of insert.
+
+Debugging Strategy: Systematic Troubleshooting
+
+When you encounter a bug, follow this systematic approach.
+
+Step one: reproduce it consistently. Can you make it happen every time? If not, what's different when it happens versus doesn't?
+
+Step two: read the error message carefully. What line number? What variable? What type?
+
+Step three: check the logs. Vercel dashboard for server errors, browser console for client errors.
+
+Step four: isolate the problem. Comment out code until the error goes away, then uncomment one piece at a time.
+
+Step five: add logging. Insert console dot log at key points to see what values variables have.
+
+Step six: check assumptions. "This variable should be a string." Is it actually? Console dot log it to confirm.
+
+Step seven: simplify. Remove complexity until you have the minimal code that reproduces the bug.
+
+Step eight: Google the error. Someone else has likely encountered it. Include framework names like "Next.js cannot read property of undefined."
+
+Step nine: check recent changes. Did this work before? What changed? Use git log to see recent commits.
+
+Step ten: ask for help. If stuck for more than 30 minutes, describe the problem to someone or an AI. Often you'll realize the answer while explaining.
+
+Error Handling in the Upload Pipeline
+
+Let's apply all this to your upload pipeline. Currently, if any step fails, the user sees a generic error. Let's make it better.
+
+In your API route, you parse the request body to get tabKey and questions. If tabKey is missing, return a 400 error with a helpful message telling the user to select a file tab.
+
+Load the staged data from the database. If it fails or doesn't exist, log the error with context including the tabKey, then return a 404 error saying the file couldn't be found and asking them to upload again.
+
+Try to parse the CSV data. If parsing fails, log the error and return a 400 error explaining the file data is corrupted and they should re-upload.
+
+Generate signals from the parsed data. If no signals are generated, return a 422 error explaining the file might not have enough data or the columns don't match signal definitions.
+
+If everything succeeds, return the signals. If an unexpected error occurs, log everything including the error message, stack trace, and timestamp, then return a 500 error with a generic message and telling the user your team has been notified.
+
+Notice how this handles different error scenarios with specific messages, logs context for debugging, and uses appropriate HTTP status codes.
+
+Testing Error Handling
+
+The best way to ensure your error handling works is to test it. For now, test manually.
+
+Upload a malformed CSV. Does the error message make sense? Upload a CSV with missing columns. Are you told which columns are missing? Disconnect your internet and trigger an API call. Is there a helpful timeout message? Try to access a signal that doesn't exist. Is there a 404 page or error boundary?
+
+As you build confidence, you'll write automated tests for these scenarios. For now, keep a checklist and test each error path whenever you change the code.
+
+When to Show Errors versus Log Silently
+
+Not every error needs to be shown to the user. Sometimes the app can recover gracefully.
+
+Show the error when the user's action failed, like upload didn't work or save didn't work. Show it when the user needs to change their input because of invalid data. Show it when something is broken and the user can't proceed.
+
+Log but don't show when a fallback strategy succeeded, like the primary API failed but cached data worked. Log silently when the error is temporary and you're retrying automatically. Log when the error is informational, like slow network but still loading.
+
+The rule of thumb: if the user can or should do something differently, show the error. If not, log it for yourself but don't bother the user.
+
+Next Steps
+
+This week, review every try catch block in your codebase. Are the error messages helpful? Do they guide users to solutions? Add logging with relevant context.
+
+Next week, we'll cover testing and data validation, how to prevent errors before they happen by validating input and writing tests that catch bugs before they reach production.
+
+Remember: good error handling is invisible when things work and helpful when things don't. Your users will judge your app by how it handles failure more than by how it handles success.
