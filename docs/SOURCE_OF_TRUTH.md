@@ -8,7 +8,7 @@ Last updated: Feb 19, 2026
 These two documents are the definitive source for what we're building and when:
 
 ### 1. Plan: CAMINO Roadmap (Final)
-**Location:** `user_read_only_context/text_attachments/Plan_-CAMINO-Roadmap-(Final)-9CQmG.pdf`
+**Location:** `/docs/00_DECISIONS/roadmap/CAMINO_ROADMAP_FINAL.md`
 
 **Purpose:** Strategic roadmap defining the 4 monthly goals and decision moments
 

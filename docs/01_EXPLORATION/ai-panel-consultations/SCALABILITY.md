@@ -5,6 +5,41 @@ Topic: Universal schema, data onboarding, opportunities/risks analysis, and synt
 
 ---
 
+## Extended Consultation: Non-CRM Data Shapes (Feb 25, 2026)
+
+Topic: What happens when customers bring data that is NOT CRM — support tickets, product analytics, financial exports?
+
+### The Core Problem
+
+The universal schema works for CRM because deal and lead data is predictable. But our market uses data that has completely different shapes, and a single universal schema cannot cover all of them.
+
+Three categories we have not fully designed for:
+
+**Ticket / Case Data (Zendesk, Pendo, Freshdesk, Intercom)**
+Each row is a discrete event with a timestamp and status lifecycle. Signals here are duration and volume based — average resolution time, open ticket count, tickets by category. Completely different math than pipeline signals.
+
+**Product / Usage Analytics (Pendo, Mixpanel, Amplitude)**
+Each row is a behavioural event — user did something at a point in time. The properties column is a freeform JSON blob. Every product defines its own event names. There is no universal schema possible here without tool-specific extractors.
+
+**Financial / Operational (Xero, QuickBooks, custom exports)**
+Each row is a ledger entry or transaction. Chart of accounts varies per business. "Revenue" might be split five ways or one way depending on the company.
+
+### The Recommended Solution: Data Shape Registry
+
+Instead of one universal schema, maintain a registry of schemas — one per data type. Each schema has its own alias library, its own signal library, and its own calculation logic.
+
+The architectural rule: every schema, every alias, every signal definition lives in the database as configuration — not in application code. Adding Freshdesk support should mean inserting rows into an alias table, not writing and deploying code.
+
+### The JSON Problem for Product Analytics
+
+Do not try to build a generic JSON parser for event properties. Build tool-specific extractors instead — a Pendo extractor that knows Pendo's standard event taxonomy, a Mixpanel extractor that knows Mixpanel's structure. One adapter per tool, built once, reused for every customer on that tool.
+
+### Decision
+
+Full architecture decision saved to: 00_DECISIONS/architecture/DATA_SHAPE_REGISTRY.md
+
+---
+
 ## Question 1: Universal Data Schema & Scale
 
 **Jordan (Data Engineer):**
