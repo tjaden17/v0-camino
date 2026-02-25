@@ -432,34 +432,6 @@ VALIDATION TESTS (Before demo day)
 
 
 ================================================================================
-PART 7: DEFINITION OF DONE
-================================================================================
-
-From Product Manager:
-
-GOAL 1 COMPLETE WHEN:
----------------------
-✓ Admin can upload 3 CSV files for Locumate
-✓ 3-question flow completes for each file
-✓ 7 signals generate correctly (values match manual calculation)
-✓ Admin can verify and save
-✓ Signals appear on /signals page for Surge immediately
-✓ Column mappings saved to database
-✓ Re-upload works (saved mappings auto-apply)
-✓ Total time from file selection to signals visible: < 5 minutes
-✓ Zero crashes or data loss during upload
-✓ Upload history visible in admin panel
-
-DEMO ACCEPTANCE:
-----------------
-Surge Singh logs in and sees:
-- Pipeline Value: AUD $450K
-- Win Rate: 67%
-- Closed Revenue: AUD $180K
-All values match what he knows from Zoho. He thinks "this is correct."
-
-
-================================================================================
 TIME ESTIMATE
 ================================================================================
 

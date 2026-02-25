@@ -32,14 +32,6 @@ As a user, I want the AI analysis to reference my actual role, KPIs, and busines
 - Interpretation auto-triggers after signal calculation completes — no manual step required
 - CEO (Surge) and CS Manager see different interpretations because their KPIs and roles differ
 
-### Definition of Done
-
-- [ ] AI prompt template updated to include user context fields
-- [ ] Tested with Surge (CEO) profile — output references his KPIs and role
-- [ ] Tested with CS Manager profile — output references their KPIs and role
-- [ ] No placeholder text appears in any section of the 6-section analysis
-- [ ] Interpretation triggers automatically after signal calc — no manual trigger
-
 ---
 
 ## Story 2: Period-Over-Period Change for All 7 Signals
@@ -53,14 +45,6 @@ As a user, I want to see how each signal has changed vs the prior period so I kn
 - Period selector (7 / 30 / 90 days) visible on signal screen, defaults to 30 days
 - Where prior period data does not exist, signal card shows "Insufficient data for X-day comparison" — not an error state, not blank
 - Period-over-period values stored in database so they persist between sessions — not recalculated on every load
-
-### Definition of Done
-
-- [ ] All 7 signals return period-over-period values for 7, 30, and 90 day windows
-- [ ] Absolute change, percentage change, and direction stored per signal per period
-- [ ] Period selector defaults to 30 days and updates all signal cards on change
-- [ ] Insufficient data case handled gracefully — message displayed, not an error
-- [ ] Values persist in database — verified by refreshing session and confirming values match
 
 ---
 
@@ -76,15 +60,6 @@ As Surge (CEO) or the CS Manager, I want to log in and see a signal screen order
 - Each signal card shows: label, current value, period-over-period change with directional arrow, and the formula used
 - Recommended signals (up to 2) show a visible "Why we're showing this" reason
 - Signals requested but not calculable show: "You asked for X. To calculate this we need Y. Upload Z to enable it."
-
-### Definition of Done
-
-- [ ] Surge profile tested — KPI signals appear first, in the order he specified
-- [ ] CS Manager profile tested — their KPI signals appear first
-- [ ] Signal ordering logic confirmed: Requested > Recommended > Available
-- [ ] Each signal card renders: value, trend arrow, percentage change, formula
-- [ ] Recommended signals show a reason string — not blank
-- [ ] Uncalculable requested signals show the correct message — not an error or blank card
 
 ---
 

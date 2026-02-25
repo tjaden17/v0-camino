@@ -167,16 +167,6 @@ TIME ESTIMATE
 4-6 hours
 
 
-DEFINITION OF DONE
-------------------
-✓ All 3 Locumate users created via admin UI
-✓ Each user has correct role and KPIs in database
-✓ KPIs visible in admin user list
-✓ Temp passwords generated and shown to admin
-✓ Users can log in and are prompted to change password
-✓ Code committed and tested in production
-
-
 ================================================================================
 
 
@@ -339,17 +329,6 @@ TESTING CHECKLIST
 TIME ESTIMATE
 -------------
 3-4 hours
-
-
-DEFINITION OF DONE
-------------------
-✓ isNonRealTicket() function created and tested
-✓ Filter applied before signal calculations
-✓ Locumate's 21 policy tickets filtered correctly
-✓ 0 false positives on real tickets
-✓ Filtered count visible to admin
-✓ Console logs show filtering activity
-✓ Code committed and tested with real data
 
 
 ================================================================================
