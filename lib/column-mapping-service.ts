@@ -1,4 +1,4 @@
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export type ColumnMappingTemplate = import("@/lib/column-mapping-utils").ColumnMappingTemplateShape
 
@@ -9,14 +9,27 @@ export type ColumnMappingTemplate = import("@/lib/column-mapping-utils").ColumnM
 export async function getColumnMappingTemplates(
   organizationId?: string | null
 ): Promise<ColumnMappingTemplate[]> {
-  const rows = await sql`
-    SELECT id, source_tool, row_type, display_name, field_mappings
-    FROM column_mappings
-    WHERE organization_id IS NULL
-       OR organization_id = ${organizationId ?? null}
-    ORDER BY display_name
-  `
-  return (rows as { id: string; source_tool: string; row_type: string; display_name: string; field_mappings: Record<string, string> }[]).map((r) => ({
+  const supabase = createAdminClient()
+
+  let query = supabase
+    .from("column_mappings")
+    .select("id, source_tool, row_type, display_name, field_mappings")
+    .order("display_name")
+
+  if (organizationId) {
+    query = query.or(`organization_id.is.null,organization_id.eq.${organizationId}`)
+  } else {
+    query = query.is("organization_id", null)
+  }
+
+  const { data: rows, error } = await query
+
+  if (error) {
+    console.error("[ColumnMappingService] getTemplates error:", error)
+    return []
+  }
+
+  return (rows || []).map((r: any) => ({
     id: r.id,
     source_tool: r.source_tool,
     row_type: r.row_type,
@@ -32,28 +45,46 @@ export async function getColumnMappingBySourceTool(
   sourceTool: string,
   organizationId?: string | null
 ): Promise<ColumnMappingTemplate | null> {
-  const orgRow = organizationId
-    ? await sql`
-        SELECT id, source_tool, row_type, display_name, field_mappings
-        FROM column_mappings
-        WHERE source_tool = ${sourceTool} AND organization_id = ${organizationId}
-        LIMIT 1
-      `
-    : []
-  const row = orgRow?.[0] ?? (await sql`
-    SELECT id, source_tool, row_type, display_name, field_mappings
-    FROM column_mappings
-    WHERE source_tool = ${sourceTool} AND organization_id IS NULL
-    LIMIT 1
-  `)?.[0]
-  if (!row) return null
-  const r = row as { id: string; source_tool: string; row_type: string; display_name: string; field_mappings: Record<string, string> }
+  const supabase = createAdminClient()
+
+  // Try org-specific first
+  if (organizationId) {
+    const { data: orgRow } = await supabase
+      .from("column_mappings")
+      .select("id, source_tool, row_type, display_name, field_mappings")
+      .eq("source_tool", sourceTool)
+      .eq("organization_id", organizationId)
+      .limit(1)
+      .maybeSingle()
+
+    if (orgRow) {
+      return {
+        id: orgRow.id,
+        source_tool: orgRow.source_tool,
+        row_type: orgRow.row_type,
+        display_name: orgRow.display_name,
+        field_mappings: orgRow.field_mappings || {},
+      }
+    }
+  }
+
+  // Fall back to global template
+  const { data: globalRow } = await supabase
+    .from("column_mappings")
+    .select("id, source_tool, row_type, display_name, field_mappings")
+    .eq("source_tool", sourceTool)
+    .is("organization_id", null)
+    .limit(1)
+    .maybeSingle()
+
+  if (!globalRow) return null
+
   return {
-    id: r.id,
-    source_tool: r.source_tool,
-    row_type: r.row_type,
-    display_name: r.display_name,
-    field_mappings: r.field_mappings || {},
+    id: globalRow.id,
+    source_tool: globalRow.source_tool,
+    row_type: globalRow.row_type,
+    display_name: globalRow.display_name,
+    field_mappings: globalRow.field_mappings || {},
   }
 }
 

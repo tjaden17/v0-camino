@@ -1,10 +1,10 @@
 /**
- * GET: list organizations from Neon (admin).
- * POST: create organization in Neon (master admin). Fixes hang when admin panel used Supabase for orgs while app data is in Neon.
+ * GET: list organizations (admin).
+ * POST: create organization (master admin).
  */
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function GET() {
   try {
@@ -17,17 +17,17 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const rows = await sql`
-      SELECT id, name, created_at, updated_at
-      FROM organizations
-      ORDER BY created_at DESC
-    `
-    // Normalise id to string so links and client comparison work (Neon may return UUID type)
-    const list = (rows ?? []).map((r: Record<string, unknown>) => ({
-      ...r,
-      id: r.id != null ? String(r.id) : r.id,
-    }))
-    return NextResponse.json(list)
+    const admin = createAdminClient()
+    const { data: list, error } = await admin
+      .from("organizations")
+      .select("id, name, created_at, updated_at")
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      throw error
+    }
+
+    return NextResponse.json(list ?? [])
   } catch (error) {
     console.error("[api/admin/organizations] GET error:", error)
     return NextResponse.json(
@@ -57,15 +57,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "name is required" }, { status: 400 })
     }
 
-    const created = await sql`
-      INSERT INTO organizations (name, created_by, created_at, updated_at)
-      VALUES (${name}, ${user.id}, NOW(), NOW())
-      RETURNING id, name, created_at, updated_at
-    `
-    const org = created?.[0]
+    const admin = createAdminClient()
+    const { data: org, error } = await admin
+      .from("organizations")
+      .insert({ name, created_by: user.id })
+      .select()
+      .single()
+
+    if (error) {
+      throw error
+    }
     if (!org) {
       return NextResponse.json({ error: "Failed to create organization" }, { status: 500 })
     }
+
     return NextResponse.json(org)
   } catch (error) {
     console.error("[api/admin/organizations] POST error:", error)

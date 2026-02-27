@@ -1,55 +1,48 @@
-DUAL DATABASE ARCHITECTURE: SUPABASE + NEON
+DATABASE ARCHITECTURE: CONSOLIDATED TO SUPABASE
 
-Decision Date: February 2026
-
----
-
-THE SPLIT
-
-Supabase — Auth, users, user_context, sessions, organizations, RLS policies
-Neon — Signals, raw_data_uploads, raw_data_rows, data_points, signal_interpretations
+Decision Date: February 2026 (consolidated Feb 27, 2026)
 
 ---
 
-THE CORE LOGIC
+HISTORY
 
-Separation of concerns drives this decision.
+The app originally used a dual-database architecture: Supabase for auth and Neon for application data.
+This was consolidated into a single Supabase database to fix critical write/read mismatch bugs
+and eliminate cross-database sync issues.
 
-Supabase was chosen for auth because it handles the entire auth lifecycle out of the box — JWT tokens, RLS policies, magic links, session management. Building this from scratch on Neon would have required significant custom auth work.
-
-Neon was chosen for data because the raw data ingestion — 1000+ row CSV uploads, bulk signal calculations, JSONB storage of original rows — is high-volume and does not need to sit behind Supabase's auth layer. Neon's serverless Postgres scales for this kind of workload without auth overhead on every query.
-
----
-
-THE EXECUTION FLOW
-
-1. User session is established via Supabase Auth (JWT)
-2. Session contains the user's organization_id
-3. Signals page reads organization_id from Supabase
-4. All signal data is fetched from Neon using organization_id as the key
-5. The two databases are joined at the application layer — not at the database level
+See git history for the original DUAL_DATABASE_REASONING.md.
 
 ---
 
-DATA OWNERSHIP BY DATABASE
+CURRENT ARCHITECTURE
 
-Supabase:
-- users (id, email, role, org_id, kpis)
-- organizations (id, name, industry, stage)
-- user_context (business goals, priorities, upcoming events)
-- sessions (managed by Supabase Auth natively)
+Single database: Supabase PostgreSQL
 
-Neon:
-- raw_data_uploads (file metadata, org_id, upload timestamp)
-- raw_data_rows (original CSV rows as JSONB, linked to upload)
-- data_points (normalized signal values per org per period)
-- signal_interpretations (AI-generated analysis per signal per org)
-- column_mappings (saved field alias mappings per org)
+- Auth: Supabase Auth (JWT, sessions, RLS policies)
+- Application data: Supabase with Admin client (bypasses RLS for server-side operations)
+- Connection pooling: Supabase PgBouncer for serverless workloads
+
+---
+
+WHY WE CONSOLIDATED
+
+1. The dual-path storage service wrote signals to Supabase, but signals-service read from Neon — data was invisible
+2. No cross-database referential integrity — orphaned records possible
+3. Profiles table duplicated with different columns across databases
+4. The Supabase Admin client already bypasses RLS for bulk operations (the original reason Neon was chosen)
+5. Eliminating Neon removed 3 env vars, a dependency, and an entire class of sync bugs
+
+---
+
+DATA ACCESS PATTERN
+
+- Auth: `createClient()` from `lib/supabase/server.ts` (user sessions, RLS-aware)
+- Data queries: `createAdminClient()` from `lib/supabase/admin.ts` (service role, bypasses RLS)
+- Client-side: `createBrowserClient()` from `lib/supabase/client.ts`
 
 ---
 
 RELATED DOCS
 
-DUAL_PATH_STORAGE.md — storage flow for file uploads
+DUAL_PATH_STORAGE.md — storage flow for file uploads (may reference Neon historically)
 USER_FLOW_DATA.md — end-to-end data flow from upload to signal display
-INTEGRATION_ARCHITECTURE.md — how external tools connect to this structure

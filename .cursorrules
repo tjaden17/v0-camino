@@ -36,7 +36,7 @@ RULE: Before building any feature, check the Weekly Sprint Plan to confirm it's 
 - Language: TypeScript 5
 - Styling: Tailwind CSS v4 with shadcn/ui components
 - Auth: Supabase Auth (client at lib/supabase/client.ts, server at lib/supabase/server.ts)
-- Database: Neon PostgreSQL (primary data store for signals, profiles, orgs)
+- Database: Supabase PostgreSQL (single database for auth + all application data)
 - AI: Vercel AI SDK v6 (ai@6.0.6)
 - File parsing: xlsx for Excel/CSV
 - Hosting: Vercel
@@ -54,19 +54,19 @@ RULE: Before building any feature, check the Weekly Sprint Plan to confirm it's 
 - `app/auth/*` - Authentication flows (login, signup, onboarding)
 - `app/api/*` - API routes (REST endpoints)
 
-### Database (Dual: Supabase Auth + Neon Data)
-- Supabase: Used ONLY for authentication (auth.users, session management)
-- Neon: Used for ALL application data (signals, profiles, orgs, uploads, data points)
-- Connection: `import { neon } from "@neondatabase/serverless"` then `const sql = neon(process.env.NEON_DATABASE_URL!)`
-- The `profiles` table in Neon is linked to Supabase auth.users via `profiles.id = auth.user.id`
+### Database (Supabase — Single Database)
+- Supabase handles authentication AND all application data in one PostgreSQL database
+- Auth: `lib/supabase/server.ts` or `lib/supabase/client.ts` for user sessions
+- Data queries: `lib/supabase/admin.ts` (service role, bypasses RLS) for server-side data operations
+- The `profiles` table is linked to Supabase auth.users via `profiles.id = auth.user.id`
 
-### Supabase Clients (Auth Only)
+### Supabase Clients
 - `lib/supabase/client.ts` - Browser/client components. Uses `createBrowserClient()`.
-- `lib/supabase/server.ts` - Server components and API routes. Uses `createServerClient()` with cookies.
-- `lib/supabase/admin.ts` - Service role client for admin operations.
+- `lib/supabase/server.ts` - Server components and API routes. Uses `createServerClient()` with cookies. Used for auth.
+- `lib/supabase/admin.ts` - Service role client for data operations (bypasses RLS). Used for all server-side data queries.
 
 ### Key Services (lib/)
-- `signals-service.ts` - CRUD for signals table (Neon). Core read path for /signals page.
+- `signals-service.ts` - CRUD for signals table (Supabase). Core read path for /signals page.
 - `interpretation-service.ts` - AI interpretation (5-section analysis)
 - `organization-service.ts` - Organization management
 - `admin-service.ts` - Admin user management
@@ -101,7 +101,7 @@ Upload CSV/XLSX (upload-proto-client.tsx)
      - Generates signal definitions from user answers (NOT from fuzzy matching)
      - Calculates values server-side (count, sum, avg, monthly_rate, group_by)
      - Extracts monthly time-series for trends
-     - Upserts into signals table + signal_data_points table (Neon)
+     - Upserts into signals table + signal_data_points table (Supabase)
   -> /signals page reads from signals table via signals-service.ts
   -> signal-accordion-card.tsx renders each signal
 \`\`\`
@@ -109,7 +109,7 @@ Upload CSV/XLSX (upload-proto-client.tsx)
 Key design principle: Signals are generated from EXPLICIT user answers, not from heuristic guessing. If a required field can't be resolved, the signal is skipped (never show a wrong number).
 
 
-## Database (Neon)
+## Database (Supabase PostgreSQL)
 
 ### Core Tables
 - profiles - User profiles (id links to Supabase auth.users)
@@ -159,9 +159,9 @@ Key design principle: Signals are generated from EXPLICIT user answers, not from
 ### API Routes
 - Always validate input
 - Always check auth: `const supabase = await createClient()` then `supabase.auth.getUser()`
-- For data queries: `const sql = neon(process.env.NEON_DATABASE_URL!)`
+- For data queries: `const admin = createAdminClient()` then `admin.from("table").select(...)`
 - Return consistent JSON: `{ success: boolean, data?: any, error?: string }`
-- Use parameterized queries (Neon template literals handle this)
+- Use Supabase client methods (parameterized automatically)
 
 ### Styling
 - Tailwind CSS v4 with design tokens (bg-background, text-foreground, etc.)
@@ -285,8 +285,8 @@ Every goal = ONE decision by ONE person at ONE moment (not "build features")
   signal-accordion-card.tsx  Signal display card with L1/L2/L3 accordion
   signals-page-client.tsx    Signal list page
 /lib
-  /supabase        Supabase client setup (auth only)
-  signals-service.ts         Reads signals from Neon for display
+  /supabase        Supabase client setup (auth + admin data access)
+  signals-service.ts         Reads signals from Supabase for display
   interpretation-service.ts  AI interpretation
   organization-service.ts    Org management
   signal-discovery-service.ts   DEPRECATED (old 92-definition pipeline)

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 import * as XLSX from "xlsx"
 import { parseCSV } from "@/lib/csv-parser"
 import { discoverSignals, type SignalDiscoveryResult } from "@/lib/signal-discovery-service"
@@ -11,13 +11,13 @@ function parseXLSX(buffer: ArrayBuffer): { headers: string[]; rows: Record<strin
   const workbook = XLSX.read(buffer, { type: "array" })
   const sheetName = workbook.SheetNames[0]
   const worksheet = workbook.Sheets[sheetName]
-  
+
   const jsonData = XLSX.utils.sheet_to_json<Record<string, any>>(worksheet, { defval: "" })
-  
+
   if (jsonData.length === 0) {
     return { headers: [], rows: [] }
   }
-  
+
   const headers = Object.keys(jsonData[0])
   const rows = jsonData.map(row => {
     const stringRow: Record<string, string> = {}
@@ -26,7 +26,7 @@ function parseXLSX(buffer: ArrayBuffer): { headers: string[]; rows: Record<strin
     }
     return stringRow
   })
-  
+
   return { headers, rows }
 }
 
@@ -51,9 +51,9 @@ export async function POST(request: NextRequest) {
     // Parse file based on type
     const fileName = file.name.toLowerCase()
     const isExcel = fileName.endsWith(".xlsx") || fileName.endsWith(".xls")
-    
+
     let rows: Record<string, string>[]
-    
+
     if (isExcel) {
       const buffer = await file.arrayBuffer()
       const result = parseXLSX(buffer)
@@ -65,32 +65,39 @@ export async function POST(request: NextRequest) {
     }
 
     if (rows.length === 0) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "File is empty or has no data rows",
-        discovery: null 
+        discovery: null
       }, { status: 400 })
     }
 
+    const admin = createAdminClient()
+
     // Get user's organization_id
-    const userContextResult = await sql`
-      SELECT organization_id FROM user_context WHERE user_id = ${user.id}
-    `
-    const organizationId = userContextResult[0]?.organization_id
-    
+    const { data: userContext } = await admin
+      .from("user_context")
+      .select("organization_id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+
+    const organizationId = userContext?.organization_id
+
     if (!organizationId) {
       return NextResponse.json({ error: "User organization not found" }, { status: 400 })
     }
 
     // Run signal discovery
     const discovery = await discoverSignals(rows, file.name)
-    
+
     // Categorize signals as new/updated/partial
     const existingSignalNames = new Set<string>()
     try {
-      const existingSignals = await sql`
-        SELECT DISTINCT name FROM signals WHERE organization_id = ${organizationId}
-      `
-      existingSignals.forEach((s: any) => existingSignalNames.add(s.name))
+      const { data: existingSignals } = await admin
+        .from("signals")
+        .select("name")
+        .eq("organization_id", organizationId)
+
+      ;(existingSignals || []).forEach((s: any) => existingSignalNames.add(s.name))
     } catch (err) {
       console.error("[v0] Error fetching existing signals:", err)
     }
@@ -105,13 +112,13 @@ export async function POST(request: NextRequest) {
     // Fetch user profile context from onboarding
     let signalContext = null
     try {
-      const userContextResult = await sql`
-        SELECT role, department, seniority_level, business_stage, company_size, industry, goals
-        FROM user_context WHERE user_id = ${user.id}
-      `
-      
-      if (userContextResult.length > 0) {
-        const ctx = userContextResult[0]
+      const { data: ctx } = await admin
+        .from("user_context")
+        .select("role, department, seniority_level, business_stage, company_size, industry, goals")
+        .eq("user_id", user.id)
+        .maybeSingle()
+
+      if (ctx) {
         const profile: UserProfile = {
           industry: ctx.industry || "",
           role: ctx.role || "",

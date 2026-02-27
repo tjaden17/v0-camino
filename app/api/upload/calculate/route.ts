@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 import * as XLSX from "xlsx"
 import { parseCSV } from "@/lib/csv-parser"
 import {
@@ -523,10 +523,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's organization_id from user_context
-    const userContextResult = await sql`
-      SELECT organization_id FROM user_context WHERE user_id = ${user.id} LIMIT 1
-    `
-    const organizationId = userContextResult?.[0]?.organization_id || null
+    const adminDb = createAdminClient()
+    const { data: userContextRow } = await adminDb
+      .from("user_context")
+      .select("organization_id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+    const organizationId = userContextRow?.organization_id || null
 
     const formData = await request.formData()
     const file = formData.get("file") as File
@@ -565,12 +568,21 @@ export async function POST(request: NextRequest) {
     let uploadId: string | null = null
     try {
       const columns = rows[0] ? Object.keys(rows[0]) : []
-      const uploadResult = await sql`
-        INSERT INTO staged_uploads (user_id, organization_id, file_name, file_type, source_type, row_count, column_count, status)
-        VALUES (${user.id}, ${organizationId}, ${file.name}, ${isExcel ? 'xlsx' : 'csv'}, 'manual_upload', ${rows.length}, ${columns.length}, 'processed')
-        RETURNING id
-      `
-      uploadId = uploadResult?.[0]?.id || null
+      const { data: uploadRow } = await adminDb
+        .from("staged_uploads")
+        .insert({
+          user_id: user.id,
+          organization_id: organizationId,
+          file_name: file.name,
+          file_type: isExcel ? 'xlsx' : 'csv',
+          source_type: 'manual_upload',
+          row_count: rows.length,
+          column_count: columns.length,
+          status: 'processed',
+        })
+        .select("id")
+        .single()
+      uploadId = uploadRow?.id || null
     } catch (uploadErr) {
       console.error("[v0] Failed to record upload:", uploadErr)
       // Non-fatal - continue with signal creation
@@ -592,7 +604,7 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      // Upsert signal using Neon - update if same name+org exists, insert otherwise
+      // Upsert signal - update if same name+org exists, insert otherwise
       try {
         const trendValue = calculated.trendPercentage !== null 
           ? `${calculated.trendPercentage > 0 ? '+' : ''}${calculated.trendPercentage}%`
@@ -608,32 +620,51 @@ export async function POST(request: NextRequest) {
         const summaryText = `${calculated.calculationMethod}: ${calculated.formula}${tabInfo}${filterInfo}. Based on ${calculated.dataPoints} data points${calculated.usedColumn ? ` from "${calculated.usedColumn}" column` : ''}.`
         
         // Use upsert to prevent duplicates - update existing signal if same name+org
-        const result = await sql`
-          INSERT INTO signals (name, category, organization_id, absolute_value, trend, trend_value, source_type, summary, created_at, updated_at)
-          VALUES (
-            ${signalDef.signalName}, 
-            ${signalDef.category}, 
-            ${organizationId}, 
-            ${calculated.formattedValue}, 
-            ${dbTrend}, 
-            ${trendValue}, 
-            'upload', 
-            ${summaryText},
-            NOW(),
-            NOW()
-          )
-          ON CONFLICT (name, organization_id) 
-          DO UPDATE SET 
-            absolute_value = EXCLUDED.absolute_value,
-            trend = EXCLUDED.trend,
-            trend_value = EXCLUDED.trend_value,
-            summary = EXCLUDED.summary,
-            updated_at = NOW()
-          RETURNING id, name, category, absolute_value, trend
-        `
-        
-        if (result && result.length > 0) {
-          const signalRecord = result[0]
+        // First check if a signal with same name+org exists
+        const { data: existingSignal } = await adminDb
+          .from("signals")
+          .select("id, name, category, absolute_value, trend")
+          .eq("name", signalDef.signalName)
+          .eq("organization_id", organizationId)
+          .maybeSingle()
+
+        let signalRecord: { id: string; name: string; category: string; absolute_value: string; trend: string } | null = null
+
+        if (existingSignal) {
+          const { data: updated } = await adminDb
+            .from("signals")
+            .update({
+              absolute_value: calculated.formattedValue,
+              trend: dbTrend,
+              trend_value: trendValue,
+              summary: summaryText,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingSignal.id)
+            .select("id, name, category, absolute_value, trend")
+            .single()
+          signalRecord = updated
+        } else {
+          const { data: inserted } = await adminDb
+            .from("signals")
+            .insert({
+              name: signalDef.signalName,
+              category: signalDef.category,
+              organization_id: organizationId,
+              absolute_value: calculated.formattedValue,
+              trend: dbTrend,
+              trend_value: trendValue,
+              source_type: 'upload',
+              summary: summaryText,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .select("id, name, category, absolute_value, trend")
+            .single()
+          signalRecord = inserted
+        }
+
+        if (signalRecord) {
           createdSignals.push(signalRecord)
 
           // ---- WRITE TIME-SERIES DATA POINTS ----
@@ -648,19 +679,17 @@ export async function POST(request: NextRequest) {
             if (timeSeries.length > 0) {
               // Upsert each data point (unique on signal_id + date)
               for (const dp of timeSeries) {
-                await sql`
-                  INSERT INTO signal_data_points (signal_id, date, value, metadata)
-                  VALUES (
-                    ${signalRecord.id}::uuid,
-                    ${dp.date.toISOString()},
-                    ${dp.value},
-                    ${JSON.stringify(dp.metadata)}
+                await adminDb
+                  .from("signal_data_points")
+                  .upsert(
+                    {
+                      signal_id: signalRecord.id,
+                      date: dp.date.toISOString(),
+                      value: dp.value,
+                      metadata: dp.metadata,
+                    },
+                    { onConflict: "signal_id,date" }
                   )
-                  ON CONFLICT (signal_id, date) 
-                  DO UPDATE SET 
-                    value = EXCLUDED.value,
-                    metadata = EXCLUDED.metadata
-                `
               }
             }
           } catch (dpErr) {
@@ -672,36 +701,55 @@ export async function POST(request: NextRequest) {
           if (uploadId) {
             try {
               // Check if signal opportunity already exists for this org
-              const existing = organizationId
-                ? await sql`SELECT id FROM signal_opportunities WHERE signal_name = ${signalDef.signalName} AND organization_id = ${organizationId} LIMIT 1`
-                : await sql`SELECT id FROM signal_opportunities WHERE signal_name = ${signalDef.signalName} AND user_id = ${user.id} LIMIT 1`
-
-              if (existing && existing.length > 0) {
-                await sql`
-                  UPDATE signal_opportunities SET
-                    status = 'active',
-                    is_calculable = true,
-                    confidence_score = ${discovered.matchScore || 0.8},
-                    available_fields = ${JSON.stringify(discovered.matchedFields)},
-                    missing_fields = ${JSON.stringify(discovered.missingFields || [])},
-                    source_uploads = ${JSON.stringify([{ upload_id: uploadId, file_name: file.name }])},
-                    updated_at = NOW()
-                  WHERE id = ${existing[0].id}
-                `
+              let existingOpp = null
+              if (organizationId) {
+                const { data } = await adminDb
+                  .from("signal_opportunities")
+                  .select("id")
+                  .eq("signal_name", signalDef.signalName)
+                  .eq("organization_id", organizationId)
+                  .maybeSingle()
+                existingOpp = data
               } else {
-                await sql`
-                  INSERT INTO signal_opportunities (
-                    user_id, organization_id, signal_name, signal_category,
-                    status, discovery_type, is_calculable, confidence_score,
-                    required_fields, available_fields, missing_fields, source_uploads
-                  ) VALUES (
-                    ${user.id}, ${organizationId}, ${signalDef.signalName}, ${signalDef.category},
-                    'active', 'new', true, ${discovered.matchScore || 0.8},
-                    ${JSON.stringify(signalDef.requiredFields)}, ${JSON.stringify(discovered.matchedFields)},
-                    ${JSON.stringify(discovered.missingFields || [])},
-                    ${JSON.stringify([{ upload_id: uploadId, file_name: file.name }])}
-                  )
-                `
+                const { data } = await adminDb
+                  .from("signal_opportunities")
+                  .select("id")
+                  .eq("signal_name", signalDef.signalName)
+                  .eq("user_id", user.id)
+                  .maybeSingle()
+                existingOpp = data
+              }
+
+              if (existingOpp) {
+                await adminDb
+                  .from("signal_opportunities")
+                  .update({
+                    status: 'active',
+                    is_calculable: true,
+                    confidence_score: discovered.matchScore || 0.8,
+                    available_fields: discovered.matchedFields,
+                    missing_fields: discovered.missingFields || [],
+                    source_uploads: [{ upload_id: uploadId, file_name: file.name }],
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq("id", existingOpp.id)
+              } else {
+                await adminDb
+                  .from("signal_opportunities")
+                  .insert({
+                    user_id: user.id,
+                    organization_id: organizationId,
+                    signal_name: signalDef.signalName,
+                    signal_category: signalDef.category,
+                    status: 'active',
+                    discovery_type: 'new',
+                    is_calculable: true,
+                    confidence_score: discovered.matchScore || 0.8,
+                    required_fields: signalDef.requiredFields,
+                    available_fields: discovered.matchedFields,
+                    missing_fields: discovered.missingFields || [],
+                    source_uploads: [{ upload_id: uploadId, file_name: file.name }],
+                  })
               }
             } catch (oppErr) {
               // Non-fatal
@@ -752,53 +800,53 @@ export async function POST(request: NextRequest) {
           const normalizedName = colName.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
 
           // staged_fields: column metadata per upload
-          await sql`
-            INSERT INTO staged_fields (upload_id, original_column_name, normalized_field_name, field_type, sample_values, stats)
-            VALUES (
-              ${uploadId}::uuid,
-              ${colName},
-              ${normalizedName},
-              ${fieldType},
-              ${JSON.stringify(samples.slice(0, 5))},
-              ${JSON.stringify(stats)}
+          await adminDb
+            .from("staged_fields")
+            .upsert(
+              {
+                upload_id: uploadId,
+                original_column_name: colName,
+                normalized_field_name: normalizedName,
+                field_type: fieldType,
+                sample_values: samples.slice(0, 5),
+                stats: stats,
+              },
+              { ignoreDuplicates: true }
             )
-            ON CONFLICT DO NOTHING
-          `
 
           // field_availability: cross-upload field index for the org
-          const existingField = await sql`
-            SELECT id, upload_ids, total_data_points 
-            FROM field_availability 
-            WHERE normalized_field_name = ${normalizedName} 
-              AND organization_id = ${organizationId}
-            LIMIT 1
-          `
+          const { data: existingField } = await adminDb
+            .from("field_availability")
+            .select("id, upload_ids, total_data_points")
+            .eq("normalized_field_name", normalizedName)
+            .eq("organization_id", organizationId)
+            .maybeSingle()
 
-          if (existingField && existingField.length > 0) {
-            const currentUploads = existingField[0].upload_ids || []
+          if (existingField) {
+            const currentUploads = existingField.upload_ids || []
             const newUploads = Array.isArray(currentUploads) ? [...currentUploads, uploadId] : [uploadId]
-            const totalPoints = (existingField[0].total_data_points || 0) + rows.length
+            const totalPoints = (existingField.total_data_points || 0) + rows.length
 
-            await sql`
-              UPDATE field_availability SET
-                upload_ids = ${JSON.stringify(newUploads)},
-                total_data_points = ${totalPoints},
-                latest_upload_at = NOW()
-              WHERE id = ${existingField[0].id}
-            `
+            await adminDb
+              .from("field_availability")
+              .update({
+                upload_ids: newUploads,
+                total_data_points: totalPoints,
+                latest_upload_at: new Date().toISOString(),
+              })
+              .eq("id", existingField.id)
           } else {
-            await sql`
-              INSERT INTO field_availability (user_id, organization_id, normalized_field_name, field_type, upload_ids, total_data_points, latest_upload_at)
-              VALUES (
-                ${user.id},
-                ${organizationId},
-                ${normalizedName},
-                ${fieldType},
-                ${JSON.stringify([uploadId])},
-                ${rows.length},
-                NOW()
-              )
-            `
+            await adminDb
+              .from("field_availability")
+              .insert({
+                user_id: user.id,
+                organization_id: organizationId,
+                normalized_field_name: normalizedName,
+                field_type: fieldType,
+                upload_ids: [uploadId],
+                total_data_points: rows.length,
+                latest_upload_at: new Date().toISOString(),
+              })
           }
         }
       } catch (fieldErr) {

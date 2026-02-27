@@ -1,10 +1,10 @@
 /**
- * GET /api/user/profile – load profile from Neon (source of truth for KPIs, role, etc.).
- * PATCH /api/user/profile – upsert profile in Neon so save works even if no row yet.
+ * GET /api/user/profile – load profile from Supabase (source of truth for KPIs, role, etc.).
+ * PATCH /api/user/profile – upsert profile in Supabase so save works even if no row yet.
  */
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function GET() {
   try {
@@ -16,13 +16,15 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const rows = await sql`
-      SELECT id, email, full_name, role, organization_id, kpi_1, kpi_2, kpi_3, updated_at
-      FROM profiles
-      WHERE id = ${user.id}
-      LIMIT 1
-    `
-    const profile = rows?.[0] ?? null
+    const adminClient = createAdminClient()
+    const { data: profile, error } = await adminClient
+      .from("profiles")
+      .select("id, email, full_name, role, organization_id, kpi_1, kpi_2, kpi_3, updated_at")
+      .eq("id", user.id)
+      .maybeSingle()
+
+    if (error) throw error
+
     return NextResponse.json({ profile })
   } catch (error) {
     console.error("[api/user/profile] GET error:", error)
@@ -54,28 +56,26 @@ export async function PATCH(request: Request) {
 
     const insFullName = full_name ?? user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? null
     const insRole = role ?? null
+
+    const adminClient = createAdminClient()
     // Upsert so we create a row if user has none (e.g. no onboarding), and always persist KPIs
-    await sql`
-      INSERT INTO profiles (id, email, full_name, role, kpi_1, kpi_2, kpi_3, created_at, updated_at)
-      VALUES (
-        ${user.id},
-        ${user.email ?? null},
-        ${insFullName},
-        ${insRole},
-        ${kpi_1 ?? null},
-        ${kpi_2 ?? null},
-        ${kpi_3 ?? null},
-        NOW(),
-        NOW()
+    const { error } = await adminClient
+      .from("profiles")
+      .upsert(
+        {
+          id: user.id,
+          email: user.email ?? null,
+          full_name: insFullName,
+          role: insRole,
+          kpi_1: kpi_1 ?? null,
+          kpi_2: kpi_2 ?? null,
+          kpi_3: kpi_3 ?? null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" }
       )
-      ON CONFLICT (id) DO UPDATE SET
-        kpi_1 = EXCLUDED.kpi_1,
-        kpi_2 = EXCLUDED.kpi_2,
-        kpi_3 = EXCLUDED.kpi_3,
-        full_name = COALESCE(EXCLUDED.full_name, profiles.full_name),
-        role = COALESCE(EXCLUDED.role, profiles.role),
-        updated_at = NOW()
-    `
+
+    if (error) throw error
 
     return NextResponse.json({ success: true })
   } catch (error) {
