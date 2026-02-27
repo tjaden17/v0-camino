@@ -1,0 +1,1036 @@
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475815613,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475817938,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475817939,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818326,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818327,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818332,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818332,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/profile"},"timestamp":1771475818368,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818394,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818395,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818396,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818396,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818408,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818409,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818409,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818409,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818584,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818584,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475818585,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475818585,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/profile","redirectTo":"/profile"},"timestamp":1771475819528,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475819534,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819534,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771475819534,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475819535,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819535,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771475819535,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819542,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819552,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819612,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819614,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819628,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819630,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819640,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819648,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819693,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475819695,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820012,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820019,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820134,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820136,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771475820461,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820462,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771475820462,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771475820463,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820463,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771475820463,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820474,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820475,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820483,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820484,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820567,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820568,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820620,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475820621,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475821115,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475821118,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475821189,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475821192,"hypothesisId":"H2"}
+{"location":"bottom-nav:Profile-click","message":"Profile link clicked","data":{"pathname":"/dashboard","href":"/profile"},"timestamp":1771475824459,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475824613,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824613,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771475824614,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771475824614,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824615,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771475824615,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824622,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824630,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824687,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824689,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824703,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824705,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824720,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824733,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824805,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475824808,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475825252,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475825269,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475825389,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475825391,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475826725,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475826755,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475826886,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475826888,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475826903,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475826924,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475827772,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475827801,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475827941,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475827943,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475827974,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475827994,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828139,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828141,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828171,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828189,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828328,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828330,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828364,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828382,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828428,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475828428,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831437,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831466,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831613,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831615,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831648,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831667,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831809,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831812,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831843,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475831861,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832004,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832007,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832036,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832056,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832101,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832101,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832111,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832111,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832121,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475832121,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475833875,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475833909,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475834048,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475834050,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475837791,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475837818,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475837954,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475837956,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839305,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839338,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839492,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839494,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839526,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839549,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839702,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839704,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839736,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839758,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839913,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839915,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839945,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475839968,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840002,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840003,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840407,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840434,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840585,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840587,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840617,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840640,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840792,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840795,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840825,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475840847,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841000,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841003,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841547,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841583,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841733,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841736,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841892,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475841916,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842067,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842070,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842100,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842123,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842279,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842281,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842311,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842333,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842369,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842369,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842378,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842379,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842388,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842389,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842397,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842398,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842407,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842408,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842417,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842418,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842427,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475842427,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844416,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844450,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844602,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844604,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844639,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844661,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844812,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844814,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844865,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475844887,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845036,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845039,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845071,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845094,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845128,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845129,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845216,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845217,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845226,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475845226,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846422,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846455,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846607,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846609,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846639,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846662,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846811,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475846813,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847027,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847056,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847205,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847207,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847309,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847332,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847367,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847368,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847388,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847389,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847399,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475847399,"hypothesisId":"H2"}
+{"location":"profile/page.tsx:handleCreateOrganization:entry","message":"Create org clicked","data":{"hasUserId":true,"newOrgNameLen":18,"trimmed":18},"timestamp":1771475848623,"hypothesisId":"H1"}
+{"location":"profile/page.tsx:handleCreateOrganization:before-create","message":"Calling POST /api/user/organizations","data":{},"timestamp":1771475848624,"hypothesisId":"H3"}
+{"location":"profile/page.tsx:handleCreateOrganization:success","message":"Org created","data":{"orgId":"a8b6646e-7823-47ad-b135-92bbacb94e87"},"timestamp":1771475849365,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849366,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849367,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849387,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849513,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849515,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849892,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475849914,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475850041,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771475850043,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771476177505,"hypothesisId":"H5"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771476177509,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476177509,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771476177509,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476177507,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771476177508,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476177521,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476177523,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771476178038,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476178038,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771476178038,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771476178039,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476178039,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771476178039,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476178044,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771476178046,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524965293,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524965295,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966612,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966613,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966605,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966604,"hypothesisId":"H5"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/profile"},"timestamp":1771524966644,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966664,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966665,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966665,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966666,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966681,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966681,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966682,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966682,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966937,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966937,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524966938,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524966938,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/profile","redirectTo":"/profile"},"timestamp":1771524968641,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524968648,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968648,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771524968648,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771524968649,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968649,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771524968649,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968654,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968658,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968691,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968692,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968700,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968701,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968707,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968709,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968724,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968725,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968885,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968887,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968925,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524968926,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771524969458,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969459,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771524969459,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771524969459,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969459,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771524969459,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969463,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969464,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771524969468,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969468,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771524969468,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771524969469,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969469,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771524969469,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969473,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969473,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969475,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969475,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969546,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969546,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969598,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524969598,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524970269,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524970272,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524970315,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524970317,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978514,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978663,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978666,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978850,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978851,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978865,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771524978866,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525020991,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525020991,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021178,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021178,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021180,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021180,"hypothesisId":"H5"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/dashboard"},"timestamp":1771525021190,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021197,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021197,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021197,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021197,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021205,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021205,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021206,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021206,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021267,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021267,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021267,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021267,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/dashboard","redirectTo":"/dashboard"},"timestamp":1771525021519,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021522,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021522,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525021522,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021522,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021522,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525021522,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021525,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021526,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021530,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021531,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021596,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021596,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021650,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021650,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021680,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021680,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525021680,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525021680,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021681,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525021681,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021682,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021683,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021685,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021686,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021901,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021902,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021958,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525021959,"hypothesisId":"H2"}
+{"location":"bottom-nav:Profile-click","message":"Profile link clicked","data":{"pathname":"/dashboard","href":"/profile"},"timestamp":1771525022841,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525022955,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022955,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525022955,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525022955,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022956,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525022956,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022960,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022961,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525022966,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022966,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525022966,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525022967,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022967,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525022967,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022971,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022972,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525022982,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022983,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525022983,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525022983,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022983,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525022983,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022987,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525022991,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023025,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023026,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023031,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023032,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023046,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023049,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023068,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023069,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023225,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023227,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023262,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525023263,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525026560,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525026561,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525034156,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525050017,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525072330,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525072330,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525073642,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073642,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525073643,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073643,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/profile"},"timestamp":1771525073645,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/profile"},"timestamp":1771525073646,"hypothesisId":"H1"}
+{"location":"layout:no-session","message":"Redirect to login (no session)","data":{"pathname":"/profile"},"timestamp":1771525073651,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525073653,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073653,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525073654,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525073654,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073654,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525073654,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073656,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073659,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073681,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073682,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073686,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073687,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073690,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073692,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073706,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073707,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073869,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525073870,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525088164,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090178,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090178,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090179,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090179,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/mission"},"timestamp":1771525090183,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/mission"},"timestamp":1771525090184,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090189,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090189,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090190,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090190,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090389,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090389,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090389,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090389,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/mission","redirectTo":"/mission"},"timestamp":1771525090859,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090862,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090863,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090863,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090863,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090863,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090863,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090867,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090867,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090867,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090868,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090868,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090868,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090874,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090875,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090881,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090881,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090881,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090881,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090881,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090881,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090886,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090887,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090891,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090891,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090891,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525090892,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090892,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525090892,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090904,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525090904,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525091071,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091071,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525091072,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525091073,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091073,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525091073,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091075,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091075,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091078,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091078,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091146,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091146,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091205,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091205,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091387,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091388,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091400,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525091402,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525098884,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098884,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525098884,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525098885,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098888,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098885,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098889,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525098885,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525098895,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098896,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525098896,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525098896,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098896,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525098896,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098901,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525098902,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525099201,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525099201,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525099201,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/mission"},"timestamp":1771525099202,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525099202,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/mission"},"timestamp":1771525099202,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525099213,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525099214,"hypothesisId":"H2"}
+{"location":"bottom-nav:Profile-click","message":"Profile link clicked","data":{"pathname":"/mission","href":"/profile"},"timestamp":1771525100247,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525100418,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100418,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525100418,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525100419,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100419,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525100419,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100421,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100427,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100455,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100455,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100459,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100460,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100469,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100476,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100495,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100495,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100676,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100682,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100722,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525100723,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525102002,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102003,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525102003,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525102003,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102003,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525102003,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102007,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102007,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525102011,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102011,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525102011,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525102012,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102012,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525102012,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102015,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102015,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525102172,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102172,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525102172,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525102172,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102172,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525102172,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102177,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525102178,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525251594,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525251596,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252133,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252133,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252139,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252140,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/signals"},"timestamp":1771525252160,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252169,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252170,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252170,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252170,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252180,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252181,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252181,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252181,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252292,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252292,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525252293,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525252293,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/signals","redirectTo":"/signals"},"timestamp":1771525253902,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525253905,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525253906,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525253906,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771525253906,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525253906,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771525253906,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525253915,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525253916,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525254072,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254073,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525254073,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525254073,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254073,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525254073,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525254079,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254079,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525254079,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771525254079,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254080,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771525254080,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254084,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254085,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254089,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254090,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254201,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254201,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254256,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254257,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254485,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254486,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254526,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525254528,"hypothesisId":"H2"}
+{"location":"bottom-nav:Profile-click","message":"Profile link clicked","data":{"pathname":"/dashboard","href":"/profile"},"timestamp":1771525303381,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303590,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303590,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303590,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303590,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303590,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303590,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303595,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303595,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303603,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303603,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303603,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303604,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303604,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303604,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303611,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303612,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303618,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303618,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303619,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303619,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303619,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303619,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303625,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303627,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303632,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303633,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303633,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303633,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303634,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303634,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303640,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303641,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303646,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303646,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303646,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/profile"},"timestamp":1771525303646,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303646,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/profile"},"timestamp":1771525303647,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303654,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303658,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303688,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303689,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303694,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303694,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303707,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303709,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303725,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525303726,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525304025,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525304027,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525304058,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525304058,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525307194,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525307195,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525314446,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525315839,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525315839,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525315998,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525315999,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525322667,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525322668,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525767018,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771525767019,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526097713,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526097714,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526412576,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526412577,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526414997,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526414998,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526442387,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526442656,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526442661,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526442912,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526442913,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526501247,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526501248,"hypothesisId":"H2"}
+{"location":"upload-proto-client.tsx:handleGenerate","message":"payload size before fetch","data":{"payloadLength":7073549,"tabCount":3,"signalCount":40,"useMultipart":true},"timestamp":1771526653856,"hypothesisId":"H3"}
+{"location":"upload-proto-client.tsx:afterFetch","message":"response received","data":{"status":200,"responseLength":5029,"responsePreview":"{\"success\":true,\"signalsCreated\":40,\"signals\":[{\"id\":\"4e68aeda-7127-4ecb-8ae1-b226ad90cada\",\"name\":\"Total Deals / Opport"},"timestamp":1771526730616,"hypothesisId":"H2"}
+{"location":"upload-proto-client.tsx:handleGenerate","message":"payload size before fetch","data":{"payloadLength":3258861,"tabCount":1,"signalCount":4,"useMultipart":false},"timestamp":1771526761019,"hypothesisId":"H3"}
+{"location":"generate/route.ts:parse-body","message":"before request.json()","data":{"contentLength":"3258933"},"timestamp":1771526761406,"hypothesisId":"H1"}
+{"location":"upload-proto-client.tsx:afterFetch","message":"response received","data":{"status":200,"responseLength":482,"responsePreview":"{\"success\":true,\"signalsCreated\":4,\"signals\":[{\"id\":\"c062ce09-c530-47af-8d1c-fe241998c1d3\",\"name\":\"Total Shifts\",\"catego"},"timestamp":1771526775374,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778096,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778096,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778096,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778096,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/signals"},"timestamp":1771526778105,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/signals"},"timestamp":1771526778106,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778110,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778110,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778110,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778110,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778285,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778285,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778285,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778285,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/signals","redirectTo":"/signals"},"timestamp":1771526778598,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778600,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778600,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778600,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778600,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778600,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778600,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778603,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778603,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778603,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778603,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778604,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778604,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778609,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778610,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778612,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778613,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778613,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778613,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778613,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778613,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778617,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778618,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778621,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778621,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778621,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778621,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778621,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778621,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778625,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778625,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778627,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778627,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778627,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778627,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778628,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778628,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778632,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778632,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778735,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778735,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778735,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778735,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778735,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778735,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778738,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778738,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778738,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778738,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778739,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778739,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778743,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778743,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778745,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778745,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778746,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778746,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778746,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778746,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778752,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778753,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778756,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778756,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778756,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778756,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778756,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778756,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778761,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778761,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778764,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778764,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778764,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771526778764,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778764,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771526778764,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778770,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526778770,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771526779146,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779146,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771526779146,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771526779147,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779147,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779152,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771526779147,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779153,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771526779157,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779157,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771526779158,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771526779158,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779158,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771526779158,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779161,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779161,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779163,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779164,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779280,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779280,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779339,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779339,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779708,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779709,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779757,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526779758,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790234,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790467,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790471,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790608,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790610,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790626,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526790627,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791143,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791143,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791156,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791156,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791215,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791215,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791216,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791268,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791269,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526791271,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526792758,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526792759,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526794796,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771526794797,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527628103,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527628382,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527628386,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527628619,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527628620,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527644016,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527644017,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527644031,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527644032,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527645577,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527645578,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527655297,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771527655298,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771613666085,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771613666416,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771613666420,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771613666738,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771613666739,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771614999476,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771614999482,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771615589985,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771615590306,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771615590310,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771615590588,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771615590590,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616086292,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616086298,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616087003,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616087004,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616087458,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616087909,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616087917,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616088023,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771616088024,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771617029380,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618531726,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618532153,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618532403,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618532411,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618532655,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618532657,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618548903,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618548904,"hypothesisId":"H2"}
+{"location":"upload-proto-client.tsx:handleGenerate","message":"payload size before fetch","data":{"payloadLength":28906,"tabCount":1,"signalCount":23,"useMultipart":false},"timestamp":1771618580142,"hypothesisId":"H3"}
+{"location":"generate/route.ts:parse-body","message":"before request.json()","data":{"contentLength":"28906"},"timestamp":1771618581047,"hypothesisId":"H1"}
+{"location":"upload-proto-client.tsx:afterFetch","message":"response received","data":{"status":200,"responseLength":2786,"responsePreview":"{\"success\":true,\"signalsCreated\":23,\"signals\":[{\"id\":\"4e68aeda-7127-4ecb-8ae1-b226ad90cada\",\"name\":\"Total Deals / Opport"},"timestamp":1771618591081,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618593901,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618593901,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618593901,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618593901,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/signals"},"timestamp":1771618593908,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:useEffect","message":"Protected layout effect ran","data":{"pathname":"/signals"},"timestamp":1771618593910,"hypothesisId":"H1"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618593918,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618593918,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618593918,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618593918,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594022,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594022,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594022,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594022,"hypothesisId":"H2"}
+{"location":"layout:onboarding","message":"Redirect to onboarding","data":{"pathname":"/signals","redirectTo":"/signals"},"timestamp":1771618594351,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594353,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594353,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594353,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594353,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594353,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594353,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594358,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594359,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594359,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594360,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594360,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594360,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594369,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594370,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594372,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594372,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594373,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594373,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594373,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594373,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594377,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594377,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594379,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594380,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594380,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594380,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594380,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594380,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594386,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594387,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594389,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594389,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594389,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594390,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594390,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594390,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594394,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594395,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594658,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594658,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594658,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594658,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594658,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594658,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594661,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594662,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594662,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594662,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594662,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594662,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594666,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594667,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594669,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594669,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594669,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594669,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594669,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594669,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594673,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594674,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594676,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594676,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594676,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594677,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594677,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594677,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594682,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594683,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594685,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594686,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594686,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/signals"},"timestamp":1771618594686,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594686,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/signals"},"timestamp":1771618594686,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594697,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594698,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771618594857,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594857,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771618594857,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771618594857,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594857,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771618594857,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594861,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594862,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771618594868,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594869,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771618594869,"hypothesisId":"H3"}
+{"location":"app/(protected)/layout.tsx:mount","message":"Protected layout mounting","data":{"pathname":"/dashboard"},"timestamp":1771618594869,"hypothesisId":"H5"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594869,"hypothesisId":"H2"}
+{"location":"app/(protected)/layout.tsx:render-main","message":"Rendering main content (auth done)","data":{"pathname":"/dashboard"},"timestamp":1771618594869,"hypothesisId":"H3"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594872,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594872,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594874,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594875,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594937,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594937,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594995,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618594996,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618595416,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618595417,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600466,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600659,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600662,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600793,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600794,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600805,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618600806,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601290,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601291,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601302,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601303,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601358,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601358,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601358,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601413,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601413,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618601413,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618603500,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618603501,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618605401,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771618605402,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771619983700,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771619984046,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771619984344,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771619984350,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771619984646,"hypothesisId":"H2"}
+{"location":"lib/supabase/client.ts:before-create","message":"About to create Supabase client","data":{"urlLen":40,"keyLen":208},"timestamp":1771619984647,"hypothesisId":"H2"}

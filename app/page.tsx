@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 "use client"
 
 import type React from "react"
@@ -15,36 +16,27 @@ import { useToast } from "@/hooks/use-toast"
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Target, LayoutGrid, GitBranch } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+=======
+import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
+>>>>>>> Stashed changes
 
-const calculateImportanceScore = (issue: SubIssue): number => {
-  // This is a placeholder algorithm - you'll replace this with your actual calculation
-  // Higher trend values and more sub-issues = more important
-  const trendScore = Math.abs(Number.parseFloat(issue.trendValue.replace(/[^0-9.-]/g, ""))) || 0
-  const subIssueScore = (issue.subIssues?.length || 0) * 2
-  return trendScore + subIssueScore
-}
+/**
+ * Root route: unauthenticated → login (so you can log in or create account);
+ * authenticated → mission. This gives a clear "start of session" flow when
+ * you open the app (e.g. after npm run dev) with no existing session.
+ */
+export default async function RootPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-const findMostImportantIssue = (): { issue: SubIssue; level: SubIssue[]; index: number } => {
-  let maxScore = -1
-  let mostImportantIssue: SubIssue = issueTreeData.subIssues[0]
-  let parentLevel: SubIssue[] = issueTreeData.subIssues
-  let issueIndex = 0
-
-  const traverseTree = (issues: SubIssue[], level: SubIssue[]) => {
-    issues.forEach((issue, index) => {
-      const score = calculateImportanceScore(issue)
-      if (score > maxScore) {
-        maxScore = score
-        mostImportantIssue = issue
-        parentLevel = level
-        issueIndex = index
-      }
-      if (issue.subIssues) {
-        traverseTree(issue.subIssues, issue.subIssues)
-      }
-    })
+  if (!user) {
+    redirect("/auth/login")
   }
 
+<<<<<<< Updated upstream
   traverseTree(issueTreeData.subIssues, issueTreeData.subIssues)
   return { issue: mostImportantIssue, level: parentLevel, index: issueIndex }
 }
@@ -424,4 +416,7 @@ export default function HomePage() {
       <ShareDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen} issueName={currentIssue.name} />
     </div>
   )
+=======
+  redirect("/mission")
+>>>>>>> Stashed changes
 }

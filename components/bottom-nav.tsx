@@ -36,7 +36,24 @@ export function BottomNav() {
               <span className="text-xs">Guidance</span>
             </Button>
           </Link>
-          <Link href="/profile">
+          {/* #region agent log */}
+          <Link
+            href="/profile"
+            onClick={() =>
+              fetch("http://127.0.0.1:7242/ingest/bc0a0876-b22a-43a2-8bb5-3b0f14e7c9c0", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  location: "bottom-nav:Profile-click",
+                  message: "Profile link clicked",
+                  data: { pathname, href: "/profile" },
+                  timestamp: Date.now(),
+                  hypothesisId: "H2",
+                }),
+              }).catch(() => {})
+            }
+          >
+            {/* #endregion */}
             <Button
               variant="ghost"
               size="sm"
