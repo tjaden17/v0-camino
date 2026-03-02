@@ -1,10 +1,10 @@
 /**
  * Centralized data points access layer.
- * 
+ *
  * All AI analysis services read time-series signal data through this module.
- * Data is stored in the Neon `signal_data_points` table, written during upload
+ * Data is stored in the Supabase `signal_data_points` table, written during upload
  * calculation (/api/upload/calculate) and integration sync.
- * 
+ *
  * Table: signal_data_points
  *   - signal_id (uuid, FK -> signals)
  *   - date (timestamptz)
@@ -12,7 +12,7 @@
  *   - metadata (jsonb) - source, period, rowCount, calcType
  */
 
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export interface DataPoint {
   date: string
@@ -35,46 +35,24 @@ export async function getSignalDataPoints(
   const { limit = 90, ascending = false, sinceDate } = options
 
   try {
-    let rows
+    const supabase = createAdminClient()
+
+    let query = supabase
+      .from("signal_data_points")
+      .select("date, value, metadata")
+      .eq("signal_id", signalId)
+      .order("date", { ascending })
+      .limit(limit)
 
     if (sinceDate) {
-      if (ascending) {
-        rows = await sql`
-          SELECT date, value, metadata
-          FROM signal_data_points
-          WHERE signal_id = ${signalId}::uuid
-            AND date >= ${sinceDate}
-          ORDER BY date ASC
-          LIMIT ${limit}
-        `
-      } else {
-        rows = await sql`
-          SELECT date, value, metadata
-          FROM signal_data_points
-          WHERE signal_id = ${signalId}::uuid
-            AND date >= ${sinceDate}
-          ORDER BY date DESC
-          LIMIT ${limit}
-        `
-      }
-    } else {
-      if (ascending) {
-        rows = await sql`
-          SELECT date, value, metadata
-          FROM signal_data_points
-          WHERE signal_id = ${signalId}::uuid
-          ORDER BY date ASC
-          LIMIT ${limit}
-        `
-      } else {
-        rows = await sql`
-          SELECT date, value, metadata
-          FROM signal_data_points
-          WHERE signal_id = ${signalId}::uuid
-          ORDER BY date DESC
-          LIMIT ${limit}
-        `
-      }
+      query = query.gte("date", sinceDate)
+    }
+
+    const { data: rows, error } = await query
+
+    if (error) {
+      console.error("[DataPointsService] Supabase error:", error)
+      return []
     }
 
     return (rows || []).map((r: any) => ({
@@ -93,10 +71,18 @@ export async function getSignalDataPoints(
  */
 export async function getSignalDataPointCount(signalId: string): Promise<number> {
   try {
-    const result = await sql`
-      SELECT COUNT(*) as count FROM signal_data_points WHERE signal_id = ${signalId}::uuid
-    `
-    return Number(result?.[0]?.count || 0)
+    const supabase = createAdminClient()
+    const { count, error } = await supabase
+      .from("signal_data_points")
+      .select("*", { count: "exact", head: true })
+      .eq("signal_id", signalId)
+
+    if (error) {
+      console.error("[DataPointsService] count error:", error)
+      return 0
+    }
+
+    return count || 0
   } catch {
     return 0
   }
@@ -115,20 +101,19 @@ export async function getMultiSignalDataPoints(
   if (signalIds.length === 0) return result
 
   try {
-    // Query all at once, then group
-    const rows = ascending
-      ? await sql`
-          SELECT signal_id, date, value, metadata
-          FROM signal_data_points
-          WHERE signal_id = ANY(${signalIds}::uuid[])
-          ORDER BY signal_id, date ASC
-        `
-      : await sql`
-          SELECT signal_id, date, value, metadata
-          FROM signal_data_points
-          WHERE signal_id = ANY(${signalIds}::uuid[])
-          ORDER BY signal_id, date DESC
-        `
+    const supabase = createAdminClient()
+
+    const { data: rows, error } = await supabase
+      .from("signal_data_points")
+      .select("signal_id, date, value, metadata")
+      .in("signal_id", signalIds)
+      .order("signal_id")
+      .order("date", { ascending })
+
+    if (error) {
+      console.error("[DataPointsService] multi-signal error:", error)
+      return result
+    }
 
     for (const row of (rows || [])) {
       const id = row.signal_id
@@ -154,13 +139,29 @@ export async function getMultiSignalDataPoints(
  */
 export async function getOrgDataPointCount(organizationId: string): Promise<number> {
   try {
-    const result = await sql`
-      SELECT COUNT(*) as count 
-      FROM signal_data_points sdp
-      JOIN signals s ON s.id = sdp.signal_id
-      WHERE s.organization_id = ${organizationId}
-    `
-    return Number(result?.[0]?.count || 0)
+    const supabase = createAdminClient()
+
+    // Get all signal IDs for the org, then count their data points
+    const { data: signals, error: sigError } = await supabase
+      .from("signals")
+      .select("id")
+      .eq("organization_id", organizationId)
+
+    if (sigError || !signals || signals.length === 0) return 0
+
+    const signalIds = signals.map((s: any) => s.id)
+
+    const { count, error } = await supabase
+      .from("signal_data_points")
+      .select("*", { count: "exact", head: true })
+      .in("signal_id", signalIds)
+
+    if (error) {
+      console.error("[DataPointsService] org count error:", error)
+      return 0
+    }
+
+    return count || 0
   } catch {
     return 0
   }

@@ -1,10 +1,10 @@
 /**
- * PATCH: update organization in Neon.
- * DELETE: delete organization in Neon.
+ * PATCH: update organization.
+ * DELETE: delete organization.
  */
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function PATCH(
   _request: NextRequest,
@@ -31,16 +31,21 @@ export async function PATCH(
       return NextResponse.json({ error: "name is required" }, { status: 400 })
     }
 
-    const updated = await sql`
-      UPDATE organizations
-      SET name = ${name}, updated_at = NOW()
-      WHERE id = ${id}
-      RETURNING id, name, created_at, updated_at
-    `
-    const org = updated?.[0]
+    const admin = createAdminClient()
+    const { data: org, error } = await admin
+      .from("organizations")
+      .update({ name, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) {
+      throw error
+    }
     if (!org) {
       return NextResponse.json({ error: "Organization not found" }, { status: 404 })
     }
+
     return NextResponse.json(org)
   } catch (error) {
     console.error("[api/admin/organizations/[id]] PATCH error:", error)
@@ -70,7 +75,16 @@ export async function DELETE(
       return NextResponse.json({ error: "id required" }, { status: 400 })
     }
 
-    await sql`DELETE FROM organizations WHERE id = ${id}`
+    const admin = createAdminClient()
+    const { error } = await admin
+      .from("organizations")
+      .delete()
+      .eq("id", id)
+
+    if (error) {
+      throw error
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("[api/admin/organizations/[id]] DELETE error:", error)

@@ -1,10 +1,10 @@
 /**
- * GET /api/admin/organizations/[id]/details – load org, members, uploads, signals, availableUsers from Neon.
- * Used by the org details page so it doesn't rely on Supabase for app data.
+ * GET /api/admin/organizations/[id]/details – load org, members, uploads, signals, availableUsers.
+ * Used by the org details page.
  */
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function GET(
   _request: NextRequest,
@@ -24,32 +24,37 @@ export async function GET(
     if (!orgId) {
       return NextResponse.json({ error: "id required" }, { status: 400 })
     }
-    const orgIdNorm = String(orgId).trim().toLowerCase()
 
-    // Compare as text so UUID format from URL always matches DB
-    const orgRows = await sql`
-      SELECT id, name, created_at, updated_at
-      FROM organizations
-      WHERE LOWER(TRIM(id::text)) = ${orgIdNorm}
-      LIMIT 1
-    `
-    const org = orgRows?.[0] ?? null
+    const admin = createAdminClient()
+
+    // Fetch organization
+    const { data: org, error: orgError } = await admin
+      .from("organizations")
+      .select("id, name, created_at, updated_at")
+      .eq("id", orgId)
+      .maybeSingle()
+
+    if (orgError) {
+      throw orgError
+    }
     if (!org) {
       return NextResponse.json({ error: "Organization not found" }, { status: 404 })
     }
-    const dbOrgId = (org as Record<string, unknown>).id
 
     // Members = profiles in this org
-    const memberRows = await sql`
-      SELECT id, email, full_name, role, organization_id, industry, business_context,
-             company_stage, team_size, market, competitors, business_model, kpi_1, kpi_2, kpi_3
-      FROM profiles
-      WHERE organization_id = ${dbOrgId}
-    `
-    const members = (memberRows ?? []).map((p: Record<string, unknown>) => ({
+    const { data: memberRows, error: membersError } = await admin
+      .from("profiles")
+      .select("*")
+      .eq("organization_id", orgId)
+
+    if (membersError) {
+      throw membersError
+    }
+
+    const members = (memberRows ?? []).map((p) => ({
       id: p.id,
       user_id: p.id,
-      organization_id: dbOrgId,
+      organization_id: orgId,
       role: p.role ?? "read-only",
       user_profile: {
         id: p.id,
@@ -71,82 +76,89 @@ export async function GET(
     }))
 
     // Available users = profiles not in this org
-    const usersRows = await sql`
-      SELECT id, email, full_name
-      FROM profiles
-      WHERE organization_id IS NULL OR organization_id != ${dbOrgId}
-    `
-    const availableUsers = usersRows ?? []
+    const { data: availableUsers, error: availableUsersError } = await admin
+      .from("profiles")
+      .select("id, email, full_name")
+      .neq("organization_id", orgId)
 
-    // Uploads: Neon may use staged_uploads or upload_history; return [] if table missing
-    let uploads: Array<Record<string, unknown>> = []
-    try {
-      const uploadRows = await sql`
-        SELECT * FROM upload_history
-        WHERE organization_id = ${dbOrgId}
-        ORDER BY created_at DESC
-      `
-      if (Array.isArray(uploadRows)) {
-        uploads = uploadRows.map((u: Record<string, unknown>) => ({
-          ...u,
-          user_email: null,
-        }))
-      }
-    } catch {
-      // upload_history may not exist in Neon
+    if (availableUsersError) {
+      throw availableUsersError
     }
 
-    // Signals from Neon with optional data point count/latest
+    // Uploads
+    const { data: uploadRows, error: uploadsError } = await admin
+      .from("upload_history")
+      .select("*")
+      .eq("organization_id", orgId)
+      .order("created_at", { ascending: false })
+
+    if (uploadsError) {
+      throw uploadsError
+    }
+
+    const uploads = (uploadRows ?? []).map((u) => ({
+      ...u,
+      user_email: null,
+    }))
+
+    // Signals with data point count and latest value
+    const { data: signalRows, error: signalsError } = await admin
+      .from("signals")
+      .select("*")
+      .eq("organization_id", orgId)
+      .order("updated_at", { ascending: false })
+
+    if (signalsError) {
+      throw signalsError
+    }
+
     let signals: Array<Record<string, unknown>> = []
-    try {
-      const signalRows = await sql`
-        SELECT * FROM signals
-        WHERE organization_id = ${dbOrgId}
-        ORDER BY updated_at DESC
-      `
-      if (Array.isArray(signalRows) && signalRows.length > 0) {
-        signals = await Promise.all(
-          signalRows.map(async (s: Record<string, unknown>) => {
-            const signalId = s.id
-            let data_points_count = 0
-            let latest_value: unknown = null
-            let latest_date: unknown = null
-            try {
-              const countRows = await sql`
-                SELECT COUNT(*) as c FROM signal_data_points WHERE signal_id = ${signalId}::uuid
-              `
-              data_points_count = Number((countRows?.[0] as { c: string })?.c ?? 0)
-              const latestRows = await sql`
-                SELECT value, date FROM signal_data_points
-                WHERE signal_id = ${signalId}::uuid
-                ORDER BY date DESC LIMIT 1
-              `
-              const latest = latestRows?.[0] as { value: unknown; date: unknown } | undefined
-              if (latest) {
-                latest_value = latest.value
-                latest_date = latest.date
-              }
-            } catch {
-              // ignore
+    if (signalRows && signalRows.length > 0) {
+      signals = await Promise.all(
+        signalRows.map(async (s) => {
+          let data_points_count = 0
+          let latest_value: unknown = null
+          let latest_date: unknown = null
+
+          try {
+            const { count } = await admin
+              .from("signal_data_points")
+              .select("*", { count: "exact", head: true })
+              .eq("signal_id", s.id)
+
+            data_points_count = count ?? 0
+
+            const { data: latest } = await admin
+              .from("signal_data_points")
+              .select("value, date")
+              .eq("signal_id", s.id)
+              .order("date", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+
+            if (latest) {
+              latest_value = latest.value
+              latest_date = latest.date
             }
-            return {
-              ...s,
-              owner_email: null,
-              data_points_count,
-              latest_value,
-              latest_date,
-            }
-          })
-        )
-      }
-    } catch (e) {
-      console.error("[api/admin/organizations/[id]/details] signals error:", e)
+          } catch {
+            // ignore
+          }
+
+          return {
+            ...s,
+            owner_email: null,
+            data_points_count,
+            latest_value,
+            latest_date,
+          }
+        })
+      )
     }
 
     return NextResponse.json({
       org,
       members,
-      availableUsers,
+      availableUsers: availableUsers ?? [],
       uploads,
       signals,
     })

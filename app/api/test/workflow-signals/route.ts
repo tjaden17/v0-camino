@@ -1,5 +1,4 @@
 import { generateText } from 'ai'
-import { sql } from '@/lib/db/neon'
 import { NextResponse } from 'next/server'
 
 // Mock organization for testing (in production, would be from auth)

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { getSignalDataPoints } from "@/lib/data-points-service"
 
 export interface Signal {
@@ -48,21 +48,25 @@ export interface SavedSignal {
 
 export async function getSignals(organizationId?: string | null): Promise<SignalWithData[]> {
   try {
-    // Query signals from Neon with deduplication (keep most recent by updated_at)
-    let signals: Signal[]
-    
+    const supabase = createAdminClient()
+
+    let query = supabase
+      .from("signals")
+      .select("*")
+      .order("name")
+      .order("updated_at", { ascending: false })
+
     if (organizationId) {
-      signals = await sql`
-        SELECT DISTINCT ON (name) * FROM signals 
-        WHERE organization_id = ${organizationId}
-        ORDER BY name, updated_at DESC
-      `
+      query = query.eq("organization_id", organizationId)
     } else {
-      signals = await sql`
-        SELECT DISTINCT ON (name) * FROM signals 
-        WHERE organization_id IS NULL
-        ORDER BY name, updated_at DESC
-      `
+      query = query.is("organization_id", null)
+    }
+
+    const { data: signals, error } = await query
+
+    if (error) {
+      console.error("[v0] getSignals error:", error)
+      return []
     }
 
     if (!signals || signals.length === 0) {
@@ -75,7 +79,7 @@ export async function getSignals(organizationId?: string | null): Promise<Signal
 
     // For now, return signals with basic data structure
     // Data points will be fetched separately if needed
-    const signalsWithData: SignalWithData[] = signals.map((signal) => {
+    const signalsWithData: SignalWithData[] = signals.map((signal: any) => {
       // Parse absolute_value as the latest value
       const latestValue = signal.absolute_value ? parseFloat(signal.absolute_value) : null
 
@@ -100,15 +104,19 @@ export async function getSignals(organizationId?: string | null): Promise<Signal
 
 export async function getSignalById(signalId: string): Promise<SignalWithData | null> {
   try {
-    const signals = await sql`
-      SELECT * FROM signals WHERE id = ${signalId} LIMIT 1
-    `
+    const supabase = createAdminClient()
 
-    if (!signals || signals.length === 0) {
+    const { data: signal, error } = await supabase
+      .from("signals")
+      .select("*")
+      .eq("id", signalId)
+      .maybeSingle()
+
+    if (error || !signal) {
+      if (error) console.error("[v0] getSignalById error:", error)
       return null
     }
 
-    const signal = signals[0] as Signal
     const latestValue = signal.absolute_value ? parseFloat(signal.absolute_value) : null
     const trendForUI = (t: string | null | undefined): string =>
       t === "up" ? "increasing" : t === "down" ? "decreasing" : (t || "stable")

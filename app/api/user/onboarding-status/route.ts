@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function GET() {
   try {
@@ -12,20 +12,16 @@ export async function GET() {
     }
 
     // Check user_context for onboarding status
-    const result = await sql`
-      SELECT 
-        onboarding_completed,
-        onboarding_step,
-        organization_id,
-        role,
-        department
-      FROM user_context 
-      WHERE user_id = ${user.id}
-      LIMIT 1
-    `
+    const adminClient = createAdminClient()
+    const { data: context, error } = await adminClient
+      .from("user_context")
+      .select("onboarding_completed, onboarding_step, organization_id, role, department")
+      .eq("user_id", user.id)
+      .maybeSingle()
 
-    if (result && result.length > 0) {
-      const context = result[0]
+    if (error) throw error
+
+    if (context) {
       return NextResponse.json({
         onboardingCompleted: context.onboarding_completed || false,
         onboardingStep: context.onboarding_step || 0,

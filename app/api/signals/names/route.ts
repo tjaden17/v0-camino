@@ -4,7 +4,7 @@
  */
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function GET() {
   try {
@@ -16,23 +16,31 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const profileRows = await sql`
-      SELECT organization_id FROM profiles WHERE id = ${user.id} LIMIT 1
-    `
-    const organizationId = profileRows?.[0]?.organization_id ?? null
+    const adminClient = createAdminClient()
+
+    const { data: profileData, error: profileError } = await adminClient
+      .from("profiles")
+      .select("organization_id")
+      .eq("id", user.id)
+      .maybeSingle()
+
+    if (profileError) throw profileError
+
+    const organizationId = profileData?.organization_id ?? null
 
     if (!organizationId) {
       return NextResponse.json({ names: [], categories: [] })
     }
 
-    const rows = await sql`
-      SELECT DISTINCT name, category
-      FROM signals
-      WHERE organization_id = ${organizationId}
-        AND name IS NOT NULL
-        AND name != ''
-      ORDER BY name
-    `
+    const { data: rows, error: signalsError } = await adminClient
+      .from("signals")
+      .select("name, category")
+      .eq("organization_id", organizationId)
+      .not("name", "is", null)
+      .neq("name", "")
+      .order("name")
+
+    if (signalsError) throw signalsError
 
     const names = [...new Set((rows ?? []).map((r: { name: string }) => r.name))]
     const categories = [...new Set((rows ?? []).map((r: { category: string | null }) => r.category).filter(Boolean))] as string[]

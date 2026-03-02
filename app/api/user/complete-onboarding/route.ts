@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sql } from "@/lib/db/neon"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function POST(request: Request) {
   try {
@@ -28,134 +28,119 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // 1. Create organization in Neon
-    const orgResult = await sql`
-      INSERT INTO organizations (name, created_by, created_at, updated_at)
-      VALUES (${organizationName}, ${user.id}, NOW(), NOW())
-      ON CONFLICT DO NOTHING
-      RETURNING id
-    `
+    const adminClient = createAdminClient()
+
+    // 1. Create organization
+    const { data: orgData, error: orgError } = await adminClient
+      .from("organizations")
+      .insert({
+        name: organizationName,
+        created_by: user.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single()
 
     let organizationId: string
 
-    if (orgResult && orgResult.length > 0) {
-      organizationId = orgResult[0].id
+    if (orgData && !orgError) {
+      organizationId = orgData.id
     } else {
       // Organization might already exist, try to fetch it
-      const existingOrg = await sql`
-        SELECT id FROM organizations WHERE created_by = ${user.id} LIMIT 1
-      `
-      if (existingOrg && existingOrg.length > 0) {
-        organizationId = existingOrg[0].id
+      const { data: existingOrg } = await adminClient
+        .from("organizations")
+        .select("id")
+        .eq("created_by", user.id)
+        .limit(1)
+        .maybeSingle()
+
+      if (existingOrg) {
+        organizationId = existingOrg.id
       } else {
         // Create with a different approach if conflict happened
-        const newOrg = await sql`
-          INSERT INTO organizations (name, created_by, created_at, updated_at)
-          VALUES (${organizationName}, ${user.id}, NOW(), NOW())
-          RETURNING id
-        `
-        organizationId = newOrg[0].id
+        const { data: newOrg, error: newOrgError } = await adminClient
+          .from("organizations")
+          .insert({
+            name: organizationName,
+            created_by: user.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .select("id")
+          .single()
+
+        if (newOrgError) throw newOrgError
+        organizationId = newOrg.id
       }
     }
 
     // 2. Update profile with organization_id and role
-    await sql`
-      INSERT INTO profiles (id, email, organization_id, role, full_name, created_at, updated_at)
-      VALUES (
-        ${user.id}, 
-        ${user.email}, 
-        ${organizationId}, 
-        ${role},
-        ${user.user_metadata?.full_name || user.email?.split("@")[0] || "User"},
-        NOW(), 
-        NOW()
+    const { error: profileError } = await adminClient
+      .from("profiles")
+      .upsert(
+        {
+          id: user.id,
+          email: user.email,
+          organization_id: organizationId,
+          role,
+          full_name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" }
       )
-      ON CONFLICT (id) DO UPDATE SET
-        organization_id = ${organizationId},
-        role = ${role},
-        updated_at = NOW()
-    `
+
+    if (profileError) throw profileError
 
     // 3. Create/update user_context with all onboarding data
-    await sql`
-      INSERT INTO user_context (
-        user_id, 
-        organization_id, 
-        role, 
-        department, 
-        seniority_level, 
-        business_stage, 
-        company_size, 
-        industry,
-        goals,
-        onboarding_completed,
-        onboarding_step,
-        created_at, 
-        updated_at
+    const { error: contextError } = await adminClient
+      .from("user_context")
+      .upsert(
+        {
+          user_id: user.id,
+          organization_id: organizationId,
+          role,
+          department,
+          seniority_level: seniorityLevel,
+          business_stage: businessStage,
+          company_size: companySize,
+          industry,
+          goals: selectedGoals || [],
+          onboarding_completed: true,
+          onboarding_step: 3,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
       )
-      VALUES (
-        ${user.id}, 
-        ${organizationId}, 
-        ${role}, 
-        ${department}, 
-        ${seniorityLevel}, 
-        ${businessStage}, 
-        ${companySize}, 
-        ${industry},
-        ${JSON.stringify(selectedGoals || [])},
-        true,
-        3,
-        NOW(), 
-        NOW()
-      )
-      ON CONFLICT (user_id) DO UPDATE SET
-        organization_id = ${organizationId},
-        role = ${role},
-        department = ${department},
-        seniority_level = ${seniorityLevel},
-        business_stage = ${businessStage},
-        company_size = ${companySize},
-        industry = ${industry},
-        goals = ${JSON.stringify(selectedGoals || [])},
-        onboarding_completed = true,
-        onboarding_step = 3,
-        updated_at = NOW()
-    `
+
+    if (contextError) throw contextError
 
     // 4. Create user_goals from selected goals
     if (selectedGoals && selectedGoals.length > 0) {
       for (let i = 0; i < selectedGoals.length; i++) {
         const goalValue = selectedGoals[i]
-        await sql`
-          INSERT INTO user_goals (
-            user_id,
-            organization_id,
-            goal_type,
-            title,
-            status,
-            priority,
-            created_at,
-            updated_at
+        await adminClient
+          .from("user_goals")
+          .upsert(
+            {
+              user_id: user.id,
+              organization_id: organizationId,
+              goal_type: "business_priority",
+              title: goalValue,
+              status: "active",
+              priority: i + 1,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+            { ignoreDuplicates: true }
           )
-          VALUES (
-            ${user.id},
-            ${organizationId},
-            'business_priority',
-            ${goalValue},
-            'active',
-            ${i + 1},
-            NOW(),
-            NOW()
-          )
-          ON CONFLICT DO NOTHING
-        `
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       organizationId,
-      message: "Onboarding completed successfully" 
+      message: "Onboarding completed successfully"
     })
 
   } catch (error) {
