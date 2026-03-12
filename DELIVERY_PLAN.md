@@ -132,7 +132,7 @@ This plan maps the 7-phase AI extraction architecture to two critical milestones
 **Purpose:** Automated validation of AI-generated opportunities before showing to users.
 
 **Spec:**
-```
+\`\`\`
 Input: Single opportunity text (e.g., "Focus sales on deals under $50K, win rate 15% higher")
 Output: { pass: boolean, score: 0-1, reason: string }
 
@@ -152,7 +152,7 @@ Validation Criteria:
 4. Reasonable? (Doesn't contradict the data)
    - ✅ "Win rate up 5%, focus on winning deals" (aligned with trend)
    - ❌ "Win rate up 5%, but we should reduce pricing" (contradicts trend)
-```
+\`\`\`
 
 **Implementation:**
 - Build a new service: `lib/opportunities-qa-service.ts`
@@ -166,7 +166,7 @@ Validation Criteria:
 
 ## Milestone 1: Critical Path Dependencies
 
-```
+\`\`\`
 Week 1: Phase 1-2 (column inference + signal extraction)
   ↓ (blocks)
 Week 2: Phase 3-5 (trends + interpretation) + QA validation
@@ -174,7 +174,7 @@ Week 2: Phase 3-5 (trends + interpretation) + QA validation
 Week 3: Phase 7 (integration) + UI rendering
   ↓ (blocks)
 Week 4: Polish + demo
-```
+\`\`\`
 
 **Go/No-Go Checkpoints:**
 - **EOW1:** Column inference + signal extraction working on Surge data

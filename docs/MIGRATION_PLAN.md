@@ -114,7 +114,7 @@ Keep this separate - it's sample/test data:
 ## Execution Steps
 
 ### Step 1: Create Folder Structure
-```bash
+\`\`\`bash
 mkdir -p docs/00_DECISIONS/roadmap
 mkdir -p docs/00_DECISIONS/sprint
 mkdir -p docs/00_DECISIONS/architecture
@@ -130,7 +130,7 @@ mkdir -p docs/01_EXPLORATION/learning/audio-chapters
 mkdir -p docs/02_ARCHIVE/deprecated-specs
 mkdir -p docs/02_ARCHIVE/old-plans
 mkdir -p docs/02_ARCHIVE/duplicates
-```
+\`\`\`
 
 ### Step 2: Move Decision Files (Priority 1)
 Move roadmap, sprint, architecture, and spec files first. Update `SOURCE_OF_TRUTH.md` immediately after.
@@ -153,35 +153,35 @@ Move superseded and old documents to archive.
 ### New Document Workflow
 
 **Adding a new idea:**
-```bash
+\`\`\`bash
 # Create in exploration
 touch docs/01_EXPLORATION/future-features/my-idea-2026-02.md
 # Iterate and research
-```
+\`\`\`
 
 **Locking down a decision:**
-```bash
+\`\`\`bash
 # Move to decisions
 mv docs/01_EXPLORATION/future-features/my-idea-2026-02.md \
    docs/00_DECISIONS/architecture/my-feature.md
 # Update SOURCE_OF_TRUTH.md
-```
+\`\`\`
 
 **Replacing a decision:**
-```bash
+\`\`\`bash
 # Archive old version
 mv docs/00_DECISIONS/architecture/old-feature.md \
    docs/02_ARCHIVE/deprecated-specs/old-feature_ARCHIVED_2026-02.md
 # Create new version
 touch docs/00_DECISIONS/architecture/new-feature.md
 # Update SOURCE_OF_TRUTH.md
-```
+\`\`\`
 
 ---
 
 ## Quick Commands
 
-```bash
+\`\`\`bash
 # See what's decided (what you should build to)
 ls docs/00_DECISIONS/**/*
 
@@ -190,7 +190,7 @@ ls docs/01_EXPLORATION/**/*
 
 # See what's archived (historical reference)
 ls docs/02_ARCHIVE/**/*
-```
+\`\`\`
 
 ---
 

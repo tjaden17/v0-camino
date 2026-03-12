@@ -15,7 +15,7 @@ Here's what makes server actions special. First, they run on the server, so your
 
 Let's look at a basic server action. You define it in a file by adding the "use server" directive at the top:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 export async function createTodo(formData: FormData) {
@@ -26,13 +26,13 @@ export async function createTodo(formData: FormData) {
   
   return { success: true }
 }
-```
+\`\`\`
 
 Notice the "use server" directive. This tells Next.js that this entire file contains server-side functions. Everything in this file runs on the server, never on the client.
 
 You can also define inline server actions within server components by adding "use server" inside the function:
 
-```typescript
+\`\`\`typescript
 export default async function TodoPage() {
   async function handleSubmit(formData: FormData) {
     "use server"
@@ -42,7 +42,7 @@ export default async function TodoPage() {
   
   return <form action={handleSubmit}>...</form>
 }
-```
+\`\`\`
 
 Both approaches work, but separate files are cleaner when you need to reuse actions across multiple components.
 
@@ -53,7 +53,7 @@ Forms are the primary way users interact with server actions. Let's build a comp
 
 Start with a simple form component:
 
-```typescript
+\`\`\`typescript
 import { createTodo } from "@/actions/todos"
 
 export function TodoForm() {
@@ -69,7 +69,7 @@ export function TodoForm() {
     </form>
   )
 }
-```
+\`\`\`
 
 Notice how clean this is. You pass the server action directly to the form's action prop. No event handlers, no prevent default, no manual fetch calls. Next.js handles everything.
 
@@ -77,7 +77,7 @@ When the user submits the form, Next.js serializes the form data, sends it to th
 
 Now let's add validation and error handling:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 export async function createTodo(formData: FormData) {
@@ -111,13 +111,13 @@ export async function createTodo(formData: FormData) {
     }
   }
 }
-```
+\`\`\`
 
 The server action now validates input and handles errors gracefully. It returns an object with either success or error information.
 
 To display these errors in your form, use React's useFormState hook:
 
-```typescript
+\`\`\`typescript
 "use client"
 
 import { useFormState } from "react-dom"
@@ -141,7 +141,7 @@ export function TodoForm() {
     </form>
   )
 }
-```
+\`\`\`
 
 The useFormState hook connects your client component to the server action. It manages the form state and provides the latest result from your action.
 
@@ -152,7 +152,7 @@ There are three levels of validation you should implement: client-side HTML vali
 
 HTML validation is your first line of defense:
 
-```typescript
+\`\`\`typescript
 <input 
   type="email"
   name="email"
@@ -161,13 +161,13 @@ HTML validation is your first line of defense:
   maxLength={100}
   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
 />
-```
+\`\`\`
 
 These HTML attributes provide instant feedback and work even if JavaScript is disabled. They're progressively enhanced.
 
 Client-side JavaScript validation provides better user experience:
 
-```typescript
+\`\`\`typescript
 "use client"
 
 export function SignupForm() {
@@ -195,11 +195,11 @@ export function SignupForm() {
     </form>
   )
 }
-```
+\`\`\`
 
 But always validate on the server. Client-side validation can be bypassed:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 import { z } from "zod"
@@ -230,7 +230,7 @@ export async function signup(formData: FormData) {
   const validData = result.data
   // Create user...
 }
-```
+\`\`\`
 
 Using a validation library like Zod gives you type safety and consistent error messages. The schema defines your rules once, and you get both TypeScript types and runtime validation.
 
@@ -241,7 +241,7 @@ Server actions enable progressive enhancement, meaning your forms work without J
 
 Start with a basic form that works without JavaScript:
 
-```typescript
+\`\`\`typescript
 export default function ContactPage() {
   async function handleContact(formData: FormData) {
     "use server"
@@ -261,13 +261,13 @@ export default function ContactPage() {
     </form>
   )
 }
-```
+\`\`\`
 
 This works perfectly with JavaScript disabled. The form submits, the server action runs, and the user is redirected.
 
 Now enhance it with JavaScript for better UX:
 
-```typescript
+\`\`\`typescript
 "use client"
 
 import { useFormStatus } from "react-dom"
@@ -291,7 +291,7 @@ export function ContactForm({ action }) {
     </form>
   )
 }
-```
+\`\`\`
 
 The useFormStatus hook provides the pending state, so you can show loading indicators. The form still works without JavaScript, but provides better feedback when JavaScript is available.
 
@@ -302,7 +302,7 @@ After a server action modifies data, you need to update the UI to reflect the ch
 
 The revalidatePath function tells Next.js to refresh specific pages:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 import { revalidatePath } from "next/cache"
@@ -317,13 +317,13 @@ export async function createPost(formData: FormData) {
   
   return { success: true }
 }
-```
+\`\`\`
 
 When you call revalidatePath, Next.js re-fetches the data for that route and updates the page. Users see fresh data without a full page reload.
 
 For more granular control, use revalidateTag:
 
-```typescript
+\`\`\`typescript
 // When fetching data, tag it
 export async function getPosts() {
   const posts = await fetch("https://api.example.com/posts", {
@@ -343,7 +343,7 @@ export async function createPost(formData: FormData) {
   // Refresh all data tagged with "posts"
   revalidateTag("posts")
 }
-```
+\`\`\`
 
 This is powerful when you have data spread across multiple pages. One tag revalidation can update everything that depends on that data.
 
@@ -354,7 +354,7 @@ For the best user experience, update the UI immediately while the server action 
 
 Use the useOptimistic hook:
 
-```typescript
+\`\`\`typescript
 "use client"
 
 import { useOptimistic } from "react"
@@ -387,7 +387,7 @@ export function TodoList({ initialTodos }) {
     </ul>
   )
 }
-```
+\`\`\`
 
 The todo disappears instantly from the UI, giving immediate feedback. If the server action fails, React automatically reverts the optimistic update.
 
@@ -398,7 +398,7 @@ Server actions run on your server, so you must protect them. Never trust client 
 
 Always authenticate and authorize:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 import { auth } from "@/lib/auth"
@@ -422,11 +422,11 @@ export async function deletePost(postId: string) {
   
   return { success: true }
 }
-```
+\`\`\`
 
 Always validate input:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 import { z } from "zod"
@@ -451,11 +451,11 @@ export async function updateProfile(formData: FormData) {
   const { bio, website } = result.data
   // Update database...
 }
-```
+\`\`\`
 
 Never expose sensitive data in return values:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 export async function createUser(email: string, password: string) {
@@ -470,7 +470,7 @@ export async function createUser(email: string, password: string) {
     email: user.email 
   }
 }
-```
+\`\`\`
 
 
 PART 8: Putting It All Together
@@ -479,7 +479,7 @@ Let's build a complete feature using everything we've learned. We'll create a bl
 
 First, define the schema:
 
-```typescript
+\`\`\`typescript
 import { z } from "zod"
 
 export const postSchema = z.object({
@@ -489,11 +489,11 @@ export const postSchema = z.object({
 })
 
 export type Post = z.infer<typeof postSchema>
-```
+\`\`\`
 
 Then create the server action:
 
-```typescript
+\`\`\`typescript
 "use server"
 
 import { auth } from "@/lib/auth"
@@ -535,11 +535,11 @@ export async function createPost(formData: FormData) {
     return { error: "Failed to create post" }
   }
 }
-```
+\`\`\`
 
 Build the form component:
 
-```typescript
+\`\`\`typescript
 "use client"
 
 import { useFormState, useFormStatus } from "react-dom"
@@ -603,7 +603,7 @@ export function CreatePostForm() {
     </form>
   )
 }
-```
+\`\`\`
 
 This form has everything: HTML validation for instant feedback, server-side validation for security, proper error handling, and loading states.
 

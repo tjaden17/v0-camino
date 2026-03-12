@@ -8,7 +8,7 @@ This guide explains how documentation is organized in the `/docs` folder to sepa
 
 ## Folder Structure
 
-```
+\`\`\`
 /docs
 ├── README_DOCS_STRUCTURE.md          ← You are here
 ├── SOURCE_OF_TRUTH.md                ← Master navigation to current decisions
@@ -27,7 +27,7 @@ This guide explains how documentation is organized in the `/docs` folder to sepa
 └── 02_ARCHIVE/                       ← 📦 OLD - Superseded or outdated
     ├── deprecated-specs/
     └── old-plans/
-```
+\`\`\`
 
 ---
 
@@ -107,27 +107,27 @@ This guide explains how documentation is organized in the `/docs` folder to sepa
 ## 🔄 Workflow: Idea → Decision → Archive
 
 ### 1. Brainstorming a New Feature
-```
+\`\`\`
 Create: /docs/01_EXPLORATION/future-features/my-idea-2026-02.md
 → Explore, research, consult AI panel
 → Iterate freely
-```
+\`\`\`
 
 ### 2. Making a Decision
-```
+\`\`\`
 Move to: /docs/00_DECISIONS/architecture/my-feature-design.md
 → Lock down the approach
 → Update SOURCE_OF_TRUTH.md to reference it
 → Build against this document
-```
+\`\`\`
 
 ### 3. Replacing a Decision
-```
+\`\`\`
 Old file: /docs/00_DECISIONS/architecture/old-design.md
 → Move to: /docs/02_ARCHIVE/deprecated-specs/old-design_ARCHIVED_2026-02.md
 New file: /docs/00_DECISIONS/architecture/new-design.md
 → Update SOURCE_OF_TRUTH.md to point to new file
-```
+\`\`\`
 
 ---
 

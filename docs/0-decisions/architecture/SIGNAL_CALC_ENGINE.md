@@ -110,7 +110,7 @@ If a signal cannot be expressed as one of these five, it is flagged as needing c
 
 ## The Execution Flow
 
-```
+\`\`\`
 Customer uploads data
         |
         v
@@ -130,7 +130,7 @@ Signal overrides table applies any per-org threshold adjustments
         |
         v
 Signal output: value, trend, status (urgent / warning / stable)
-```
+\`\`\`
 
 ---
 

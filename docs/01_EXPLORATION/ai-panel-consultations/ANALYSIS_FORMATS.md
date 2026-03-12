@@ -62,21 +62,21 @@ There are actually **3 different glance contexts**, each needing a different for
 **Alternative formats ranked by cognitive efficiency:**
 
 **Format A: Single Big Number (Most efficient)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │  YOUR BUSINESS HEALTH: 78%  │
 │  ↑ 5 points vs last week    │
 │                             │
 │  [Tap to see what changed]  │
 └─────────────────────────────┘
-```
+\`\`\`
 - One composite score from all signals
 - Pro: Zero cognitive load, instant understanding
 - Con: Loses nuance, need to drill down for details
 - **Best for:** Morning check (5 sec glance)
 
 **Format B: Priority Stack (Current approach + ranking)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │ 🔴 NEEDS ATTENTION          │
 │  • Ticket backlog: 47 (↑22) │
@@ -88,28 +88,28 @@ There are actually **3 different glance contexts**, each needing a different for
 │ 🟢 PERFORMING WELL          │
 │  • 5 other signals stable   │
 └─────────────────────────────┘
-```
+\`\`\`
 - Grouped by urgency, not alphabetically
 - Pro: Directs attention to what matters
 - Con: Requires rules for "urgent" vs "stable"
 - **Best for:** Daily check (30 sec scan)
 
 **Format C: Contextual Comparison (Relative performance)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │ Win Rate: 31%               │
 │ ▓▓▓▓▓▓▓░░░ Below your goal  │
 │ You: 31% | Goal: 35%        │
 │ Industry: 28% (you're ahead)│
 └─────────────────────────────┘
-```
+\`\`\`
 - Shows performance relative to goals/benchmarks
 - Pro: Adds meaning to numbers
 - Con: Requires goal-setting and benchmark data
 - **Best for:** Weekly review (2 min review)
 
 **Format D: Timeline View (Change over time)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │ Win Rate (Last 30 days)     │
 │     ╱‾‾‾╲                   │
@@ -118,7 +118,7 @@ There are actually **3 different glance contexts**, each needing a different for
 │ 28% → 33% → 31%             │
 │ Peaked 2 weeks ago          │
 └─────────────────────────────┘
-```
+\`\`\`
 - Mini sparklines showing trajectory
 - Pro: Shows volatility vs steady trends
 - Con: Takes more space per signal
@@ -133,7 +133,7 @@ There are actually **3 different glance contexts**, each needing a different for
 **The insight:** Your competitors show metrics. You should show **recommended actions**.
 
 **Format E: Action-Oriented Cards (Decision support)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │ 🔴 Ticket Backlog: 47       │
 │                             │
@@ -147,14 +147,14 @@ There are actually **3 different glance contexts**, each needing a different for
 │                             │
 │ [Take Action] [Ignore]      │
 └─────────────────────────────┘
-```
+\`\`\`
 - Transforms signal into specific next step
 - Pro: Executives can act immediately without thinking
 - Con: Requires AI/rules to generate good recommendations
 - **Best for:** Turning insight into action
 
 **Format F: Risk Alerts (Predict problems before they happen)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │ ⚠️ EARLY WARNING            │
 │                             │
@@ -168,7 +168,7 @@ There are actually **3 different glance contexts**, each needing a different for
 │                             │
 │ [Plan Response]             │
 └─────────────────────────────┘
-```
+\`\`\`
 - Shows future problems based on current trends
 - Pro: Proactive vs reactive management
 - Con: Requires historical correlation data
@@ -205,12 +205,12 @@ There are actually **3 different glance contexts**, each needing a different for
 - Rationale: Aggregate scores mask individual problems.
 
 **Format G: Signal-Appropriate Visualization**
-```
+\`\`\`
 Volume:    ▓▓▓▓▓▓▓▓░░ 47 of 60 capacity
 Ratio:     31% ←─●───→ 35% (4% from goal)
 Time:      ●●●●●●●●○○ 8 tickets over SLA
 Quality:   ⭐⭐⭐⭐☆ 4.2 (3 🔴 detractors)
-```
+\`\`\`
 
 **Alex's recommendation:** Adaptive formats based on metric type, not one-size-fits-all.
 
@@ -226,11 +226,11 @@ Quality:   ⭐⭐⭐⭐☆ 4.2 (3 🔴 detractors)
 - Execs check dashboards 1x/week: No urgency, no habit
 
 **Format H: Notification-First Design (Push vs Pull)**
-```
+\`\`\`
 INSTEAD OF: User opens Camino → scans 8 signals → finds nothing urgent → leaves
 
 DO THIS: Camino pushes notification → "Win rate dropped 5% - review now?" → User opens → sees context
-```
+\`\`\`
 
 **The psychological pattern:**
 1. **Variable reward:** Sometimes there's urgent news, sometimes not (like checking lottery tickets)
@@ -238,7 +238,7 @@ DO THIS: Camino pushes notification → "Win rate dropped 5% - review now?" → 
 3. **Completion mechanics:** "3 signals need review" creates open loop (Zeigarnik effect)
 
 **Format I: Gamification (Competitive instinct)**
-```
+\`\`\`
 ┌─────────────────────────────┐
 │ YOUR PERFORMANCE SCORE      │
 │                             │
@@ -250,7 +250,7 @@ DO THIS: Camino pushes notification → "Win rate dropped 5% - review now?" → 
 │ • Closing 2 more deals      │
 │ • Reducing backlog by 5     │
 └─────────────────────────────┘
-```
+\`\`\`
 
 **Morgan's warning:** Don't overuse - gamification works for 3-6 months, then users tune out. Use sparingly.
 
@@ -263,22 +263,22 @@ DO THIS: Camino pushes notification → "Win rate dropped 5% - review now?" → 
 Don't choose ONE format. Build **three layers** for different glance durations:
 
 **Layer 1: Hero Metric (5 second glance)**
-```
+\`\`\`
 Business Health: 78% ↑ 5pts
 2 signals need attention
-```
+\`\`\`
 
 **Layer 2: Priority Groups (30 second scan)**
-```
+\`\`\`
 🔴 URGENT (1)
 🟡 MONITOR (2)  
 🟢 STABLE (5)
-```
+\`\`\`
 
 **Layer 3: Detailed Cards (2 minute review)**
-```
+\`\`\`
 [Your current ticker-style cards with context and actions]
-```
+\`\`\`
 
 **Navigation:** Expand/collapse. Default to Layer 1+2, tap to see Layer 3.
 
@@ -287,12 +287,12 @@ Business Health: 78% ↑ 5pts
 ### Recommendation 2: **Context-Rich Signals**
 
 Transform from:
-```
+\`\`\`
 ❌ Ticket Backlog: 47 (↑ 22)
-```
+\`\`\`
 
 To:
-```
+\`\`\`
 ✅ Ticket Backlog: 47 (↑ 47%)
    ⚠️ Above normal by 18 tickets
    8 tickets over 3-day SLA
@@ -300,7 +300,7 @@ To:
    
    Recommended: Reassign to Tom
    [Take Action] [Snooze 3 days]
-```
+\`\`\`
 
 **Elements added:**
 1. **Percent change** (not absolute) for context
@@ -346,7 +346,7 @@ To:
 ## Prototype Concepts
 
 ### Concept A: "Control Tower" (Inspired by air traffic control)
-```
+\`\`\`
 ┌──────────────────────────────────────┐
 │  ALL SYSTEMS NORMAL                  │
 │  ────────────────────────────        │
@@ -368,7 +368,7 @@ vs when there's an issue:
 │                                      │
 │  [Review Now]                        │
 └──────────────────────────────────────┘
-```
+\`\`\`
 - **Philosophy:** No news is good news. Only interrupt when needed.
 - **Pro:** Minimal cognitive load on normal days
 - **Con:** User might ignore app if "all systems normal" too often
@@ -376,7 +376,7 @@ vs when there's an issue:
 ---
 
 ### Concept B: "Smart Brief" (Inspired by morning news briefs)
-```
+\`\`\`
 ┌──────────────────────────────────────┐
 │  GOOD MORNING, ALEX                  │
 │  Here's what you need to know:       │
@@ -393,7 +393,7 @@ vs when there's an issue:
 │                                      │
 │  [View All Signals] [Take Action]    │
 └──────────────────────────────────────┘
-```
+\`\`\`
 - **Philosophy:** AI-written narrative with context and suggestions
 - **Pro:** Reads like a human wrote it, highly personalized
 - **Con:** Requires sophisticated AI interpretation
@@ -401,7 +401,7 @@ vs when there's an issue:
 ---
 
 ### Concept C: "Mission Control" (Inspired by NASA mission dashboards)
-```
+\`\`\`
 ┌──────────────────────────────────────┐
 │  MISSION: Hit 35% win rate by Mar 14│
 │  STATUS: ⚠️ CAUTION                  │
@@ -416,7 +416,7 @@ vs when there's an issue:
 │                                      │
 │  [Adjust Mission] [Review Plan]      │
 └──────────────────────────────────────┘
-```
+\`\`\`
 - **Philosophy:** All signals roll up to a mission/goal
 - **Pro:** Gives context for why any signal matters
 - **Con:** Requires users to define clear goals first
@@ -468,7 +468,7 @@ Why:
 4. **Backwards compatible:** Doesn't break current users' mental model
 
 **The winning format for daily executive glances:**
-```
+\`\`\`
 ┌──────────────────────────────────────┐
 │  CAMINO INSIGHTS                     │
 │  Last updated: 2 min ago             │
@@ -486,7 +486,7 @@ Why:
 │                                      │
 │  [View All] [Set Alerts]             │
 └──────────────────────────────────────┘
-```
+\`\`\`
 
 This answers: "What needs my attention?" in 5 seconds. Everything else is a tap away.
 

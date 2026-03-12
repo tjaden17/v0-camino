@@ -56,7 +56,7 @@ For each unknown, spend 5 minutes to answer: **"Is this possible and roughly how
 
 Create a spike doc (or add to sprint notes):
 
-```
+\`\`\`
 SPRINT 3 TECH SPIKES
 
 Unknown: Zoho API custom field filtering
@@ -70,7 +70,7 @@ Answer: Use auth.uid() in policy + orgs table join
 Confidence: Medium (need to test)
 Blocker Risk: Medium
 Notes: Schedule 1hr to build prototype policy
-```
+\`\`\`
 
 **Decision Rule:**
 - Low confidence + High blocker risk = Schedule spike time in sprint
@@ -99,14 +99,14 @@ Write down every task for the sprint. Example:
 
 Use simple arrows to show "X needs Y first":
 
-```
+\`\`\`
 [Integration Settings Page]
           ↓ (needs endpoint)
 [Zoho Integration Service] → [Data Sync Scheduler]
           ↓                          ↓
           ↓                          ↓
     [Dashboard Update] ← [Signal Filtering UI]
-```
+\`\`\`
 
 **Simple rule:** If task A reads/uses data from task B, draw arrow from B to A.
 
@@ -160,7 +160,7 @@ Number tasks in the order you'll build them:
 
 ## Template: Weekly 30-Minute Blocker Check
 
-```
+\`\`\`
 SPRINT X - BLOCKER CHECK (30 minutes)
 Date: [Date]
 
@@ -189,7 +189,7 @@ BLOCKERS FLAGGED:
 
 GOOD TO GO:
 - [All other tasks]: High confidence, clear path
-```
+\`\`\`
 
 ---
 
