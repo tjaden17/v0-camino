@@ -1,0 +1,159 @@
+Chapter 11: Testing and Data Validation
+
+Welcome to Week 11 of the Camino Builder learning curriculum. This week is about prevention, catching bugs before they reach production through testing and data validation.
+
+Right now, Camino has zero automated tests. Every time you change code, you manually test by clicking through the app. This works when you're moving fast and the codebase is small. But as you add features, manual testing becomes impossible. There are too many combinations to check.
+
+Automated tests give you confidence. Change the signal calculation logic? Run the tests. Refactor the upload pipeline? Run the tests. If they pass, you know you didn't break existing functionality.
+
+By the end of this chapter, you'll understand different types of tests, how to validate data with Zod, and how to build a manual testing checklist for your Tier 1 features.
+
+Why Test: The Real Reason
+
+Let's start with why. The goal of testing isn't to find bugs. It's to give you confidence to make changes fast.
+
+Without tests, every change is scary. "If I refactor this function, will it break something?" You have to manually test the entire app to find out. So you don't refactor. Technical debt accumulates. Code becomes harder to change.
+
+With tests, refactoring is safe. Change the implementation, run the tests, and if they pass, you know the behavior didn't change. You can move fast without fear.
+
+Tests also serve as documentation. A test named "calculateWinRate returns percentage of won deals out of total closed deals" tells you exactly what the function does. Better than a comment because the test proves it works.
+
+The key insight: tests are an investment. They take time to write upfront, but they save time over the lifespan of the project. The first month, manual testing is faster. By month six, automated tests pay for themselves. By month twelve, they're essential.
+
+The Testing Pyramid
+
+There are three levels of tests, forming a pyramid.
+
+Unit tests are at the bottom and are the most numerous. They test a single function in isolation. Given this input, does this function return this output? Fast to run, easy to write. Example: testing your calculateWinRate function with sample data.
+
+Integration tests are in the middle. They test how multiple parts work together. Does this API endpoint correctly call the database and return the expected response? Slower than unit tests, more realistic. Example: testing the upload generate endpoint from request to response.
+
+End to end tests are at the top and are the fewest. They test the entire app from the user's perspective. Can a user upload a CSV, generate signals, and see them on the signals page? Slowest, most brittle, but catches issues that unit tests miss. Example: automated browser test that clicks through the upload flow.
+
+The pyramid shape represents the ratio. Aim for many unit tests, some integration tests, and a few critical path end to end tests.
+
+Why this shape? Unit tests are fast and stable. They rarely fail due to unrelated changes. E2E tests are slow and brittle. A change to a button's class name breaks them. Most bugs can be caught with unit and integration tests, so those give you the best return on investment.
+
+Unit Tests: Testing Pure Functions
+
+Let's start with unit tests because they're the easiest to understand and write. A unit test for a pure function has a simple structure.
+
+You import describe, it, and expect from your testing framework. You import the function you want to test. Then you use describe to group related tests. Inside, you use it to define individual test cases.
+
+Each test follows a pattern: arrange, act, assert. First, arrange means set up test data. Create an array of deals with different stages and amounts. Second, act means call the function with that data. Third, assert means check that the result matches what you expect using the expect function.
+
+For example, you test that calculateWinRate correctly calculates 66.67% when you have 2 won deals out of 3 closed deals. You test that it returns null when there are no closed deals. You test the edge case of 100% win rate.
+
+If the function works, you see green checkmarks. If it fails, you see exactly which assertion failed and why.
+
+Writing Your First Test
+
+Let's write a real test for your codebase. Create a test file for your parseNumber function. This function takes a string value and converts it to a number, handling currency symbols and formats.
+
+You test that it parses plain numbers like 123 and 123.45. You test that it removes currency symbols like dollar signs and euro signs. You test that it removes currency codes like AUD and USD. You test that it handles negative numbers written in parentheses. You test that it returns null for invalid input like text, empty strings, null, or undefined.
+
+Run this test and you'll see if your parseNumber function handles all these cases. If a test fails, you know exactly which case broke.
+
+This is the workflow: write the test first describing what you want, then write the function to make it pass. This is called Test Driven Development or TDD. It feels backwards at first, but it forces you to think about edge cases before writing code.
+
+Integration Tests: Testing API Routes
+
+Integration tests are more realistic. They test how components work together. For API routes, you test the full request response cycle.
+
+Here's an integration test for your upload discover endpoint. You arrange by creating a mock CSV file with sample deal data. You create a FormData object and append the file. You create a Request object with the method set to POST and the body set to the form data.
+
+You act by calling the POST function from your API route, passing the request. You await the response and parse the JSON.
+
+You assert by checking that the response status is 200, that the tabs array has the expected length, and that it contains the columns you expect like Amount and Stage.
+
+You can also test error cases. Create a test with an invalid file format and verify it returns status 400.
+
+Integration tests are slower because they touch the database and file system. But they catch bugs that unit tests miss, like forgetting to await a promise or passing data in the wrong format between functions.
+
+Data Validation with Zod
+
+The best way to prevent errors is to validate data at the boundaries of your system, when it enters from external sources. This is where Zod comes in.
+
+Zod is a TypeScript schema validation library. You define the shape of your data, and Zod checks that incoming data matches.
+
+You create a schema with z dot object. Each property has a type constraint. Name is a string with minimum length 1. Category is an enum with specific allowed values. Value is a positive number. Trend is another enum. Date is an optional datetime string.
+
+The type is automatically inferred from the schema, so you get full TypeScript support.
+
+To validate data, you call schema dot parse with the data. If it doesn't match, Zod throws an error with details about what's wrong. The message tells you exactly which fields failed validation and why.
+
+You can also use safeParse for non-throwing validation. It returns an object with a success property. If success is true, you access the validated data. If false, you access the error details.
+
+Let's add Zod validation to your upload endpoint. Define a schema for the request body with rowType, metricColumn, and optional dateColumn. Parse the body with safeParse. If validation fails, return a 400 error with specific details about what's invalid.
+
+Now you're guaranteed that by the time you use rowType, it exists and isn't empty. No more "cannot read property of undefined" errors from bad input.
+
+Zod schemas also serve as documentation. You can see exactly what shape the API expects without reading the implementation.
+
+Schema Validation for CSV Structure
+
+You can also use Zod to validate CSV structure. Before processing uploaded data, check that it has the expected columns.
+
+Define a schema for a CSV row with required columns like Deal Name, Amount, Stage, and Close Date. Validate the first row to check the structure. If validation fails, extract the missing column names from the error and throw a helpful error message.
+
+Now when a user uploads a CSV without an Amount column, they get a helpful error immediately instead of a confusing failure during calculation.
+
+Manual Testing Checklist for Tier 1
+
+While you build automated tests, you still need manual testing. Here's a checklist for your Tier 1 pipeline.
+
+For the upload flow: can upload a CSV file, can upload an XLSX file with multiple tabs, sees correct column detection for numeric versus text versus date, can answer all 3 questions about row type metric and date, error message shown for invalid file format, error message shown for empty file.
+
+For signal generation: generates count signals, generates sum and average for numeric columns, generates win rate for deals with stage column, generates group by signals for text columns, shows preview values correctly, loading state shown during generation.
+
+For signal display: all generated signals appear on the signals page, signal cards show correct values, trend arrows show correct direction, can expand cards to see details, My KPIs filter works, can save and unsave signals.
+
+For AI interpretation: can request interpretation for a signal, 5 section analysis appears, sections are relevant to the signal, interpretation is cached so second view is instant, force refresh works.
+
+For error handling: upload with malformed CSV shows helpful error, upload with missing columns shows which columns, network failure shows user friendly message, database error doesn't crash the page.
+
+Test each item after every significant change. Once you have automated tests covering these scenarios, you can run them all with one command instead of clicking through manually.
+
+Common Testing Mistakes
+
+Mistake number one: testing implementation instead of behavior. Bad: checking that a specific function was called with specific arguments. Good: checking that the result is correct. The first test checks how the code works, the internal implementation. If you refactor to use a different function, it breaks. The second checks what the code does, the external behavior. Refactoring doesn't break it as long as the behavior stays the same.
+
+Mistake number two: testing too much in one test. Bad: one massive test that handles the entire upload flow in 50 lines. Good: separate tests for parsing CSV, discovering signals, calculating values, and storing in database. One concept per test. When a test fails, you should immediately know what broke.
+
+Mistake number three: not testing edge cases. Most bugs happen at the edges: empty arrays, null values, very large numbers, boundary conditions. Always test empty input with 0 items, single item, null or undefined, negative numbers if relevant, very large numbers, and invalid types.
+
+Mistake number four: brittle tests that break on unrelated changes. Avoid hardcoding values that might change. Instead of expecting the exact text "Total deals," check that it matches the pattern "deals" in a case insensitive way. The first breaks if you change the exact wording. The second checks the intent.
+
+Testing Philosophy: What to Test
+
+You can't test everything. It would take forever. Here's what to prioritize.
+
+High priority: business logic like calculations and data transformations, data validation for what goes in and what comes out, error handling to ensure it fails gracefully, and critical user paths like upload to generate to display.
+
+Medium priority: edge cases in core features, API contracts for request and response shapes, and database queries to verify correct filters and joins.
+
+Low priority: UI layout because it changes too often, third party libraries because you assume they work, and trivial functions like one line utilities.
+
+Start with high priority. Write tests for your signal calculation logic, your CSV parsing, your data validation. Once those are solid, move to medium priority.
+
+Setting Up Testing in Your Project
+
+To add testing to Camino, first install Vitest with npm install dash dash save dash dev vitest and the Vitest UI package.
+
+Second, add test scripts to package dot json. One script called "test" that runs vitest, and another called "test colon ui" that runs vitest with the dash dash ui flag.
+
+Third, create vitest dot config dot ts with basic configuration enabling globals and setting up path aliases.
+
+Fourth, write your first test in a file like lib slash underscore underscore tests underscore underscore slash parse dash number dot test dot ts.
+
+Fifth, run tests with npm run test.
+
+Vitest watches your files and reruns tests automatically when you save. The UI version gives you a browser interface to see test results.
+
+Next Week: Performance and Security
+
+This week, add Zod validation to your API endpoints. Write unit tests for your calculation functions. Build a manual testing checklist and run through it before each deploy.
+
+Next week, we'll cover performance and security: optimizing slow queries, caching AI interpretations, securing your database with RLS, and preparing for your first paying customer.
+
+Testing gives you confidence. Security gives you trust. Together, they let you ship fast without compromising quality.

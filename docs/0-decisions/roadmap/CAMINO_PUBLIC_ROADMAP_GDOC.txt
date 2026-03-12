@@ -1,0 +1,204 @@
+CAMINO PUBLIC ROADMAP
+User Problems We're Solving
+
+Last Updated: February 22, 2026
+─────────────────────────────────────────────────────────────────────────────
+
+HOW TO READ THIS ROADMAP
+
+Status Indicators:
+✅ LIVE - Available now
+🔨 BUILDING - In active development
+🔍 RESEARCHING - Validating with customers
+📋 BACKLOG - Considering for future
+
+Priority: We build based on what prevents the most pain for small business leaders, not what's technically easiest.
+
+Feedback: Your input shapes this roadmap. Email us at feedback@camino.app with your biggest pain points.
+
+─────────────────────────────────────────────────────────────────────────────
+
+✅ LIVE (Available Now)
+
+Problem 1: "I spend hours every week pulling reports from different tools"
+
+User Pain: Manually exporting CSVs from Zoho, HubSpot, Salesforce, etc. Copy-pasting into spreadsheets. Formatting data. By the time you're done, the insights are stale.
+
+Impact: 3-5 hours/week of manual work that could be spent on strategy.
+
+Our Solution: Upload once, see signals immediately. Camino automatically maps your columns, calculates key metrics, and surfaces what matters. No more manual data wrangling.
+
+Current Status: Works with any CSV/Excel export from major business tools.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 2: "I see numbers but don't know what they mean for my business"
+
+User Pain: Raw metrics without context. "Pipeline value is $2.3M" - is that good? Compared to what? What should I do about it?
+
+Impact: Data paralysis. You have information but can't make decisions.
+
+Our Solution: AI explains what each signal means for YOUR role and goals. "Pipeline is 15% below target and trending down. This impacts Q1 revenue forecasts."
+
+Current Status: Every signal includes context-aware interpretation.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 3: "My team wastes time in meetings trying to understand the same data"
+
+User Pain: Sales sees pipeline, CS sees tickets, executives want both connected. Everyone interprets metrics differently. Meetings become data debates.
+
+Impact: 2+ hours/week in alignment meetings that should be 15 minutes.
+
+Our Solution: Role-based views. Executives see high-level signals, managers see their team's metrics, reps see their individual performance. Everyone looking at the same truth.
+
+Current Status: Profiles for Executive, Sales Manager, CS Manager roles.
+
+─────────────────────────────────────────────────────────────────────────────
+
+🔨 BUILDING (In Progress - Goal 1)
+
+Problem 4: "I have to manually re-upload data every month"
+
+User Pain: You solved the problem once by uploading a CSV. Next month, you do it all over again. Manual, repetitive work that should be automated.
+
+Impact: The first upload saves time, but ongoing uploads waste it back.
+
+Our Solution: API integration with Zoho, HubSpot, Salesforce. Connect once, data syncs automatically. Set it and forget it.
+
+Current Status: Building Zoho CRM + Zoho Desk integration for pilot customer.
+
+Target: March 2026
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 5: "The data has errors and inconsistencies I have to clean manually"
+
+User Pain: Duplicate records, test accounts, automated tickets, bad formatting. You can't trust the numbers without hours of cleaning.
+
+Impact: Either accept bad data or spend time fixing it manually.
+
+Our Solution: Smart filtering removes noise automatically. Learns what's signal vs noise in your data. One-click cleanup that gets smarter over time.
+
+Current Status: Building intelligent filters for Locumate's support tickets.
+
+Target: March 2026
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 6: "I don't know if my metrics are getting better or worse"
+
+User Pain: Point-in-time numbers with no trend context. "21 open tickets" - is that up or down? Improving or deteriorating?
+
+Impact: Can't spot problems until they're critical. Reactive instead of proactive.
+
+Our Solution: Period-over-period comparisons (vs last week/month/quarter). Trend indicators show direction and velocity. Catch problems early.
+
+Current Status: Designing trend visualization for signal cards.
+
+Target: March 2026
+
+─────────────────────────────────────────────────────────────────────────────
+
+🔍 RESEARCHING (Validating with Customers - Goals 2-3)
+
+Problem 7: "I use multiple tools and can't see the full picture"
+
+User Pain: Deals in HubSpot, tickets in Zendesk, revenue in Stripe. Each tool shows part of the story. You manually connect the dots in your head.
+
+Impact: Miss patterns like "deals with slow response times churn faster."
+
+Our Solution: Cross-source signals that connect the dots automatically. See how sales affects support, support affects retention, retention affects revenue.
+
+Validation: Testing with customers who use 2+ data sources.
+
+Timeline: Mid 2026
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 8: "I want custom metrics specific to my business"
+
+User Pain: Standard reports don't match how you measure success. Your KPIs are unique to your business model.
+
+Impact: Forced to calculate manually or use generic metrics that don't matter.
+
+Our Solution: Flexible signal builder for your unique KPIs. Define custom formulas, thresholds, and interpretations that match your business.
+
+Validation: Gathering requirements from early customers.
+
+Timeline: Mid-Late 2026
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 9: "My data changes constantly and insights get stale"
+
+User Pain: By the time you analyze data, it's outdated. Business moves faster than your reporting cycle.
+
+Impact: Making decisions on yesterday's information.
+
+Our Solution: Daily/weekly automated updates. Fresh signals delivered on your schedule. Always working from current data.
+
+Validation: Determining optimal refresh frequencies for different roles.
+
+Timeline: Late 2026
+
+─────────────────────────────────────────────────────────────────────────────
+
+📋 BACKLOG (Considering for Future)
+
+Problem 10: "I need to share insights with my board/investors"
+
+User Pain: Manual screenshot and email process. No control over what they see or when.
+
+Impact: Time-consuming prep work before every board meeting.
+
+Potential Solution: Shareable reports and scheduled digests. Automated delivery on your timeline.
+
+Status: Collecting feedback on must-have features.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Problem 11: "I want to benchmark against similar companies"
+
+User Pain: Don't know if your metrics are good or bad in context. No comparison point.
+
+Impact: Blind spots about competitive position.
+
+Potential Solution: Anonymous peer benchmarks from our customer base. See how you compare to similar businesses.
+
+Status: Early exploration. Requires privacy/anonymization strategy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+WHAT WE WON'T BUILD
+
+We focus on interpretation, not visualization
+- We won't build complex dashboards with 20+ charts
+- We won't compete with Tableau or Power BI
+- We focus on "what does this mean?" not "how many ways can we show it?"
+
+We serve small business operators, not data analysts
+- No SQL query builders
+- No data warehouse connectors
+- No complex ETL pipelines
+- Keep it simple enough for a CEO to use without training
+
+We're opinionated about quality over quantity
+- We'd rather have 8 perfect signals than 80 mediocre ones
+- We curate what matters, we don't show everything
+
+─────────────────────────────────────────────────────────────────────────────
+
+HOW THIS ROADMAP CHANGES
+
+Customer feedback drives priorities: If 5 customers need Problem 7 before Problem 6, we adapt.
+
+We validate before building: Problems move from Backlog → Research → Building only after customer validation.
+
+Transparency matters: We'll update this quarterly and explain why priorities shifted.
+
+Your voice matters: Email feedback@camino.app to influence what we build next.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Questions? Reach out to feedback@camino.app

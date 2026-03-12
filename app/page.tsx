@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 import { issueTreeData, type SubIssue, getParentIssue } from "@/lib/issue-tree-data"
 import { userProfile } from "@/lib/user-data"
 import { saveIssue } from "@/lib/saved-issues"
@@ -49,7 +50,9 @@ const findMostImportantIssue = (): { issue: SubIssue; level: SubIssue[]; index: 
   return { issue: mostImportantIssue, level: parentLevel, index: issueIndex }
 }
 
-export default function HomePage() {
+export default function RootPage() {
+  redirect("/mission")
+
   const router = useRouter()
   const defaultIssue =
     issueTreeData.subIssues.find((i) => i.id === userProfile.defaultView) || issueTreeData.subIssues[0]

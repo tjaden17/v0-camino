@@ -1,0 +1,297 @@
+# Camino - Cursor Rules
+# Last updated: 19 Feb 2026
+
+## Project Overview
+
+Camino is a mobile-first business intelligence platform that turns raw business data (CSV/XLSX uploads) into actionable signals with AI-powered interpretation. The target user is a small business executive/manager who needs to understand their data without being a data analyst.
+
+North Star metric: 1 upload (manager) + 1 view/week (any user)
+
+Current phase: MSS (Minimum Sellable Service) - admin-in-the-loop model.
+First customer: Locumate (Surge Singh, CEO) - Uses Zoho CRM, Zoho Desk
+Goal: Reach billing decision by Mar 14, 2026
+
+## SOURCE OF TRUTH - Read These First
+
+1. **Plan: CAMINO Roadmap (Final)**
+   Location: user_read_only_context/text_attachments/Plan_-CAMINO-Roadmap-(Final)-9CQmG.pdf
+   Purpose: Strategic roadmap with 4 monthly goals and decision moments
+   Contains: 5 modular areas, critical path Gantt, backlog tradeoffs
+
+2. **Do: Weekly Sprint Plan + AC**
+   Location: user_read_only_context/text_attachments/Do_-Weekly-Sprint-plan-+-AC-YhG08.pdf
+   Purpose: Current week's 3-5 user stories with acceptance criteria
+   Updated: Weekly
+
+3. **Documentation Hub**
+   Location: /docs/SOURCE_OF_TRUTH.md
+   Purpose: Navigation guide explaining how all docs work together
+
+RULE: Before building any feature, check the Weekly Sprint Plan to confirm it's in scope for this week. If not in the sprint plan, defer it.
+
+
+## Tech Stack
+
+- Framework: Next.js 16 (App Router) with React 19.2
+- Language: TypeScript 5
+- Styling: Tailwind CSS v4 with shadcn/ui components
+- Auth: Supabase Auth (client at lib/supabase/client.ts, server at lib/supabase/server.ts)
+- Database: Supabase PostgreSQL (single database for auth + all application data)
+- AI: Vercel AI SDK v6 (ai@6.0.6)
+- File parsing: xlsx for Excel/CSV
+- Hosting: Vercel
+- Icons: lucide-react (^0.454.0)
+- Forms: react-hook-form + zod
+- Charts: Recharts via shadcn/ui chart components
+- Date utils: date-fns 4.1.0
+
+
+## Architecture
+
+### Route Groups
+- `app/(protected)/*` - Customer-facing pages (auth-guarded, mobile-first, bottom nav)
+- `app/admin/*` - Admin panel (sidebar nav, desktop layout)
+- `app/auth/*` - Authentication flows (login, signup, onboarding)
+- `app/api/*` - API routes (REST endpoints)
+
+### Database (Supabase — Single Database)
+- Supabase handles authentication AND all application data in one PostgreSQL database
+- Auth: `lib/supabase/server.ts` or `lib/supabase/client.ts` for user sessions
+- Data queries: `lib/supabase/admin.ts` (service role, bypasses RLS) for server-side data operations
+- The `profiles` table is linked to Supabase auth.users via `profiles.id = auth.user.id`
+
+### Supabase Clients
+- `lib/supabase/client.ts` - Browser/client components. Uses `createBrowserClient()`.
+- `lib/supabase/server.ts` - Server components and API routes. Uses `createServerClient()` with cookies. Used for auth.
+- `lib/supabase/admin.ts` - Service role client for data operations (bypasses RLS). Used for all server-side data queries.
+
+### Key Services (lib/)
+- `signals-service.ts` - CRUD for signals table (Supabase). Core read path for /signals page.
+- `interpretation-service.ts` - AI interpretation (5-section analysis)
+- `organization-service.ts` - Organization management
+- `admin-service.ts` - Admin user management
+- `csv-parser.ts` / `xlsx-parser.ts` - File parsing utilities
+- `zoho-api-client.ts` - Zoho CRM/Desk REST API client (needs wiring to generate pipeline)
+- `zoho-oauth-service.ts` - Zoho OAuth token management
+- `zoho-desk-processor.ts` - Processes Zoho Desk data into rows
+- `zoho-signal-discovery.ts` - Zoho-specific signal definitions (needs migration to new pipeline)
+
+### Deprecated Services (still in codebase, NOT used by active flows)
+- `signal-discovery-service.ts` - Old AI-powered signal detection with 92 definitions. REPLACED by 3-question upload flow.
+- `signal-calculation-service.ts` - Old heuristic calculation. REPLACED by spec-driven calculation in generate route.
+- `staging-service.ts` - Old staging pipeline. Not used.
+- `intelligent-mapping-service.ts` - Old field mapping. Not used.
+- `upload-page-client.tsx` - Old upload component. REPLACED by upload-proto-client.tsx.
+- `signal-discovery-panel.tsx` - Old discovery panel. Not used.
+- `upload-modal.tsx` - Old upload modal. Not used.
+
+
+### Critical Pipeline (MSS - Current)
+
+This is the active data flow. Every change to these files needs extra care:
+
+\`\`\`
+Upload CSV/XLSX (upload-proto-client.tsx)
+  -> User classifies each tab via 3 questions:
+     Q1: What does each row represent? (leads/deals/tickets/customers/events/agents)
+     Q2: Which column is the main metric? (dropdown of numeric columns, or "just count rows")
+     Q3: Which column is the date? (dropdown of date columns)
+  -> POST /api/upload/generate (route.ts)
+     - Receives classified tabs + raw row data
+     - Generates signal definitions from user answers (NOT from fuzzy matching)
+     - Calculates values server-side (count, sum, avg, monthly_rate, group_by)
+     - Extracts monthly time-series for trends
+     - Upserts into signals table + signal_data_points table (Supabase)
+  -> /signals page reads from signals table via signals-service.ts
+  -> signal-accordion-card.tsx renders each signal
+\`\`\`
+
+Key design principle: Signals are generated from EXPLICIT user answers, not from heuristic guessing. If a required field can't be resolved, the signal is skipped (never show a wrong number).
+
+
+## Database (Supabase PostgreSQL)
+
+### Core Tables
+- profiles - User profiles (id links to Supabase auth.users)
+- organizations - Customer organizations
+- organization_members - User-org membership with roles
+- signals - Computed signals (name, category, absolute_value, trend, trend_value, summary, source_metadata, organization_id)
+- signal_data_points - Monthly time-series per signal (signal_id, date, value)
+- signal_interpretations - Cached AI interpretations
+- saved_signals - User bookmarks
+- upload_history - Upload tracking
+- integrations - OAuth connections (zoho-crm, zoho-desk, hubspot)
+
+### Key Relationships
+- signals.organization_id -> organizations.id (signals are scoped to an org)
+- signal_data_points.signal_id -> signals.id
+- profiles.organization_id -> organizations.id
+- The /signals page queries signals WHERE organization_id matches the user's profile.organization_id
+
+### Unique Constraints
+- signals: unique on (name, organization_id) - enables upsert on re-upload
+- signal_data_points: unique on (signal_id, date) - enables upsert of time-series
+
+### Migration Discipline
+1. Write SQL in `/scripts/` with descriptive name
+2. Run against dev first
+3. Test the app against dev
+4. Run the EXACT SAME file against prod
+5. Commit the script to git
+
+
+## Coding Conventions
+
+### General
+- Use TypeScript strict mode
+- Prefer `const` over `let`
+- Use async/await, never raw promises
+- Error handling: always try/catch in API routes, return meaningful JSON errors
+- No console.log in production code (use console.error for actual errors)
+
+### Components
+- Split pages into page.tsx (server) + *-client.tsx (client component)
+- Use shadcn/ui components from `@/components/ui/*`
+- Import utility: `import { cn } from "@/lib/utils"`
+- Icons from lucide-react only
+- Mobile-first: design for 375px width, then scale up
+
+### API Routes
+- Always validate input
+- Always check auth: `const supabase = await createClient()` then `supabase.auth.getUser()`
+- For data queries: `const admin = createAdminClient()` then `admin.from("table").select(...)`
+- Return consistent JSON: `{ success: boolean, data?: any, error?: string }`
+- Use Supabase client methods (parameterized automatically)
+
+### Styling
+- Tailwind CSS v4 with design tokens (bg-background, text-foreground, etc.)
+- Never use direct colors (no bg-white, text-black) - use semantic tokens
+- Fonts: Geist (sans) and Geist Mono (mono)
+- Spacing: use Tailwind scale (p-4, gap-6) not arbitrary values
+- Mobile breakpoints: default is mobile, use md: and lg: for larger screens
+
+### Protected Pages Pattern
+\`\`\`tsx
+// app/(protected)/example/page.tsx (server component, thin wrapper)
+import { ExampleClient } from "@/components/example-client"
+export default function ExamplePage() {
+  return <ExampleClient />
+}
+
+// components/example-client.tsx (client component, all logic)
+"use client"
+export function ExampleClient() {
+  // ... component logic
+}
+\`\`\`
+
+
+## What NOT To Do
+
+- Do NOT use localStorage for data persistence
+- Do NOT add new npm packages without checking if existing ones cover the need
+- Do NOT modify Supabase client files without understanding both client/server patterns
+- Do NOT run migrations directly on prod - always dev first
+- Do NOT build features outside the current sprint scope (check /docs/DELIVERY_PLAN_MVP_GDOC.txt)
+- Do NOT add purple/violet colors
+- Do NOT use `space-*` Tailwind classes - use `gap-*` instead
+- Do NOT create new service files when existing ones cover the domain
+- Do NOT use the old signal-discovery-service.ts or signal-calculation-service.ts for new features
+- Do NOT use upload-page-client.tsx or upload-modal.tsx - they are deprecated
+- Do NOT import from signal-discovery-service.ts in new code
+
+
+## Current Sprint Focus (Week of Feb 16-22, 2026)
+
+**Goal 1 Decision:** Will Surge (Locumate CEO) pay by Mar 14, 2026?
+
+**Week 1 Critical Path (Foundation):**
+See: /docs/SOURCE_OF_TRUTH.md and Weekly Sprint Plan PDF
+
+Current sprint user stories:
+1. ✅ DONE: Understanding - Admin create 2 user accounts with role-based profiles
+   - Admin can create users via Admin CP
+   - Users have KPI fields (kpi_1, kpi_2, kpi_3) stored in profiles table
+   - Role-based KPI defaults (executive vs manager)
+
+2. ⏳ IN PROGRESS: Data In - Universal pattern detector for non-real tickets
+   - Filter automated tickets before signal calculation
+   - Pattern detection: bulk timestamps, automated subjects, instant close times
+   - See: /docs/AI_PANEL_CONSULTATION_TICKET_FILTERING.md
+
+3. ⏳ BACKLOG: Data In - Pre-built column mapping templates per tool
+   - Column mapping template system with database table
+   - Store Locumate's Zoho mappings as first 3 templates
+   - See: /docs/CAMINO_PRODUCT_ROADMAP.md (Task 1.3)
+
+**By Friday Feb 22, this must be true:**
+"Surge's 3 Zoho CSVs can be uploaded, non-real tickets filtered out, and 3 user accounts exist with correct KPIs."
+
+**Reference Documents:**
+- Strategic plan: Plan_-CAMINO-Roadmap-(Final)-9CQmG.pdf
+- Weekly execution: Do_-Weekly-Sprint-plan-+-AC-YhG08.pdf
+- Sprint acceptance criteria: /docs/SPRINT_ACCEPTANCE_CRITERIA_WEEK1.md
+- MSS build plan: /docs/MSS_BUILD_PLAN_LOCKED.md
+
+
+## Planning Methodology
+
+**Goals → Critical Path → Weekly Sprints**
+
+Every goal = ONE decision by ONE person at ONE moment (not "build features")
+- Goal 1: Will Surge pay? (Mar 14, 2026)
+- Goal 2: Will Surge stay 3 months? (Month 2-3)
+- Goal 3: Will customers 2-5 commit? (Month 3-4)
+- Goal 4: Will strangers self-serve? (Month 5-8)
+
+**Weekly Cut Line:** "By Friday, X must be true, or we can't reach the next goal decision"
+- If it's not on the critical path, defer it
+- Build 70% done and ship (not 100% polished)
+- Exception: Don't ship if it breaks trust (wrong calculations, bad data quality)
+
+
+## Known Issues
+
+1. **Build Error: /test page prerendering fails on Vercel**
+   - The /app/test/page.tsx (or similar) throws an error during build time prerendering
+   - Status: NEEDS FIX before next deployment
+   - Solution: Either delete /test page if it's development-only, or add `export const dynamic = 'force-dynamic'` to skip prerendering
+   - Impact: Blocks deployments to production
+
+2. **GitHub Repo Permissions on Vercel**
+   - Cursor pushes from local machine (nhattran@Nhats-MacBook-Air.local) fail because not added to Vercel team
+   - Status: RESOLVED - repo is now public, deployments should work
+   - Note: Making the repo public allows Vercel to deploy without team member restrictions
+
+
+## File Organization
+
+\`\`\`
+/app
+  /(protected)     Customer-facing pages (upload, signals, profile, decisions)
+  /admin           Admin panel (users, orgs, uploads)
+  /auth            Login, signup, onboarding
+  /api
+    /upload/generate  NEW: Signal generation from 3-question flow
+    /upload/calculate OLD (deprecated): Heuristic-based calculation
+    /upload/discover  OLD (deprecated): Fuzzy signal discovery
+    /signals          Signal CRUD endpoints
+  /uploadproto     Redirects to /upload (legacy URL)
+/components
+  /ui              shadcn/ui base components (DO NOT EDIT)
+  /admin           Admin-specific components
+  upload-proto-client.tsx  ACTIVE upload component (3-question flow, multi-file)
+  upload-page-client.tsx   DEPRECATED (old upload flow)
+  signal-accordion-card.tsx  Signal display card with L1/L2/L3 accordion
+  signals-page-client.tsx    Signal list page
+/lib
+  /supabase        Supabase client setup (auth + admin data access)
+  signals-service.ts         Reads signals from Supabase for display
+  interpretation-service.ts  AI interpretation
+  organization-service.ts    Org management
+  signal-discovery-service.ts   DEPRECATED (old 92-definition pipeline)
+  signal-calculation-service.ts DEPRECATED (old heuristic calc)
+/scripts           SQL migration scripts
+/docs              MSS_SCOPE.txt, DELIVERY_PLAN_MVP_GDOC.txt
+/public            Static assets, icons
+\`\`\`

@@ -1,0 +1,328 @@
+Chapter 7: AI SDK and Prompt Engineering
+
+Duration: approximately 15 minutes
+Topic: Generating AI interpretations, structuring output, and optimizing prompt quality for your signal analysis.
+
+Introduction
+
+Welcome to Week 7 of the Camino Builder learning curriculum. This week, we're focusing on the AI SDK and prompt engineering, the system that powers your product's core differentiator: AI-generated signal analysis.
+
+Your interpretation service is what sets Camino apart. Understanding the AI SDK and prompt engineering directly improves output quality, reliability, and user value. By the end of this chapter, you'll master structured output generation, understand temperature and model selection, and know how to craft effective prompts.
+
+The AI SDK: Vercel's Tool for AI Applications
+
+The AI SDK by Vercel is a library that makes it easy to call AI models. It handles API communication, streaming responses, error handling, and structured output.
+
+Your app uses generate text from the AI SDK:
+
+import open brace generate text close brace from quote AI quote
+
+const result equals await generate text open parenthesis open brace
+  model colon quote open ai slash GPT dash 4 quote comma
+  prompt colon quote Your prompt here quote
+close brace close parenthesis
+
+This calls the GPT 4 model with your prompt and returns the generated text.
+
+The AI SDK abstracts away the complexity of different AI providers. Whether you use OpenAI, Anthropic, or another provider, the API is the same. You just change the model parameter.
+
+In Camino, your interpretation service uses this to generate the 5-section analysis: What We Found, What It Means, So What, Recommended Action, and Key Risks.
+
+Model Selection: Speed Versus Quality
+
+Different models have different trade-offs. GPT 4 is slow but produces high-quality output. GPT 3.5 is fast but lower quality. GPT 4 turbo is a middle ground.
+
+For Camino interpretations, you want quality. Users expect thoughtful analysis, not quick summaries. You probably use GPT 4 or GPT 4 turbo.
+
+For other tasks like summarizing or extracting keywords, you might use a faster, cheaper model.
+
+The model parameter in generate text controls which model runs:
+
+model colon quote open ai slash GPT dash 4 quote
+model colon quote open ai slash GPT dash 3.5 dash turbo quote
+model colon quote anthropic slash claude dash 3 dash opus quote
+
+Experiment with different models and measure quality. Sometimes a faster model is good enough. Sometimes you need the best.
+
+Structured Output: Getting JSON Back
+
+When generating interpretations, you don't want free-form text. You want structured data that matches your Signal Interpretation interface.
+
+The AI SDK supports structured output. You define a schema, and the AI returns data that matches it.
+
+Example using Zod:
+
+import open brace z close brace from quote zod quote
+
+const interpretation schema equals z dot object open parenthesis open brace
+  what underscore we underscore found colon z dot string open parenthesis close parenthesis comma
+  what underscore it underscore means colon z dot string open parenthesis close parenthesis comma
+  so underscore what colon z dot string open parenthesis close parenthesis comma
+  recommended underscore action colon z dot string open parenthesis close parenthesis comma
+  key underscore risks colon z dot string open parenthesis close parenthesis
+close brace close parenthesis
+
+const result equals await generate text open parenthesis open brace
+  model colon quote open ai slash GPT dash 4 quote comma
+  prompt colon quote Analyze this signal dot dot dot quote comma
+  schema colon interpretation schema
+close brace close parenthesis
+
+const interpretation equals result dot object
+
+Now interpretation is a typed object that matches your schema. The AI is forced to return data in this exact shape. No parsing, no validation needed.
+
+This prevents errors where the AI returns unstructured text that you can't use. The schema guarantees the output is usable.
+
+System Prompts: Setting the AI's Persona
+
+A system prompt defines the AI's role and behavior. It's the context that shapes how the AI responds.
+
+In your interpretation service, you have a system prompt like:
+
+You are a business intelligence analyst for small business leaders. Your job is to interpret data signals in clear, actionable language. Always focus on business impact, not technical details. Use short paragraphs and avoid jargon.
+
+This tells the AI what perspective to take. Without this, the AI might give technical, verbose explanations that confuse users.
+
+System prompts are powerful. They set the tone, style, and focus of responses. Spend time crafting them.
+
+Here's the pattern in the AI SDK:
+
+const result equals await generate text open parenthesis open brace
+  model colon quote open ai slash GPT dash 4 quote comma
+  system colon quote You are a business intelligence analyst dot dot dot quote comma
+  prompt colon quote Analyze this signal dot dot dot quote
+close brace close parenthesis
+
+The system parameter sets the system prompt. The prompt parameter is the user's specific request.
+
+Crafting Effective Prompts
+
+The quality of AI output depends heavily on prompt quality. Here are patterns that work:
+
+Pattern 1: Provide context.
+Don't just say quote Analyze this signal quote. Say quote You are analyzing support ticket volume for a SaaS company. Higher volume might indicate product issues or growth. Consider both possibilities. quote
+
+Context helps the AI understand what matters.
+
+Pattern 2: Give examples.
+Show the AI what good output looks like. This is called few-shot prompting.
+
+Example:
+
+For a signal showing declining revenue, a good interpretation is:
+
+What We Found: Revenue declined 15 percent month over month, from 50K to 42.5K.
+
+What It Means: This decline exceeds normal fluctuation and indicates a trend, not noise.
+
+So What: If this continues, Q1 revenue targets will be missed by approximately 20 percent.
+
+Recommended Action: Investigate churn reasons and pause new feature development to focus on customer retention.
+
+Key Risks: Declining revenue reduces runway and limits hiring plans.
+
+Now analyze this signal using the same format.
+
+The AI learns from the example and produces output in that style.
+
+Pattern 3: Be specific about format.
+Don't say quote Explain this quote. Say quote Write a 2 to 3 sentence summary in plain language. Avoid jargon. Focus on what the business leader should do. quote
+
+Specificity reduces variance in output.
+
+Pattern 4: Chain of thought.
+Ask the AI to reason step by step. This improves quality for complex analysis.
+
+Example:
+
+Analyze this signal step by step:
+1 Identify the trend: is it up, down, or stable?
+2 Compare to historical norms: is this unusual?
+3 Consider business context: what might cause this?
+4 Recommend action: what should the leader do?
+
+Output your final interpretation.
+
+The AI works through each step, producing more thoughtful output.
+
+Temperature: Controlling Creativity
+
+Temperature controls how creative or conservative the AI is. It ranges from 0 to 2, but typically you use 0 to 1.
+
+Temperature 0: Deterministic. The AI always picks the most likely next word. Output is consistent but can be repetitive.
+
+Temperature 0.7: Balanced. The AI has some creativity but stays reasonable. This is the default for most use cases.
+
+Temperature 1: Creative. The AI explores less likely options. Output is varied but can be unpredictable.
+
+For Camino interpretations, you want consistency. Users expect similar signals to get similar analysis. Use a lower temperature, like 0.3 or 0.5.
+
+const result equals await generate text open parenthesis open brace
+  model colon quote open ai slash GPT dash 4 quote comma
+  prompt colon quote dot dot dot quote comma
+  temperature colon 0.3
+close brace close parenthesis
+
+Token Limits: Understanding Context Windows
+
+AI models have token limits. A token is roughly a word or part of a word. GPT 4 has a context window of 8,000 or 32,000 tokens depending on the version.
+
+Your prompt, system message, and response all count toward this limit. If you exceed it, the request fails.
+
+For Camino, you send signal data and data points to the AI. If a signal has thousands of data points, you might exceed the token limit.
+
+Solutions:
+
+1 Summarize the data points. Send aggregate statistics instead of raw data. Quote 142 data points with an average value of 37 and a trend of down 12 percent quote.
+
+2 Truncate. Send only the most recent 100 data points.
+
+3 Use a model with a larger context window.
+
+Monitor token usage. The AI SDK returns token counts:
+
+const result equals await generate text open parenthesis open brace dot dot dot close brace close parenthesis
+console dot log open parenthesis result dot usage close parenthesis
+
+This shows how many tokens were used. If you're consistently near the limit, adjust your prompt.
+
+Error Handling: Retries and Fallbacks
+
+AI calls can fail. The API might be down, the request might timeout, or the response might be malformed.
+
+Always wrap AI calls in try-catch:
+
+try open brace
+  const result equals await generate text open parenthesis open brace dot dot dot close brace close parenthesis
+  return result dot object
+close brace catch open parenthesis error close parenthesis open brace
+  console dot error open parenthesis quote AI generation failed colon quote comma error close parenthesis
+  return null
+close brace
+
+Consider retries. If the API fails, wait a moment and try again:
+
+async function generate with retry open parenthesis prompt colon string comma retries equals 3 close parenthesis open brace
+  for open parenthesis let i equals 0 semicolon i less than retries semicolon i plus plus close parenthesis open brace
+    try open brace
+      const result equals await generate text open parenthesis open brace prompt close brace close parenthesis
+      return result dot object
+    close brace catch open parenthesis error close parenthesis open brace
+      if open parenthesis i equals equals equals retries minus 1 close parenthesis throw error
+      await new Promise open parenthesis resolve equals close angle bracket set timeout open parenthesis resolve comma 1000 close parenthesis close parenthesis
+    close brace
+  close brace
+close brace
+
+This retries up to 3 times with a 1-second delay between attempts.
+
+Consider fallbacks. If GPT 4 fails, try GPT 3.5. If all models fail, return a generic message like quote Unable to generate interpretation. Please try again later. quote
+
+Your Camino Interpretation Service
+
+Let's walk through your lib slash interpretation service dot ts file.
+
+At the top, you import the AI SDK and define your schema:
+
+import open brace generate text close brace from quote AI quote
+import open brace z close brace from quote zod quote
+
+const interpretation schema equals z dot object open parenthesis open brace
+  signal underscore id colon z dot string open parenthesis close parenthesis comma
+  what underscore we underscore found colon z dot string open parenthesis close parenthesis comma
+  what underscore it underscore means colon z dot string open parenthesis close parenthesis comma
+  so underscore what colon z dot string open parenthesis close parenthesis comma
+  recommended underscore action colon z dot string open parenthesis close parenthesis comma
+  key underscore risks colon z dot string open parenthesis close parenthesis
+close brace close parenthesis
+
+The generate interpretation function builds the prompt:
+
+const system prompt equals quote You are a business intelligence analyst for small business leaders. Analyze signals with clarity and actionable recommendations. quote
+
+const user prompt equals back tick
+Signal: dollar sign open brace signal dot name close brace
+Description: dollar sign open brace signal dot description close brace
+Data: dollar sign open brace summarize data points open parenthesis data points close parenthesis close brace
+User role: dollar sign open brace profile dot role close brace
+
+Provide a 5-section analysis using the format described above.
+back tick
+
+Then it calls the AI:
+
+const result equals await generate text open parenthesis open brace
+  model colon quote open ai slash GPT dash 4 dash turbo quote comma
+  system colon system prompt comma
+  prompt colon user prompt comma
+  schema colon interpretation schema comma
+  temperature colon 0.3
+close brace close parenthesis
+
+return result dot object
+
+This pattern, system prompt plus structured user prompt plus schema, ensures consistent, high-quality interpretations.
+
+Improving Interpretation Quality
+
+Here are specific ways to improve your interpretations:
+
+1 Add more context about the user's business. If you know they're in SaaS, e-commerce, or professional services, include that in the prompt. The AI tailors analysis to the industry.
+
+2 Provide historical baselines. If you know the typical range for this signal, include it. Quote Typical range is 20 to 40, current value is 55, which is 37 percent above normal. quote
+
+3 Include user goals. If the user set a target for this signal, reference it. Quote User target is 100, current value is 85, which is 15 percent below target. quote
+
+4 Use few-shot examples. Show the AI 2 to 3 examples of perfect interpretations for different signal types. The AI learns the style and quality bar.
+
+5 Iterate on the system prompt. Test different phrasings and see which produces better output. Small changes can have big impacts.
+
+6 Ask for uncertainty. Tell the AI to say quote I don't know quote if the data is ambiguous. This prevents overconfident, incorrect interpretations.
+
+Prompt Engineering as Product Development
+
+Every change to your prompt changes the product. Users see the AI's output. If interpretations get better, users get more value.
+
+Treat prompt engineering like feature development. Test changes, measure quality, get user feedback. Don't just set the prompt once and forget it.
+
+Create a library of test cases. For each signal type, have examples of good and bad interpretations. Run your prompt against them and see if quality improves.
+
+Track interpretation quality over time. Maybe add a thumbs up thumbs down button so users can rate interpretations. Use this feedback to refine prompts.
+
+The better your prompts, the better your product. This is a competitive advantage.
+
+Practical Exercise: Improve a Prompt
+
+Let's practice. You're going to take a basic prompt and improve it.
+
+Start with:
+
+Analyze this signal: dollar sign open brace signal dot name close brace with data dollar sign open brace data close brace.
+
+This is vague and gives inconsistent output. Now improve it:
+
+You are analyzing dollar sign open brace signal dot name close brace for a dollar sign open brace profile dot industry close brace company. The signal currently shows dollar sign open brace current value close brace, which is dollar sign open brace trend close brace compared to last period.
+
+Provide a 5-section analysis:
+1 What We Found: State the key metric and trend in one sentence.
+2 What It Means: Explain why this trend matters in 2 to 3 sentences.
+3 So What: Describe the business impact if this trend continues.
+4 Recommended Action: Give one specific action the leader should take this week.
+5 Key Risks: List 1 to 2 risks if no action is taken.
+
+Use plain language. Avoid jargon. Be concise.
+
+Run both prompts with the same data. Compare outputs. The improved prompt produces clearer, more actionable analysis.
+
+This teaches you: specificity improves quality, context makes AI smarter, structure ensures consistency.
+
+Next Steps
+
+This week, practice reading your interpretation service prompt. Understand every part: the system prompt, the user prompt, the schema, the temperature.
+
+Experiment with prompt changes. Try adding more context, try different phrasings, and measure output quality.
+
+Next week, we'll dive into Tailwind CSS and component design. You'll learn how to style your UI, use design tokens, and build new components quickly. But the content you're styling comes from the AI interpretations you learned this week, so this foundation matters.
+
+For now, remember: the AI SDK makes it easy to call models, structured output ensures usable results, prompts shape quality, and temperature controls consistency. Treat prompts like code, version them, test them, and iterate. Keep this mindset and your AI features get better over time.

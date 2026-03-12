@@ -1,0 +1,558 @@
+CAMINO MSS DELIVERY PLAN
+=========================
+
+Last Updated: 10 Feb 2026
+Sprint Duration: 1 week
+Builder: Solo
+Model: Minimum Sellable Service (Admin-in-the-loop)
+North Star: Customer pays after Week 2. Customer retains after Week 6.
+First Customer: Uses Zoho CRM, Zoho Desk, and custom CSV data files.
+
+
+USER PROBLEMS WE ARE SOLVING
+------------------------------
+
+1. TOO SLOW
+   Current company workflow is too slow to surface valuable information required for action.
+   Desired Outcome: Increased speed to valuable information. Decrease time to produce reports, analyse information, find opportunities and risks.
+
+2. SO WHAT?
+   Lacking "so what" from managers who are providing data and reporting.
+   Desired Outcome: Better business results from actions.
+
+3. OVERWHELM
+   Execs find it difficult to use current tools, which are analyst-first.
+   Desired Outcome: Improved ease and intuitiveness in exploring valuable information.
+
+4. EASY INTEGRATIONS
+   Easy for team members to connect and update data. No IT department required.
+   Desired Outcome: Decreased time to produce reports.
+
+
+DEFINITION OF BILLABLE (END OF WEEK 2) -- Updated 11 Feb 2026
+---------------------------------------------------------------
+
+The customer agrees to pay when ALL of these are true:
+
+[ ] User onboarding - Exec/manager tells Camino Admin what's important (data types, signal needs, business context, upcoming decisions)
+[ ] Data onboarding - Manager sends CSV/XLSX samples from all tools to Camino Admin
+[ ] Data onboarding - Camino Admin helps system understand data shape, identify signals, make correct calculations
+[ ] Signals - System generates at least 3 signals from data layer (uploaded or via API integration) with correct values
+[ ] AI analysis - Each pinned/saved signal has AI analysis personalised to org and user
+[ ] Browse - Exec can browse signals and read expanded view
+[ ] Admin - Admin can create users and upload on their behalf
+[ ] Deployed - App is deployed to production
+
+Note: API integration (Zoho CRM/Desk) is crucial for billing as it solves the "easy integrations" pain point.
+Data onboarding is admin-assisted and not scalable, but overcomes signal flow challenges for MSS.
+
+
+MSS USER STORIES (SCOPE)
+==========================
+
+
+US1: COLLECT USER CONTEXT
+
+As Camino Admin, I collect user context during a discovery call and store it in the system, so that AI analysis is personalised and relevant.
+
+Acceptance Criteria:
+- Admin can input discovery call notes into a user profile via Admin CP.
+- Admin can update user profile fields at any time via Admin CP.
+- System saves: full_name, role, organization, industry, business_context, upcoming_priorities, signal_preferences, company_stage, team_size, market, competitors.
+- Profile data is used downstream by the AI analysis prompt (US6).
+
+
+US2: USER PROFILE PAGE
+
+As a user, I can see a profile page that reflects what the system knows about me, so I trust it understands my context.
+
+Acceptance Criteria:
+- User sees: Role, What is Upcoming, Signal Preferences, Org Details.
+- Profile is read-only. Only admin can edit.
+
+
+US3: DATA INPUT WITH 3-QUESTION FLOW
+
+As a manager (or admin on behalf of a user), I upload data files and answer 3 questions per tab, so the system correctly understands what was uploaded.
+
+Acceptance Criteria:
+- User can upload one or more CSV/XLSX files.
+- For each tab, system prompts 3 questions:
+  1. What does each row represent? (leads, deals, tickets, customers, events, agents, other)
+  2. Which column is the main metric? (dropdown of numeric columns, or "just count rows")
+  3. Which column is the date? (dropdown of date columns)
+- Admin can upload on behalf of a user (selects org/user first).
+- System normalises fields and stores data in a persisting org data layer.
+- Multiple uploads accumulate, not replace.
+
+
+US4: GENERATE AT LEAST 3 ACCURATE SIGNALS
+
+As a user, I see at least 3 signals generated from my data, with correct and verifiable values.
+
+Acceptance Criteria:
+- System reads data fields and user answers from US3 to determine which signals to create.
+- Each signal has: name, value, trend direction, percentage change.
+- Every signal has an explicit calculation spec (calcSpec). No guessed calculations.
+- Signals are saved to the database.
+
+
+US5: SIGNAL CARD AND EXPANDED VIEW
+
+As a user, I can see signal info on a compact card and expand it for deeper AI analysis.
+
+Acceptance Criteria:
+- Card shows: category badge, signal name, change value, trend icon.
+- Expanded accordion shows: data details (L2) and AI analysis (L3).
+
+
+US6: AI 5-SECTION ANALYSIS WITH USER CONTEXT
+
+As a user, I see AI-generated analysis that is personalised to my role, priorities, and business context.
+
+Acceptance Criteria:
+- AI generates analysis with 5 sections:
+  1. What We Found (factual data)
+  2. What It Means (interpretation)
+  3. So What (business impact)
+  4. Opportunities
+  5. Risks
+- AI prompt includes user context: role, upcoming_priorities, signal_preferences, business_context, org industry, company_stage.
+- Analysis is triggered on upload. Admin can re-trigger manually.
+- Response is cached in signal_interpretations table.
+
+
+US7: BROWSE SIGNALS
+
+As a user, I can scroll through all my signals in a list, with single card focus or stacked view.
+
+Acceptance Criteria:
+- Signal list scrolls vertically with single card focus.
+- Toggle to grouped/stacked view for scanning breadth.
+
+
+US8: ADMIN MANAGES USERS AND ORGS
+
+As Camino Admin, I can create users, create orgs, and assign users to orgs without engineering involvement.
+
+Acceptance Criteria:
+- Admin can create a user (email, name, role, password).
+- Admin can create an organisation.
+- Admin can assign users to organisations.
+
+
+US9: APP IS DEPLOYED
+
+As a user, I access the app via a production URL, not localhost.
+
+Acceptance Criteria:
+- App deployed on Vercel, accessible at a stable URL.
+- Database running on Supabase + Neon.
+
+
+==============================================
+6-WEEK ACTION PLAN
+==============================================
+
+
+WEEK 1: ACCURATE SIGNALS
+--------------------------
+Dates: 10 Feb - 16 Feb 2026
+Goal: The core pipeline works correctly. Upload a file, answer 3 questions, get accurate signals.
+Delivers: US3 (partial), US4, US5, US9
+
+Key Changes This Week:
+- Cut signal definitions from 93 to ~20 core. Every remaining definition must have a calcSpec with explicit: sourceTab, operation, valueField, dateField, filters, displayUnit.
+- Remove the legacy heuristic calculation path entirely (calculateSignalLegacy). If a signal does not have a calcSpec, it does not appear. No wrong numbers.
+- Replace the old upload flow (/upload) with the 3-question approach. Each tab prompts: (1) what does each row represent, (2) which column is the metric, (3) which column is the date.
+- Signal generation is driven by user answers, not by fuzzy-matching column names against 93 definitions.
+- Signals to keep (aligned to first customer's Zoho data):
+    Deals: pipeline value, closed-won revenue, win rate, avg deal size, deals by owner, deals by stage, sales cycle length
+    Leads: total leads, leads per month, leads by owner, lead conversion rate
+    Support: ticket volume, tickets per month, tickets by status, tickets by priority, avg resolution time
+    Custom: event count, events per period, events by entity
+
+Stories:
+  MSS-01  Cut signal definitions to ~20 core with calcSpecs
+  MSS-02  Remove legacy heuristic calculation path
+  MSS-03  Integrate 3-question upload flow into /upload
+  MSS-04  Signal generation from user answers (not fuzzy matching)
+  MSS-05  Verify signal card displays correct values for Zoho files
+  MSS-06  Deploy to production
+
+Exit Criteria:
+- Upload Zoho CRM Deals CSV. Answer 3 questions. See pipeline value, win rate, avg deal size with correct numbers.
+- Upload Zoho Desk Tickets CSV. Answer 3 questions. See ticket volume, tickets by status, tickets by priority with correct numbers.
+- Values are manually verifiable against the CSV.
+
+Demo: Friday 14 Feb. Show customer the upload flow and resulting signals. Get feedback on accuracy.
+
+
+WEEK 2: PERSONALISED AI, ADMIN OPS, AND API INTEGRATION
+----------------------------------------------------------
+Dates: 17 Feb - 23 Feb 2026
+Goal: AI analysis is personalised. Admin tooling works. API integration flows data automatically. Customer agrees to pay.
+Delivers: US1, US2, US3 (admin upload + API integration), US6, US8
+
+Key Changes This Week:
+
+A) USER CONTEXT + AI PERSONALISATION
+- Add upcoming_priorities (text) and signal_preferences (text) columns to the profiles table. These fields feed into the AI prompt so analysis is personalised.
+- Build Admin CP form to input discovery call notes into any user's profile. Admin fills this after the onboarding call.
+- Update buildInterpretationPrompt in interpretation-service.ts to fetch user profile data and include it in the AI prompt. Add a USER CONTEXT section: role, upcoming priorities, signal preferences, business context, org industry, company stage, team size.
+- Make profile page read-only for non-admin users. Admin manages profiles on behalf of users during MSS.
+- Auto-trigger AI analysis on upload completion.
+
+B) ADMIN OPS
+- Add admin upload-on-behalf-of-user. In admin panel, admin selects org/user, uploads file, answers 3 prompts. Signals are attributed to that org.
+- Verify admin create-user, create-org, assign-user-to-org flows work end-to-end.
+
+C) API INTEGRATION (Zoho CRM + Zoho Desk)
+- Wire existing Zoho OAuth + API client code to the new signal generation pipeline.
+- Admin connects customer's Zoho account via existing OAuth flow.
+- System pulls data from Zoho API (deals, leads, tickets).
+- Data is formatted as "virtual tabs" (same shape as CSV upload rows).
+- 3-question answers are PRE-FILLED automatically for known Zoho data types:
+  - Zoho CRM Deals: row_type=deals, metric=Amount, date=Closing_Date
+  - Zoho CRM Leads: row_type=leads, metric=(count rows), date=Created_Time
+  - Zoho Desk Tickets: row_type=tickets, metric=(count rows), date=createdTime
+- Virtual tabs are sent through POST /api/upload/generate (same pipeline as uploads).
+- Signals tagged with source_type="api-zoho-crm" or "api-zoho-desk".
+- Admin triggers sync manually for MSS. Auto-refresh is Week 3+.
+
+D) DATA ONBOARDING WORKFLOW
+- During onboarding, Admin receives CSV/XLSX samples from customer.
+- Admin uploads samples and classifies data via the 3-question flow.
+- Admin validates generated signals are correct.
+- For tools with API integration (Zoho), Admin sets up OAuth so future data flows automatically.
+- This admin-assisted flow is not scalable but overcomes signal flow challenges.
+
+Stories:
+  MSS-07  Add upcoming_priorities and signal_preferences to profiles DB
+  MSS-08  Admin CP form: input discovery notes into user profile
+  MSS-09  Inject user/org context into AI interpretation prompt
+  MSS-10  Auto-trigger AI analysis on upload
+  MSS-11  Profile page read-only, show new fields
+  MSS-12  Admin upload-on-behalf-of-user (org/user selector)
+  MSS-13  Verify admin create user, create org, assign flows
+  MSS-14  Wire Zoho API to generate pipeline (virtual tabs + pre-filled answers)
+  MSS-15  Admin Zoho sync trigger (pull data, generate signals)
+
+Exit Criteria:
+- Admin inputs discovery notes for a user via Admin CP.
+- Admin uploads file on behalf of user. Signals are correct.
+- Admin connects Zoho, triggers sync, signals appear with correct values.
+- AI analysis references the user's role and priorities in its commentary.
+- Customer agrees scope is billable.
+
+Demo: Friday 21 Feb. Show personalised AI analysis + Zoho integration. Close billing agreement.
+
+
+WEEK 3: MULTI-FILE DATA LAYER + API AUTO-REFRESH  (Tier 2 starts)
+-------------------------------------------------------------------
+Dates: 24 Feb - 2 Mar 2026
+Goal: Org data persists across uploads. Returning uploads compare to previous data. API refreshes automatically.
+Delivers: US10, US11
+
+Key Changes This Week:
+- Create org_data_sources table: org_id, source_name, data_type, columns (JSON), row_count, date_range_start, date_range_end, last_uploaded_at. This stores what data the system knows about for each org.
+- On upload, persist tab metadata to org_data_sources. On subsequent uploads, the system knows both datasets exist and can compute cross-file signals (e.g. lead-to-deal conversion rate from Leads + Deals files).
+- Returning upload recognition: when a user uploads a "Deals" file and the org already has deals data, show "Comparing to previous Deals data..." and compute delta.
+- Upload history visible to user (list of past uploads with date, file name, tab count, signal count).
+- API auto-refresh: admin can configure sync frequency per Zoho integration. System pulls data on schedule.
+
+Stories:
+  MSS-16  Create org_data_sources table and persist tab metadata     [US10]
+  MSS-17  Returning upload recognition and delta comparison          [US10]
+  MSS-18  Upload history page for user and admin                     [US10]
+  MSS-19  Cross-file signal discovery (e.g. lead-to-deal conversion) [US10]
+  MSS-20  API auto-refresh (scheduled Zoho sync)                     [US11]
+
+Exit Criteria:
+- Upload Deals CSV, then Leads CSV for same org. System shows signals from both.
+- Re-upload Deals CSV a week later. System says "Comparing to previous..." and shows change.
+
+Demo: Friday 28 Feb. Show multi-file and returning upload experience.
+
+
+WEEK 4: SIGNAL RELEVANCE
+--------------------------
+Dates: 3 Mar - 9 Mar 2026
+Goal: Signals are ranked by what matters to the user. Partial signals tell the user what data is missing.
+Delivers: US4 (enhanced), US7 (enhanced)
+
+Key Changes This Week:
+- Signal relevance scoring: each signal gets a relevance score based on the user's role, upcoming_priorities, and signal_preferences. Head of Support sees support signals first. CEO sees revenue signals first.
+- Sort signals by relevance score as default (instead of rank or trend).
+- Category filter bar on signals page: when additional data types are available (user, market, tech, business), user can filter by category.
+- Partial signal identification: system tells user what data is missing for signals it could compute if more data were uploaded. Example: "Upload deals data to unlock Win Rate and Pipeline Value."
+
+Stories:
+  MSS-21  Signal relevance scoring (role + priorities)              [US12]
+  MSS-22  Category filter bar on signals page                       [US12]
+  MSS-23  Partial signal identification (what data is missing)      [US13]
+  MSS-24  Sort signals by relevance score as default                [US12]
+
+Exit Criteria:
+- User with role "Head of Support" sees support signals ranked higher than sales signals.
+- System tells user "Upload deals data to unlock Win Rate and Pipeline Value."
+
+Demo: Friday 7 Mar. Show ranked signals and partial signal prompts.
+
+
+WEEK 5: ANALYSIS DEPTH
+------------------------
+Dates: 10 Mar - 16 Mar 2026
+Goal: Richer analysis per signal. Trend charts. Cross-signal references. Admin QA.
+Delivers: US14, US15, US16, US17
+
+Key Changes This Week:
+- Trend visualisation: line chart on signal detail view showing value over time. Requires 4+ weeks of data points. If insufficient data, show a note instead of a chart.
+- KPI implication section: add a 6th section to AI analysis that connects the signal to the user's stated KPIs. Example: "This impacts your KPI: Customer Retention."
+- Cross-signal references: AI prompt includes summary of other signals for the same org, so analysis can reference correlations. Example: "Ticket volume up 23%, which correlates with your 3 new hires."
+- Admin AI review panel: admin can view all AI interpretations, approve, edit text, or regenerate.
+
+Stories:
+  MSS-25  Trend visualisation on signal detail (line chart)          [US14]
+  MSS-26  KPI implication section in AI analysis                     [US16]
+  MSS-27  Cross-signal references in AI prompt                       [US15]
+  MSS-28  Admin AI review panel (approve, edit, regenerate)          [US17]
+
+Exit Criteria:
+- Signal detail shows a trend chart with 4+ weeks of data points.
+- AI analysis says "This impacts your KPI: Customer Retention."
+- AI analysis references other signals: "This correlates with the increase in ticket volume."
+- Admin can review and edit AI interpretations.
+
+Demo: Friday 14 Mar. Show trend charts and cross-signal analysis.
+
+
+WEEK 6: RETENTION AND POLISH
+------------------------------
+Dates: 17 Mar - 23 Mar 2026
+Goal: The experience is polished. Customer is retained. Ready for second customer.
+Delivers: US18, US19, US20, US21
+
+Key Changes This Week:
+- Progressive context: each session, system asks one new question to refine user preferences. Example: "Last week you looked at ticket data most. Would you like support signals prioritised?"
+- Upload reminders: if no data uploaded in 7 days, system nudges the user.
+- Admin quality dashboard: signal count per org, AI interpretation count, user engagement (last login, signals viewed), data freshness.
+- Full QA pass: manually verify every signal and AI interpretation for the first customer. Fix any accuracy issues.
+- Onboarding runbook: step-by-step document for onboarding a second customer without re-engineering.
+
+Stories:
+  MSS-29  Progressive context (one question per session)             [US18]
+  MSS-30  Upload reminder nudge (7 days without upload)              [US19]
+  MSS-31  Admin quality dashboard                                    [US20]
+  MSS-32  Full QA pass on all signals and AI for first customer
+  MSS-33  Onboarding runbook for second customer                     [US21]
+
+Exit Criteria:
+- Customer has been using the app for 4+ weeks. Signals are accurate. AI is relevant.
+- Admin dashboard shows quality metrics.
+- Onboarding runbook exists. Second customer can be onboarded without re-engineering.
+
+Demo: Friday 21 Mar. Review with customer. Collect testimonial.
+
+
+WEEKLY RHYTHM
+--------------
+
+Monday:     Sprint planning. Pick stories, set priorities.
+Tue-Thu:    Build. Focus on critical path first.
+Friday:     Demo to customer and sprint review.
+Weekend:    Update delivery plan. Prep next sprint.
+
+
+RISK REGISTER
+--------------
+
+1. AI synthesis quality is poor with limited data
+   Likelihood: Medium    Impact: High
+   Mitigation: Test with real Zoho files before Week 2 demo. Tune prompt.
+   Owner: Week 2
+
+2. Customer expects more than MSS scope
+   Likelihood: Medium    Impact: Medium
+   Mitigation: Set expectations in Week 1 demo. Show 6-week roadmap.
+   Owner: Week 1
+
+3. Signal values are wrong for Zoho data format
+   Likelihood: Medium    Impact: High
+   Mitigation: Week 1 is entirely focused on accuracy. Test with all 4 sample files.
+   Owner: Week 1
+
+4. Multi-file data layer introduces complexity
+   Likelihood: Medium    Impact: Medium
+   Mitigation: Keep it simple. Append-only data. No in-place updates for Week 3.
+   Owner: Week 3
+
+5. Solo builder bandwidth cannot finish Week 1 + 2 in 2 weeks
+   Likelihood: Medium    Impact: High
+   Mitigation: Week 1 cuts scope aggressively (no AI, no admin, just accurate signals). Week 2 adds AI + admin.
+   Owner: Week 1-2
+
+
+DECISIONS LOG
+--------------
+
+10 Feb 2026 - Pivoted from full MVP to MSS (Minimum Sellable Service)
+  Rationale: Full productisation has blockers. Admin-in-the-loop bridges gaps while delivering enough value to bill.
+
+10 Feb 2026 - 3-question upload flow replaces fuzzy signal discovery
+  Rationale: User clarifies data type, metric column, and date column. Eliminates guessing. Every signal is grounded in confirmed understanding.
+
+10 Feb 2026 - Cut from 93 signal definitions to ~20
+  Rationale: 82 of 93 used heuristic calculations that produced wrong values. Fewer correct signals are better than many wrong ones.
+
+10 Feb 2026 - User context in AI prompt is the billing differentiator
+  Rationale: Generic AI analysis is not worth paying for. Personalised analysis based on role, priorities, and business context is.
+
+10 Feb 2026 - 6-week release cadence with weekly demos
+  Rationale: Tight feedback loops. Ship weekly, learn weekly. Customer sees progress every Friday.
+
+10 Feb 2026 - Dual database (Neon for signals, Supabase for auth)
+  Rationale: Keep separation clean. Auth is Supabase-native. Signal data is relational on Neon.
+
+11 Feb 2026 - API integration (Zoho) added to Tier 1 billing gate
+  Rationale: Manual CSV uploads are a key user pain point (Problem 4: Easy Integrations).
+  API integration removes the friction. Existing Zoho code can be wired to the new generate pipeline.
+  Pre-filling the 3-question answers for known data shapes means API data flows through the same pipeline as uploads.
+
+11 Feb 2026 - Data onboarding is admin-assisted (not self-service)
+  Rationale: Not scalable, but overcomes signal flow challenges for MSS.
+  Admin receives samples, classifies data, validates signals, sets up API if available.
+  This bridges the gap until the pipeline is fully productised.
+
+11 Feb 2026 - Updated Tier 1 billing gate with explicit criteria from customer agreement draft
+  Rationale: Previous billing gate was informal. New version has 8 explicit criteria aligned to
+  the customer agreement draft. Key additions: API integration as a data source, data onboarding
+  as an admin workflow, AI personalisation to org KPIs (not just user).
+
+11 Feb 2026 - Added Tier 2/Backlog user stories (US10-US21) and recommended roadmap
+  Rationale: Tier 2 captures post-billing features that drive retention, depth, and scalability.
+  Roadmap recommends sequence based on retention risk, value, and dependencies.
+
+
+========================================
+TIER 2 / BACKLOG USER STORY MAP
+========================================
+
+Stories are referenced inline in Weeks 3-6 above. Summary for traceability:
+
+ID    | Story                              | Week | MSS Stories   | Priority
+------|--------------------------------------|------|---------------|----------
+US10  | Persisting Org Data Layer            | 3    | MSS-16 to 19  | High (retention)
+US11  | API Auto-Refresh                     | 3    | MSS-20        | High (UX)
+US12  | Signal Relevance Scoring             | 4    | MSS-21,22,24  | Medium (UX)
+US13  | Partial Signal Identification        | 4    | MSS-23        | Medium (engagement)
+US14  | Trend Visualisation (Charts)         | 5    | MSS-25        | Medium (depth)
+US15  | Cross-Signal AI References           | 5    | MSS-27        | Medium (insight quality)
+US16  | KPI Implication in AI Analysis       | 5    | MSS-26        | Medium (personalisation)
+US17  | Admin AI Review Panel                | 5    | MSS-28        | Medium (quality control)
+US18  | Progressive Context                  | 6    | MSS-29        | Low (engagement)
+US19  | Upload Reminders                     | 6    | MSS-30        | Low (retention nudge)
+US20  | Admin Quality Dashboard              | 6    | MSS-31        | Low (ops tooling)
+US21  | Onboarding Runbook                   | 6    | MSS-33        | Low (scalability)
+
+
+========================================
+RECOMMENDED ROADMAP
+========================================
+
+Sequence is based on: retention risk (losing the paying customer), user value
+(features they'd notice), and technical dependencies (what enables what).
+
+
+PHASE 1: BILLING GATE (Weeks 1-2) -- "Get Paid"
+-------------------------------------------------
+Tier: 1 (all 8 billing criteria)
+User stories: US1-US9
+Goal: Customer agrees to pay.
+Why this order: Nothing else matters until the customer is paying.
+
+  Week 1: Accurate signals from upload (3-question flow, field aliases, generate pipeline)
+  Week 2: Personalised AI + admin ops + API integration (Zoho)
+
+
+PHASE 2: DATA DEPTH (Week 3) -- "Make It Sticky"
+--------------------------------------------------
+Tier: 2
+User stories: US10, US11
+Goal: Data accumulates. API auto-refreshes. Customer sees increasing value over time.
+Why this order: Highest retention risk. If the customer uploads once and sees the
+same signals forever, they'll churn. Accumulating data and auto-refresh make the
+product feel alive. Also a technical prerequisite for US12-US15 (relevance scoring
+and cross-signal analysis need multiple data sources to work).
+
+  Week 3: Org data layer + returning upload recognition + API auto-refresh
+
+
+PHASE 3: SIGNAL INTELLIGENCE (Week 4) -- "Show What Matters"
+--------------------------------------------------------------
+Tier: 2
+User stories: US12, US13
+Goal: Signals are ranked by relevance to the user. System tells users what data is missing.
+Why this order: With multiple data sources from Phase 2, the signals list grows.
+Relevance scoring prevents information overload. Partial signal identification
+creates a pull mechanism for more data (self-reinforcing loop). Depends on US10
+(needs multiple data sources to rank across).
+
+  Week 4: Relevance scoring + category filters + partial signal prompts
+
+
+PHASE 4: ANALYSIS DEPTH (Week 5) -- "Deepen Insight"
+------------------------------------------------------
+Tier: 2
+User stories: US14, US15, US16, US17
+Goal: Richer, more connected analysis. Trend charts. Cross-signal AI. Admin QA.
+Why this order: By Week 5, there's 4+ weeks of signal history -- enough data points
+for meaningful trend charts (US14). Cross-signal references (US15) need multiple
+signal types from Phase 2-3. KPI implication (US16) builds on the user context
+from Tier 1. Admin AI review (US17) is a quality gate before scaling to customer 2.
+
+  Week 5: Trend charts + KPI section + cross-signal AI + admin review panel
+
+
+PHASE 5: RETENTION + SCALE (Week 6) -- "Ready for Customer 2"
+---------------------------------------------------------------
+Tier: 2
+User stories: US18, US19, US20, US21
+Goal: Product retains customer 1 on autopilot. Process is documented for customer 2.
+Why this order: These are polish and scalability features. Progressive context (US18)
+and upload reminders (US19) reduce admin workload. Quality dashboard (US20) gives
+admin visibility. Onboarding runbook (US21) codifies everything learned from
+customer 1 so customer 2 doesn't require re-engineering.
+
+  Week 6: Progressive context + upload reminders + admin dashboard + runbook
+
+
+BEYOND WEEK 6: FUTURE BACKLOG (Not Scheduled)
+-----------------------------------------------
+
+These are ideas that have come up but are not in the 6-week plan. They are captured
+here for future prioritisation.
+
+  FB-01  HubSpot API integration (same pattern as Zoho, second tool connector)
+  FB-02  Salesforce API integration (third tool connector)
+  FB-03  Zendesk API integration (fourth tool connector)
+  FB-04  Self-service data onboarding (remove admin from the loop)
+  FB-05  Multi-org admin (admin manages multiple customers from one view)
+  FB-06  User-facing dashboard (not just signal list, but a dashboard with cards)
+  FB-07  Notification system (email/push for new signals or threshold breaches)
+  FB-08  Signal alerting (user sets thresholds, gets notified when breached)
+  FB-09  Data export (user can export signals and analysis to PDF/CSV)
+  FB-10  White-label / custom branding per org
+  FB-11  Billing system integration (Stripe, automated invoicing)
+  FB-12  User self-service profile editing (remove admin dependency)
+  FB-13  Mobile-optimised signal browsing
+  FB-14  Webhook support (push signals to Slack, Teams, etc.)
+
+
+STORY COUNT SUMMARY
+---------------------
+
+Tier 1 (Billing Gate):   US1-US9     | 15 MSS stories (MSS-01 to MSS-15)  | Weeks 1-2
+Tier 2 (Backlog):        US10-US21   | 18 MSS stories (MSS-16 to MSS-33)  | Weeks 3-6
+Future Backlog:          FB-01 to 14 | Not estimated                       | Post Week 6
+Total:                   21 user stories, 33 MSS stories, 14 future ideas

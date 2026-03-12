@@ -1,0 +1,201 @@
+Chapter 1: TypeScript Fundamentals
+
+Duration: approximately 15 minutes
+Topic: Understanding types, interfaces, and how TypeScript flows through your Camino application.
+
+Introduction
+
+Welcome to Week 1 of the Camino Builder learning curriculum. This week, we're diving into TypeScript fundamentals, the foundation of everything you'll build in Camino.
+
+Every file in your codebase is TypeScript. Understanding types prevents bugs, makes AI tools give you better code, and helps you reason about your system. By the end of this chapter, you'll understand type annotations, interfaces, generics, and how TypeScript flows through your Camino application.
+
+The TypeScript Mental Model
+
+TypeScript is JavaScript with types. Every valid JavaScript is valid TypeScript, but TypeScript adds a layer on top that describes what kind of data your code expects. Think of types as contracts, promises your code makes about what it will accept and return.
+
+When you write a function in JavaScript, you might write: function add numbers, parameters a and b, return a plus b. This function will happily add two numbers, two strings, a number and a string, or anything else. Sometimes this flexibility is useful. Often, it causes bugs.
+
+In TypeScript, you write: function add numbers, parameters a colon number comma b colon number, colon number, open brace, return a plus b, close brace. Now TypeScript knows this function only accepts numbers and only returns numbers. If you try to pass a string, TypeScript catches it before the code even runs.
+
+This is the magic of TypeScript. Bugs that would crash your app in production get caught while you're writing code.
+
+Type Annotations Versus Type Inference
+
+TypeScript has two ways to know what type something is: you tell it explicitly, or it figures it out automatically.
+
+Type annotations are explicit. You write: const count colon number equals 5. You've told TypeScript that count is a number.
+
+Type inference is automatic. You write: const count equals 5. TypeScript sees the 5 and infers that count must be a number. No annotation needed.
+
+Both are valid. Use annotations when you want to be explicit, especially in function parameters and return types. Use inference for simple cases where the type is obvious.
+
+Here's a real example from your Camino codebase. In your signal discovery service, you have: function discover signals, parameter data colon Parsed CSV Row open square bracket close square bracket, colon Promise open angle bracket Signal Requirement open square bracket close square bracket close angle bracket. This tells TypeScript: this function takes an array of Parsed CSV Row objects and returns a Promise that resolves to an array of Signal Requirement objects.
+
+TypeScript can now check every call to discover signals and ensure you're passing the right data and handling the returned Promise correctly.
+
+Interfaces Versus Types
+
+In TypeScript, you can define custom types in two ways: interfaces and types. They're similar but have subtle differences.
+
+An interface describes the shape of an object. In Camino, you have: interface Signal Interpretation with fields signal underscore id colon string, what underscore we underscore found colon string, what underscore it underscore means colon string, and so on. This interface says: any Signal Interpretation object must have these exact fields with these exact types.
+
+A type can do the same thing but is more flexible. You can write: type Status equals quote active quote pipe quote archived quote pipe quote deleted quote. This creates a union type where Status can only be one of those three strings.
+
+The practical difference: interfaces are better for objects that might be extended later. Types are better for unions, intersections, and complex combinations.
+
+In your codebase, you use both. Interfaces for database models like Signal Interpretation, Profile Complete, Org Data Layer. Types for things like Trend Direction which is quote up quote pipe quote down quote pipe quote stable quote.
+
+When should you use which? Here's the rule: if you're describing an object shape that represents real data from your database or API, use an interface. If you're creating a union of possible values or combining types, use a type.
+
+Generics: Types with Parameters
+
+Generics let you write types that accept other types as parameters. This sounds abstract, but you use them constantly in Camino.
+
+The most common example is Promise. When you see: Promise open angle bracket boolean close angle bracket, that's a generic type. Promise is the generic, and boolean is the type parameter. This reads as: a Promise that will eventually resolve to a boolean value.
+
+In your check connection function in the integration architecture module, the return type is: Promise open angle bracket boolean close angle bracket. This tells TypeScript: this function returns a Promise, and when that Promise resolves, the value will be a boolean.
+
+Arrays are also generic. When you write: string open square bracket close square bracket, you're really writing: Array open angle bracket string close angle bracket. An array that contains strings.
+
+Your signal discovery service returns: Signal Requirement open square bracket close square bracket. This is: an array of Signal Requirement objects.
+
+Generics let you reuse logic across different types. The Promise logic works the same whether it's Promise open angle bracket boolean close angle bracket or Promise open angle bracket Signal Interpretation close angle bracket. You don't need separate Promise implementations for each type.
+
+Union Types: This or That
+
+A union type means a value can be one of several types. You create unions with the pipe character.
+
+In Camino, your Trend Direction type is: type Trend Direction equals quote up quote pipe quote down quote pipe quote stable quote. A Trend Direction can only be one of those three strings. If you try to assign quote sideways quote, TypeScript will error.
+
+This is incredibly useful for things like status fields. Instead of accepting any string and hoping it's valid, you explicitly define the valid values. This prevents typos and makes autocomplete work perfectly.
+
+Another example from your codebase: error handling. When you catch an error, it might be an Error object, or it might be a string, or it might be something else. You can type this as: unknown, then narrow it down: if error instanceof Error, then error dot message.
+
+Optional Properties: The Question Mark
+
+In your interfaces, you'll see the question mark symbol. This makes a property optional.
+
+In the Signal Interpretation interface, if a field is marked: context question mark colon string, it means: this field might be a string, or it might be undefined. It's not required.
+
+Without the question mark, the field is required. TypeScript will error if you try to create a Signal Interpretation object without providing that field.
+
+Use optional properties when data might not always be available. For example, a signal might have interpretation data after it's been analyzed, but not immediately after creation. Mark interpretation question mark colon Signal Interpretation.
+
+When accessing optional properties, always check if they exist first: if signal dot interpretation, then use signal dot interpretation dot what underscore we underscore found.
+
+Type Narrowing: Making Types More Specific
+
+Type narrowing is how you tell TypeScript: I know this value is more specific than its current type suggests.
+
+The most common example is error handling. In a catch block, the error is typed as unknown. You need to narrow it to Error to access error dot message.
+
+You write: if error instanceof Error, open brace, console dot log error dot message, close brace. Inside that if block, TypeScript knows error is an Error object, so it lets you access the message property.
+
+Another example: optional properties. If you have: signal dot interpretation question mark dot what underscore it underscore means, the question mark operator narrows the type. It reads as: if signal dot interpretation exists, access what underscore it underscore means. Otherwise, return undefined.
+
+This prevents the classic "Cannot read property of undefined" runtime error. TypeScript forces you to handle the case where interpretation might not exist.
+
+Applying TypeScript to Your Camino Codebase
+
+Let's walk through a real file in your codebase and understand every type.
+
+Open lib slash interpretation service dot ts. At the top, you'll see interface definitions:
+
+interface Signal Interpretation open brace
+  signal underscore id colon string
+  what underscore we underscore found colon string
+  what underscore it underscore means colon string
+  so underscore what colon string
+  recommended underscore action colon string
+  insight underscore quality colon quote high quote pipe quote medium quote pipe quote low quote
+close brace
+
+This interface describes the exact shape of an interpretation. Every field is required except insight underscore quality which has three possible values.
+
+Now look at the generate interpretation function:
+
+export async function generate interpretation open parenthesis
+  signal colon Signal Data comma
+  data underscore points colon Data Point open square bracket close square bracket comma
+  profile colon User Profile
+close parenthesis colon Promise open angle bracket Signal Interpretation close angle bracket
+
+This function signature tells you everything:
+- It takes three parameters: a Signal Data object, an array of Data Point objects, and a User Profile object.
+- It returns a Promise that resolves to a Signal Interpretation.
+- It's async, which means it can use await inside.
+
+Inside the function, every variable's type is inferred from the parameters or explicitly annotated. When you call generate text from the AI SDK, TypeScript knows what parameters it expects and what it returns.
+
+This type safety means if you try to pass the wrong data, TypeScript catches it immediately. If you typo a field name like signal underscore i d instead of signal underscore id, TypeScript errors. No runtime crashes, no debugging sessions, just: fix the typo and move on.
+
+Common TypeScript Patterns in Camino
+
+Here are patterns you'll see throughout your codebase:
+
+Pattern 1: Database query results.
+Your Supabase queries return: open brace data comma error close brace. The data type depends on the query. If you query signals, data is: Signal open square bracket close square bracket or null. If there's an error, error is: Postgrest Error or null.
+
+You always check both: if error, handle the error. If data, use the data.
+
+Pattern 2: React component props.
+Your signal accordion card component has: interface Signal Accordion Card Props open brace signal colon Signal Data comma interpretation question mark colon Signal Interpretation close brace. This describes the props the component expects. Signal is required, interpretation is optional.
+
+Pattern 3: API route responses.
+Your API routes return: Next Response dot json open parenthesis open brace success colon true comma data colon result close brace close parenthesis. TypeScript infers the response shape from the object you pass.
+
+Pattern 4: Server actions.
+Server actions are typed like regular functions but run on the server. Your upload action might be: async function upload CSV open parenthesis file colon File close parenthesis colon Promise open angle bracket Upload Result close angle bracket.
+
+Debugging TypeScript Errors
+
+TypeScript errors can be intimidating at first. Here's how to read them.
+
+Error: Type string is not assignable to type number.
+Translation: You're trying to put a string where TypeScript expects a number. Find where you're assigning or passing the value and check the types.
+
+Error: Property interpretation does not exist on type Signal Data.
+Translation: You're trying to access signal dot interpretation, but the Signal Data interface doesn't have that field. Either add it to the interface, or it's a typo.
+
+Error: Argument of type string is not assignable to parameter of type Trend Direction.
+Translation: You're passing a string to a function that expects specifically quote up quote comma quote down quote comma or quote stable quote. The string you're passing doesn't match those exact values.
+
+The key: read the error carefully. TypeScript is trying to help you. It's telling you exactly what's wrong and often suggests a fix.
+
+Practical Exercise: Add a Field to an Interface
+
+Let's practice. You're going to add a new field to the Signal Interpretation interface and see what breaks.
+
+Open lib slash interpretation service dot ts. Find the Signal Interpretation interface. Add a new field: urgency colon quote low quote pipe quote medium quote pipe quote high quote.
+
+Save the file. Now TypeScript is angry. Every place that creates a Signal Interpretation object is missing the urgency field.
+
+You have two choices: make urgency optional with urgency question mark, or update every place that creates interpretations to include urgency.
+
+Try both approaches. First, make it optional and see the errors disappear. Then, make it required and fix each error by adding urgency colon quote medium quote.
+
+This exercise teaches you: TypeScript errors aren't scary, they're helpful. They show you exactly what needs to be updated when you change an interface.
+
+TypeScript Configuration: tsconfig dot json
+
+Your project has a tsconfig dot json file that configures how TypeScript behaves. You rarely need to edit it, but understanding a few key options helps.
+
+strict colon true. This enables all strict type checking options. Without this, TypeScript is very permissive and misses bugs. With it, TypeScript is strict but catches more issues.
+
+target colon quote ES 2020 quote. This tells TypeScript what version of JavaScript to compile down to. ES 2020 includes modern features like optional chaining.
+
+module colon quote ESNext quote. This tells TypeScript to use modern ES module syntax: import and export.
+
+jsx colon quote preserve quote. This tells TypeScript to leave JSX syntax alone. Next dot js handles JSX compilation.
+
+You don't need to memorize these. Just know: the config makes TypeScript stricter and smarter.
+
+Next Steps
+
+This week, practice reading types in your codebase. Open any file and trace the types: what does this function accept? What does it return? What interfaces are used?
+
+Use your code editor's "Go to definition" feature. Hover over a variable and see its type. Click through to interface definitions.
+
+Next week, we'll dive into React fundamentals. You'll learn about components, props, state, and effects. But everything will be typed with TypeScript, so this week's foundation matters.
+
+For now, remember: TypeScript is your ally. It catches bugs before they happen. The more you embrace types, the faster you'll ship with confidence.

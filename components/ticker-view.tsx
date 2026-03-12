@@ -4,14 +4,17 @@ import type { SubIssue } from "@/lib/issue-tree-data"
 import { ArrowDown, ArrowUp, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
+import { getAdjustedTrendValue, getTimeframeLabel } from "@/lib/date-range-utils"
+import type { DateRange } from "@/lib/date-range-utils"
 
 interface TickerViewProps {
   issues: SubIssue[]
   onIssueClick: (issue: SubIssue) => void
-  onIssueDoubleClick?: (issue: SubIssue) => void // Added double-click handler prop
+  onIssueDoubleClick?: (issue: SubIssue) => void
+  dateRange?: DateRange
 }
 
-export function TickerView({ issues, onIssueClick, onIssueDoubleClick }: TickerViewProps) {
+export function TickerView({ issues, onIssueClick, onIssueDoubleClick, dateRange = "7days" }: TickerViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [lastTapTime, setLastTapTime] = useState(0)
   const [lastTappedIssueId, setLastTappedIssueId] = useState<string | null>(null)
@@ -103,20 +106,25 @@ export function TickerView({ issues, onIssueClick, onIssueDoubleClick }: TickerV
             className="flex gap-8 overflow-x-hidden whitespace-nowrap"
             style={{ scrollBehavior: "auto" }}
           >
-            {displayIssues.map((issue, index) => (
-              <button
-                key={`${issue.id}-${index}`}
-                onClick={() => handleIssueClick(issue)} // Use new handler with double-tap detection
-                className="inline-flex items-center gap-3 px-6 py-4 rounded-lg bg-muted/50 hover:bg-accent/20 transition-colors flex-shrink-0 border border-border hover:border-accent"
-              >
-                <span className="font-semibold text-lg">{issue.name}</span>
-                <div className={cn("flex items-center gap-2", getTrendColor(issue.trend))}>
-                  {getTrendIcon(issue.trend)}
-                  <span className="text-lg font-bold">{issue.trendValue}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">· {issue.timeframe}</span>
-              </button>
-            ))}
+            {displayIssues.map((issue, index) => {
+              const adjustedTrendValue = getAdjustedTrendValue(issue.trendValue, dateRange)
+              const timeframeLabel = getTimeframeLabel(dateRange)
+
+              return (
+                <button
+                  key={`${issue.id}-${index}`}
+                  onClick={() => handleIssueClick(issue)}
+                  className="inline-flex items-center gap-3 px-6 py-4 rounded-lg bg-muted/50 hover:bg-accent/20 transition-colors flex-shrink-0 border border-border hover:border-accent"
+                >
+                  <span className="font-semibold text-lg">{issue.name}</span>
+                  <div className={cn("flex items-center gap-2", getTrendColor(issue.trend))}>
+                    {getTrendIcon(issue.trend)}
+                    <span className="text-lg font-bold">{adjustedTrendValue}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">· {timeframeLabel}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>

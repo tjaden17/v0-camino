@@ -1,0 +1,621 @@
+Chapter 8: Server Actions and Forms
+
+Welcome to Chapter 8, where we explore server actions and forms in Next.js. This is where your application starts feeling real, because you're building the bridges between your user interface and your backend. By the end of this chapter, you'll understand how to handle form submissions, validate data, and perform server-side operations securely.
+
+Let's dive in.
+
+
+PART 1: Understanding Server Actions
+
+Server actions are one of the most powerful features in Next.js 15 and beyond. They let you write server-side code that can be called directly from your client components, without setting up API routes.
+
+Think of server actions as functions that run on the server but can be invoked from the client as easily as calling any other function. The magic is that Next.js handles all the serialization, security, and transport for you.
+
+Here's what makes server actions special. First, they run on the server, so your secrets stay secret. Your database credentials, API keys, and sensitive logic never touch the client. Second, they're type-safe when you use TypeScript, which means you catch errors at compile time, not runtime. Third, they integrate seamlessly with React's form handling, making form submissions feel natural and progressively enhanced.
+
+Let's look at a basic server action. You define it in a file by adding the "use server" directive at the top:
+
+\`\`\`typescript
+"use server"
+
+export async function createTodo(formData: FormData) {
+  const title = formData.get("title") as string
+  
+  // Server-side logic here
+  await db.insert({ title })
+  
+  return { success: true }
+}
+\`\`\`
+
+Notice the "use server" directive. This tells Next.js that this entire file contains server-side functions. Everything in this file runs on the server, never on the client.
+
+You can also define inline server actions within server components by adding "use server" inside the function:
+
+\`\`\`typescript
+export default async function TodoPage() {
+  async function handleSubmit(formData: FormData) {
+    "use server"
+    const title = formData.get("title") as string
+    await db.insert({ title })
+  }
+  
+  return <form action={handleSubmit}>...</form>
+}
+\`\`\`
+
+Both approaches work, but separate files are cleaner when you need to reuse actions across multiple components.
+
+
+PART 2: Building Forms with Server Actions
+
+Forms are the primary way users interact with server actions. Let's build a complete form flow from start to finish.
+
+Start with a simple form component:
+
+\`\`\`typescript
+import { createTodo } from "@/actions/todos"
+
+export function TodoForm() {
+  return (
+    <form action={createTodo}>
+      <input 
+        type="text" 
+        name="title" 
+        placeholder="What needs to be done?"
+        required
+      />
+      <button type="submit">Add Todo</button>
+    </form>
+  )
+}
+\`\`\`
+
+Notice how clean this is. You pass the server action directly to the form's action prop. No event handlers, no prevent default, no manual fetch calls. Next.js handles everything.
+
+When the user submits the form, Next.js serializes the form data, sends it to the server, executes your action, and returns the result. All automatically.
+
+Now let's add validation and error handling:
+
+\`\`\`typescript
+"use server"
+
+export async function createTodo(formData: FormData) {
+  const title = formData.get("title") as string
+  
+  // Validate input
+  if (!title || title.trim().length === 0) {
+    return { 
+      error: "Title is required" 
+    }
+  }
+  
+  if (title.length > 100) {
+    return { 
+      error: "Title must be less than 100 characters" 
+    }
+  }
+  
+  try {
+    await db.todos.insert({ 
+      title: title.trim(),
+      completed: false,
+      createdAt: new Date()
+    })
+    
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to create todo:", error)
+    return { 
+      error: "Failed to create todo. Please try again." 
+    }
+  }
+}
+\`\`\`
+
+The server action now validates input and handles errors gracefully. It returns an object with either success or error information.
+
+To display these errors in your form, use React's useFormState hook:
+
+\`\`\`typescript
+"use client"
+
+import { useFormState } from "react-dom"
+import { createTodo } from "@/actions/todos"
+
+export function TodoForm() {
+  const [state, formAction] = useFormState(createTodo, { error: null })
+  
+  return (
+    <form action={formAction}>
+      <input 
+        type="text" 
+        name="title" 
+        placeholder="What needs to be done?"
+        required
+      />
+      {state.error && (
+        <p className="text-red-500">{state.error}</p>
+      )}
+      <button type="submit">Add Todo</button>
+    </form>
+  )
+}
+\`\`\`
+
+The useFormState hook connects your client component to the server action. It manages the form state and provides the latest result from your action.
+
+
+PART 3: Form Validation Patterns
+
+There are three levels of validation you should implement: client-side HTML validation, client-side JavaScript validation, and server-side validation.
+
+HTML validation is your first line of defense:
+
+\`\`\`typescript
+<input 
+  type="email"
+  name="email"
+  required
+  minLength={3}
+  maxLength={100}
+  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+/>
+\`\`\`
+
+These HTML attributes provide instant feedback and work even if JavaScript is disabled. They're progressively enhanced.
+
+Client-side JavaScript validation provides better user experience:
+
+\`\`\`typescript
+"use client"
+
+export function SignupForm() {
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  function validateEmail(email: string) {
+    if (!email) return "Email is required"
+    if (!email.includes("@")) return "Invalid email address"
+    return null
+  }
+  
+  function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const error = validateEmail(e.target.value)
+    setErrors(prev => ({ ...prev, email: error }))
+  }
+  
+  return (
+    <form>
+      <input
+        type="email"
+        name="email"
+        onBlur={handleBlur}
+      />
+      {errors.email && <span>{errors.email}</span>}
+    </form>
+  )
+}
+\`\`\`
+
+But always validate on the server. Client-side validation can be bypassed:
+
+\`\`\`typescript
+"use server"
+
+import { z } from "zod"
+
+const signupSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters")
+})
+
+export async function signup(formData: FormData) {
+  const data = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+    name: formData.get("name") as string
+  }
+  
+  // Validate with Zod
+  const result = signupSchema.safeParse(data)
+  
+  if (!result.success) {
+    return { 
+      errors: result.error.flatten().fieldErrors 
+    }
+  }
+  
+  // Proceed with validated data
+  const validData = result.data
+  // Create user...
+}
+\`\`\`
+
+Using a validation library like Zod gives you type safety and consistent error messages. The schema defines your rules once, and you get both TypeScript types and runtime validation.
+
+
+PART 4: Progressive Enhancement
+
+Server actions enable progressive enhancement, meaning your forms work without JavaScript but feel better with it.
+
+Start with a basic form that works without JavaScript:
+
+\`\`\`typescript
+export default function ContactPage() {
+  async function handleContact(formData: FormData) {
+    "use server"
+    const email = formData.get("email") as string
+    const message = formData.get("message") as string
+    
+    await sendEmail({ email, message })
+    
+    redirect("/thank-you")
+  }
+  
+  return (
+    <form action={handleContact}>
+      <input type="email" name="email" required />
+      <textarea name="message" required />
+      <button type="submit">Send Message</button>
+    </form>
+  )
+}
+\`\`\`
+
+This works perfectly with JavaScript disabled. The form submits, the server action runs, and the user is redirected.
+
+Now enhance it with JavaScript for better UX:
+
+\`\`\`typescript
+"use client"
+
+import { useFormStatus } from "react-dom"
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? "Sending..." : "Send Message"}
+    </button>
+  )
+}
+
+export function ContactForm({ action }) {
+  return (
+    <form action={action}>
+      <input type="email" name="email" required />
+      <textarea name="message" required />
+      <SubmitButton />
+    </form>
+  )
+}
+\`\`\`
+
+The useFormStatus hook provides the pending state, so you can show loading indicators. The form still works without JavaScript, but provides better feedback when JavaScript is available.
+
+
+PART 5: Revalidation and Cache Management
+
+After a server action modifies data, you need to update the UI to reflect the changes. Next.js provides revalidation functions for this.
+
+The revalidatePath function tells Next.js to refresh specific pages:
+
+\`\`\`typescript
+"use server"
+
+import { revalidatePath } from "next/cache"
+
+export async function createPost(formData: FormData) {
+  const title = formData.get("title") as string
+  
+  await db.posts.insert({ title })
+  
+  // Refresh the posts page
+  revalidatePath("/posts")
+  
+  return { success: true }
+}
+\`\`\`
+
+When you call revalidatePath, Next.js re-fetches the data for that route and updates the page. Users see fresh data without a full page reload.
+
+For more granular control, use revalidateTag:
+
+\`\`\`typescript
+// When fetching data, tag it
+export async function getPosts() {
+  const posts = await fetch("https://api.example.com/posts", {
+    next: { tags: ["posts"] }
+  })
+  return posts.json()
+}
+
+// In your action, revalidate by tag
+"use server"
+
+import { revalidateTag } from "next/cache"
+
+export async function createPost(formData: FormData) {
+  await db.posts.insert({ ... })
+  
+  // Refresh all data tagged with "posts"
+  revalidateTag("posts")
+}
+\`\`\`
+
+This is powerful when you have data spread across multiple pages. One tag revalidation can update everything that depends on that data.
+
+
+PART 6: Optimistic Updates
+
+For the best user experience, update the UI immediately while the server action runs in the background. This is called optimistic updating.
+
+Use the useOptimistic hook:
+
+\`\`\`typescript
+"use client"
+
+import { useOptimistic } from "react"
+import { deleteTodo } from "@/actions/todos"
+
+export function TodoList({ initialTodos }) {
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    initialTodos,
+    (state, deletedId) => state.filter(todo => todo.id !== deletedId)
+  )
+  
+  async function handleDelete(id: string) {
+    // Optimistically remove from UI
+    addOptimisticTodo(id)
+    
+    // Actually delete on server
+    await deleteTodo(id)
+  }
+  
+  return (
+    <ul>
+      {optimisticTodos.map(todo => (
+        <li key={todo.id}>
+          {todo.title}
+          <button onClick={() => handleDelete(todo.id)}>
+            Delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+\`\`\`
+
+The todo disappears instantly from the UI, giving immediate feedback. If the server action fails, React automatically reverts the optimistic update.
+
+
+PART 7: Security Best Practices
+
+Server actions run on your server, so you must protect them. Never trust client input.
+
+Always authenticate and authorize:
+
+\`\`\`typescript
+"use server"
+
+import { auth } from "@/lib/auth"
+
+export async function deletePost(postId: string) {
+  const session = await auth()
+  
+  if (!session?.user) {
+    return { error: "Unauthorized" }
+  }
+  
+  // Check if user owns this post
+  const post = await db.posts.findById(postId)
+  
+  if (post.authorId !== session.user.id) {
+    return { error: "Forbidden" }
+  }
+  
+  await db.posts.delete(postId)
+  revalidatePath("/posts")
+  
+  return { success: true }
+}
+\`\`\`
+
+Always validate input:
+
+\`\`\`typescript
+"use server"
+
+import { z } from "zod"
+
+const updateProfileSchema = z.object({
+  bio: z.string().max(500),
+  website: z.string().url().optional()
+})
+
+export async function updateProfile(formData: FormData) {
+  // Validate first
+  const result = updateProfileSchema.safeParse({
+    bio: formData.get("bio"),
+    website: formData.get("website")
+  })
+  
+  if (!result.success) {
+    return { errors: result.error.flatten() }
+  }
+  
+  // Then proceed with validated data
+  const { bio, website } = result.data
+  // Update database...
+}
+\`\`\`
+
+Never expose sensitive data in return values:
+
+\`\`\`typescript
+"use server"
+
+export async function createUser(email: string, password: string) {
+  // WRONG: Don't return sensitive data
+  const user = await db.users.insert({ email, password })
+  return user // This includes the hashed password!
+  
+  // RIGHT: Return only what the client needs
+  const user = await db.users.insert({ email, password })
+  return { 
+    id: user.id, 
+    email: user.email 
+  }
+}
+\`\`\`
+
+
+PART 8: Putting It All Together
+
+Let's build a complete feature using everything we've learned. We'll create a blog post creation form with validation, optimistic updates, and proper error handling.
+
+First, define the schema:
+
+\`\`\`typescript
+import { z } from "zod"
+
+export const postSchema = z.object({
+  title: z.string().min(5).max(100),
+  content: z.string().min(50).max(5000),
+  published: z.boolean().default(false)
+})
+
+export type Post = z.infer<typeof postSchema>
+\`\`\`
+
+Then create the server action:
+
+\`\`\`typescript
+"use server"
+
+import { auth } from "@/lib/auth"
+import { postSchema } from "@/lib/schemas"
+import { revalidatePath } from "next/cache"
+
+export async function createPost(formData: FormData) {
+  // Authenticate
+  const session = await auth()
+  if (!session?.user) {
+    return { error: "You must be logged in" }
+  }
+  
+  // Parse and validate
+  const result = postSchema.safeParse({
+    title: formData.get("title"),
+    content: formData.get("content"),
+    published: formData.get("published") === "on"
+  })
+  
+  if (!result.success) {
+    return { 
+      errors: result.error.flatten().fieldErrors 
+    }
+  }
+  
+  // Insert into database
+  try {
+    const post = await db.posts.insert({
+      ...result.data,
+      authorId: session.user.id,
+      createdAt: new Date()
+    })
+    
+    revalidatePath("/posts")
+    return { success: true, postId: post.id }
+  } catch (error) {
+    console.error("Failed to create post:", error)
+    return { error: "Failed to create post" }
+  }
+}
+\`\`\`
+
+Build the form component:
+
+\`\`\`typescript
+"use client"
+
+import { useFormState, useFormStatus } from "react-dom"
+import { createPost } from "@/actions/posts"
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? "Creating..." : "Create Post"}
+    </button>
+  )
+}
+
+export function CreatePostForm() {
+  const [state, formAction] = useFormState(createPost, null)
+  
+  return (
+    <form action={formAction} className="space-y-4">
+      <div>
+        <label htmlFor="title">Title</label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          required
+          minLength={5}
+          maxLength={100}
+        />
+        {state?.errors?.title && (
+          <p className="text-red-500">{state.errors.title}</p>
+        )}
+      </div>
+      
+      <div>
+        <label htmlFor="content">Content</label>
+        <textarea
+          id="content"
+          name="content"
+          required
+          minLength={50}
+          rows={10}
+        />
+        {state?.errors?.content && (
+          <p className="text-red-500">{state.errors.content}</p>
+        )}
+      </div>
+      
+      <div>
+        <label>
+          <input type="checkbox" name="published" />
+          Publish immediately
+        </label>
+      </div>
+      
+      {state?.error && (
+        <p className="text-red-500">{state.error}</p>
+      )}
+      
+      <SubmitButton />
+    </form>
+  )
+}
+\`\`\`
+
+This form has everything: HTML validation for instant feedback, server-side validation for security, proper error handling, and loading states.
+
+
+CONCLUSION
+
+Server actions are the modern way to handle forms and mutations in Next.js. They eliminate the need for API routes in many cases, provide automatic type safety, and enable progressive enhancement.
+
+Remember the key principles: validate on both client and server, authenticate every action, handle errors gracefully, and use revalidation to keep your UI fresh.
+
+In the next chapter, we'll explore version control with Git and deploying your applications to production. You'll learn how to collaborate with others and ship your work to real users.
+
+You're building the skills to create production-ready applications. Keep practicing, keep building, and keep learning.
+
+See you in chapter 9.

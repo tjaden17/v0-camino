@@ -1,0 +1,15 @@
+Zoho CRM Pipeline Analysis
+Report Generated: Wednesday, February 14, 2024
+Org: Acme Corp | CRM Version: Enterprise
+
+"Week","Total Value ($)","Qual Leads","Discovery","Proposals","Negotiating","Cycle Days","Conv Rate","Owner","Stage"
+"Jan 1, 2024","$850,000",124,52,28,15,45 days,22.1%,Sales Team,All
+"January 8 2024",920k,138,58,31,18,"43",23.5,Sales Team,All
+15/01/2024,"895,000.00",142,55,29,16,46,23.5%,Sales Team,All
+"2024-01-22","$985,000",151,62,34,19,42 days,24.0,Sales Team,All
+"29-Jan-24",1050000,148,65,37,21,"41","23.2%",Sales Team,All
+"Feb 05 2024","$1,120,000",162,68,39,23,40,24.2%,Sales Team,All
+12-Feb-2024,"1,090,000",155,64,36,20,"42 days",24.0,Sales Team,All
+"February 19, 2024","$1.185M",168,72,41,24,39,24.3%,Sales Team,All
+01/01/2024,,,52,,,,,John Smith,Discovery
+Jan 8 2024,"$420,000",,,,10,,,John Smith,Negotiation

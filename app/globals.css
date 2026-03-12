@@ -1,29 +1,27 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Instagram-inspired clean, minimal color scheme with subtle borders and bright backgrounds */
-  --background: oklch(1 0 0); /* Pure white background */
-  --foreground: oklch(0.05 0 0); /* Near-black text */
-  --card: oklch(1 0 0); /* White cards */
-  --card-foreground: oklch(0.05 0 0); /* Near-black card text */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.05 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.05 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.05 0 0);
-  --primary: oklch(0.55 0.22 265); /* Vibrant purple accent */
+  --primary: oklch(0.55 0.22 265);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0); /* Light gray background */
+  --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.05 0 0);
-  --muted: oklch(0.98 0 0); /* Very light gray for subtle backgrounds */
-  --muted-foreground: oklch(0.5 0.01 265); /* Medium gray for secondary text */
-  --accent: oklch(0.6 0.24 250); /* Bright blue accent */
+  --muted: oklch(0.98 0 0);
+  --muted-foreground: oklch(0.5 0.01 265);
+  --accent: oklch(0.6 0.24 250);
   --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.58 0.21 25); /* Bright red for errors */
+  --destructive: oklch(0.58 0.21 25);
   --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.55 0.16 145); /* Instagram-style green */
+  --success: oklch(0.55 0.16 145);
   --success-foreground: oklch(1 0 0);
-  --border: oklch(0.91 0 0); /* Light gray borders like Instagram */
+  --border: oklch(0.91 0 0);
   --input: oklch(0.98 0 0);
   --ring: oklch(0.55 0.22 265);
   --chart-1: oklch(0.55 0.22 265);
@@ -31,7 +29,7 @@
   --chart-3: oklch(0.55 0.16 145);
   --chart-4: oklch(0.65 0.2 200);
   --chart-5: oklch(0.5 0.15 40);
-  --radius: 0.5rem; /* Smaller, Instagram-style radius */
+  --radius: 0.5rem;
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.05 0 0);
   --sidebar-primary: oklch(0.05 0 0);
@@ -43,7 +41,6 @@
 }
 
 .dark {
-  /* Dark theme kept for potential future use */
   --background: oklch(0.1 0 0);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.14 0 0);
@@ -130,7 +127,6 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Prevent horizontal overflow on all pages */
   html,
   body {
     overflow-x: hidden;
@@ -142,11 +138,9 @@
   .touch-pan-y {
     touch-action: pan-y;
   }
-
   .touch-pan-x {
     touch-action: pan-x;
   }
-
   .touch-none {
     touch-action: none;
   }

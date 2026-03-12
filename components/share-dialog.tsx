@@ -12,25 +12,45 @@ interface ShareDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   issueName: string
+  signalId?: string
 }
 
-export function ShareDialog({ open, onOpenChange, issueName }: ShareDialogProps) {
+export function ShareDialog({ open, onOpenChange, issueName, signalId }: ShareDialogProps) {
   const [copied, setCopied] = useState(false)
   const [email, setEmail] = useState("")
   const [note, setNote] = useState("")
 
+  const logShare = async (method: "copy" | "email", recipientEmail?: string) => {
+    if (!signalId) return
+    try {
+      await fetch("/api/signals/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          signalId,
+          shareMethod: method,
+          recipientEmail,
+        }),
+      })
+    } catch (error) {
+      console.error("Failed to log share:", error)
+    }
+  }
+
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(window.location.href)
     setCopied(true)
+    await logShare("copy")
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleEmailShare = () => {
+  const handleEmailShare = async () => {
     const subject = encodeURIComponent(`Camino: ${issueName}`)
     const body = encodeURIComponent(
       `${note ? note + "\n\n" : ""}Check out this issue analysis: ${window.location.href}`,
     )
     const mailto = email ? `${email}?subject=${subject}&body=${body}` : `?subject=${subject}&body=${body}`
+    await logShare("email", email || undefined)
     window.location.href = `mailto:${mailto}`
   }
 

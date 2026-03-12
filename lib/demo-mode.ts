@@ -63,5 +63,6 @@ function convertDemoToUserProfile(demoProfile: DemoProfile): UserProfile {
     savedIssueIds: demoProfile.savedIssueIds,
     companyMission: demoProfile.companyMission,
     roleMission: demoProfile.roleMission,
+    upcomingDecisions: demoProfile.upcomingDecisions,
   }
 }

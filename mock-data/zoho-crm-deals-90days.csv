@@ -1,0 +1,51 @@
+Deal Name,Amount,Stage,Closing Date,Created Time,Modified Time,Owner,Type,Lead Source,Pipeline,Probability,Expected Revenue,Contact Name,Account Name
+Enterprise Plan - Acme Corp,45000,Proposal/Price Quote,2025-03-15,2025-01-17 09:23:12,2025-01-17 14:30:45,Sarah Johnson,New Business,Website,Sales Pipeline,60,27000,John Smith,Acme Corp
+Starter Plan - Tech Solutions,8500,Qualification,2025-02-28,2025-01-16 11:15:33,2025-01-16 16:22:11,Mike Chen,New Business,Referral,Sales Pipeline,30,2550,Emily Davis,Tech Solutions Inc
+Professional Plan - Global Innovations,22000,Closed Won,2025-01-20,2025-01-15 10:42:18,2025-01-20 09:15:32,Sarah Johnson,Upgrade,Paid Search,Sales Pipeline,100,22000,Robert Lee,Global Innovations
+Enterprise Plan - Digital Dynamics,52000,Negotiation/Review,2025-03-01,2025-01-14 14:55:27,2025-01-17 11:45:18,Tom Williams,New Business,Conference,Sales Pipeline,75,39000,Jessica Brown,Digital Dynamics
+Starter Plan - Quick Start LLC,7200,Closed Lost,2025-01-18,2025-01-13 08:30:44,2025-01-18 15:20:33,Mike Chen,New Business,Cold Call,Sales Pipeline,0,0,Mark Wilson,Quick Start LLC
+Professional Plan - Smart Systems,19500,Closed Won,2025-01-22,2025-01-12 13:17:52,2025-01-22 10:33:21,Sarah Johnson,New Business,LinkedIn,Sales Pipeline,100,19500,Linda Martinez,Smart Systems
+Enterprise Plan - Future Tech,48000,Proposal/Price Quote,2025-03-20,2025-01-11 09:44:19,2025-01-16 14:12:05,Tom Williams,New Business,Partner Referral,Sales Pipeline,60,28800,David Garcia,Future Tech
+Starter Plan - Startup Hub,6800,Qualification,2025-02-25,2025-01-10 15:28:36,2025-01-10 16:55:42,Mike Chen,New Business,Website,Sales Pipeline,30,2040,Amy Rodriguez,Startup Hub
+Professional Plan - Enterprise Co,21000,Negotiation/Review,2025-02-15,2025-01-09 11:33:48,2025-01-17 09:22:14,Sarah Johnson,Upgrade,Existing Customer,Sales Pipeline,80,16800,Chris Anderson,Enterprise Co
+Enterprise Plan - Mega Corp,55000,Closed Won,2025-01-25,2025-01-08 10:15:23,2025-01-25 11:45:39,Tom Williams,New Business,Conference,Sales Pipeline,100,55000,Patricia Taylor,Mega Corp
+Starter Plan - Mini Business,5500,Closed Lost,2025-01-19,2025-01-07 14:42:55,2025-01-19 13:18:27,Mike Chen,New Business,Cold Call,Sales Pipeline,0,0,Michael Thomas,Mini Business
+Professional Plan - Mid Market Inc,23500,Closed Won,2025-01-28,2025-01-06 09:27:31,2025-01-28 15:42:18,Sarah Johnson,New Business,Paid Search,Sales Pipeline,100,23500,Jennifer White,Mid Market Inc
+Enterprise Plan - Big Enterprise,50000,Proposal/Price Quote,2025-03-10,2025-01-05 13:55:19,2025-01-15 10:33:52,Tom Williams,New Business,Referral,Sales Pipeline,65,32500,Daniel Harris,Big Enterprise
+Starter Plan - Little Co,7800,Qualification,2025-03-05,2025-01-04 08:18:44,2025-01-04 11:25:36,Mike Chen,New Business,Website,Sales Pipeline,25,1950,Karen Martin,Little Co
+Professional Plan - Growth Corp,20500,Negotiation/Review,2025-02-20,2025-01-03 16:39:27,2025-01-16 14:55:21,Sarah Johnson,Upgrade,Existing Customer,Sales Pipeline,75,15375,Steven Thompson,Growth Corp
+Enterprise Plan - Major Player,58000,Closed Won,2025-01-30,2024-12-29 11:22:15,2025-01-30 10:28:45,Tom Williams,New Business,Partner Referral,Sales Pipeline,100,58000,Barbara Moore,Major Player
+Starter Plan - New Venture,6200,Closed Lost,2024-12-20,2024-12-28 09:47:33,2025-01-20 14:35:19,Mike Chen,New Business,LinkedIn,Sales Pipeline,0,0,William Jackson,New Venture
+Professional Plan - Scale Up,24000,Closed Won,2025-01-15,2024-12-27 14:12:48,2025-01-15 09:52:33,Sarah Johnson,New Business,Conference,Sales Pipeline,100,24000,Susan Lewis,Scale Up
+Enterprise Plan - Top Tier,62000,Proposal/Price Quote,2025-03-25,2024-12-26 10:35:21,2025-01-17 11:18:45,Tom Williams,New Business,Referral,Sales Pipeline,70,43400,Joseph Walker,Top Tier
+Starter Plan - Micro Biz,5800,Qualification,2025-02-28,2024-12-25 15:58:44,2024-12-25 16:45:22,Mike Chen,New Business,Cold Call,Sales Pipeline,20,1160,Lisa Hall,Micro Biz
+Professional Plan - Medium Enterprise,22500,Negotiation/Review,2025-02-18,2024-12-24 11:23:17,2025-01-14 10:42:35,Sarah Johnson,New Business,Website,Sales Pipeline,80,18000,Richard Allen,Medium Enterprise
+Enterprise Plan - Enterprise Solutions,51000,Closed Won,2025-01-12,2024-12-23 09:15:42,2025-01-12 15:33:28,Tom Williams,Upgrade,Existing Customer,Sales Pipeline,100,51000,Mary Young,Enterprise Solutions
+Starter Plan - Small Biz Co,7100,Closed Lost,2024-12-18,2024-12-22 13:48:29,2025-01-18 11:25:44,Mike Chen,New Business,Paid Search,Sales Pipeline,0,0,Charles King,Small Biz Co
+Professional Plan - Growing Fast,21500,Closed Won,2025-01-08,2024-12-21 10:52:36,2025-01-08 14:18:52,Sarah Johnson,New Business,Referral,Sales Pipeline,100,21500,Nancy Wright,Growing Fast
+Enterprise Plan - Elite Corp,56000,Proposal/Price Quote,2025-03-18,2024-12-20 14:27:18,2025-01-16 09:45:31,Tom Williams,New Business,Conference,Sales Pipeline,65,36400,Paul Lopez,Elite Corp
+Starter Plan - Tiny Tech,6500,Qualification,2025-03-02,2024-12-19 08:41:53,2024-12-19 15:33:17,Mike Chen,New Business,Website,Sales Pipeline,30,1950,Sandra Hill,Tiny Tech
+Professional Plan - Expand Co,23000,Negotiation/Review,2025-02-22,2024-12-18 16:19:45,2025-01-15 13:28:44,Sarah Johnson,Upgrade,Existing Customer,Sales Pipeline,75,17250,Kevin Scott,Expand Co
+Enterprise Plan - Premier Inc,54000,Closed Won,2025-01-27,2024-12-17 11:34:22,2025-01-27 10:15:39,Tom Williams,New Business,Partner Referral,Sales Pipeline,100,54000,Betty Green,Premier Inc
+Starter Plan - Begin Here,5900,Closed Lost,2024-12-15,2024-12-16 09:28:47,2025-01-15 14:42:21,Mike Chen,New Business,Cold Call,Sales Pipeline,0,0,Edward Adams,Begin Here
+Professional Plan - Progress Ltd,20000,Closed Won,2025-01-10,2024-12-15 13:55:31,2025-01-10 11:33:45,Sarah Johnson,New Business,LinkedIn,Sales Pipeline,100,20000,Margaret Baker,Progress Ltd
+Enterprise Plan - Supreme Corp,59000,Proposal/Price Quote,2025-03-22,2024-12-14 10:18:25,2025-01-17 15:22:18,Tom Williams,New Business,Conference,Sales Pipeline,60,35400,George Gonzalez,Supreme Corp
+Starter Plan - Launch Pad,7500,Qualification,2025-03-08,2024-12-13 15:42:19,2024-12-13 16:28:55,Mike Chen,New Business,Website,Sales Pipeline,25,1875,Dorothy Nelson,Launch Pad
+Professional Plan - Advance Inc,22000,Negotiation/Review,2025-02-25,2024-12-12 11:27:44,2025-01-16 10:15:33,Sarah Johnson,New Business,Paid Search,Sales Pipeline,80,17600,Ronald Carter,Advance Inc
+Enterprise Plan - Excellence Ltd,53000,Closed Won,2025-01-23,2024-12-11 09:13:58,2025-01-23 14:52:27,Tom Williams,Upgrade,Existing Customer,Sales Pipeline,100,53000,Carol Mitchell,Excellence Ltd
+Starter Plan - First Step,6300,Closed Lost,2024-12-17,2024-12-10 14:38:42,2025-01-17 09:35:18,Mike Chen,New Business,Referral,Sales Pipeline,0,0,Jason Perez,First Step
+Professional Plan - Momentum Co,21800,Closed Won,2025-01-13,2024-12-09 10:45:27,2025-01-13 15:28:41,Sarah Johnson,New Business,Partner Referral,Sales Pipeline,100,21800,Sarah Roberts,Momentum Co
+Enterprise Plan - Premium Services,57000,Proposal/Price Quote,2025-03-28,2024-12-08 13:22:15,2025-01-17 11:45:52,Tom Williams,New Business,Conference,Sales Pipeline,70,39900,Brian Turner,Premium Services
+Starter Plan - Rookie Inc,6900,Qualification,2025-03-12,2024-12-07 08:57:33,2024-12-07 14:22:48,Mike Chen,New Business,Cold Call,Sales Pipeline,30,2070,Deborah Phillips,Rookie Inc
+Professional Plan - Ascend Corp,23500,Negotiation/Review,2025-02-28,2024-12-06 16:11:29,2025-01-15 09:38:22,Sarah Johnson,New Business,Website,Sales Pipeline,75,17625,Timothy Campbell,Ascend Corp
+Enterprise Plan - Ultimate Solutions,60000,Closed Won,2025-01-31,2024-12-05 11:48:36,2025-01-31 10:42:15,Tom Williams,New Business,Referral,Sales Pipeline,100,60000,Jessica Parker,Ultimate Solutions
+Starter Plan - Genesis Co,5700,Closed Lost,2024-12-19,2024-12-04 09:33:41,2025-01-19 13:15:44,Mike Chen,New Business,LinkedIn,Sales Pipeline,0,0,Gary Evans,Genesis Co
+Professional Plan - Rise Up,20800,Closed Won,2025-01-18,2024-12-03 14:25:18,2025-01-18 11:25:33,Sarah Johnson,New Business,Paid Search,Sales Pipeline,100,20800,Sharon Edwards,Rise Up
+Enterprise Plan - Peak Performance,55000,Proposal/Price Quote,2025-03-15,2024-12-02 10:52:44,2025-01-16 14:33:27,Tom Williams,Upgrade,Existing Customer,Sales Pipeline,65,35750,Justin Collins,Peak Performance
+Starter Plan - Origin Labs,7200,Qualification,2025-03-05,2024-12-01 15:18:52,2024-12-01 16:42:35,Mike Chen,New Business,Conference,Sales Pipeline,25,1800,Carolyn Stewart,Origin Labs
+Professional Plan - Thrive Inc,22200,Negotiation/Review,2025-02-20,2024-11-30 11:35:27,2025-01-14 10:28:19,Sarah Johnson,New Business,Partner Referral,Sales Pipeline,80,17760,Brandon Sanchez,Thrive Inc
+Enterprise Plan - Apex Group,58000,Closed Won,2025-01-26,2024-11-29 09:47:13,2025-01-26 15:18:42,Tom Williams,New Business,Website,Sales Pipeline,100,58000,Nicole Morris,Apex Group
+Starter Plan - Seed Ventures,6100,Closed Lost,2024-12-21,2024-11-28 13:29:55,2025-01-21 11:45:28,Mike Chen,New Business,Cold Call,Sales Pipeline,0,0,Jeremy Rogers,Seed Ventures
+Professional Plan - Flourish Co,21200,Closed Won,2025-01-14,2024-11-27 10:15:38,2025-01-14 14:33:51,Sarah Johnson,New Business,Referral,Sales Pipeline,100,21200,Stephanie Reed,Flourish Co
+Enterprise Plan - Summit Corp,61000,Proposal/Price Quote,2025-03-30,2024-11-26 14:42:21,2025-01-17 10:22:45,Tom Williams,New Business,Conference,Sales Pipeline,70,42700,Aaron Cook,Summit Corp
+Starter Plan - Initial Tech,6800,Qualification,2025-03-10,2024-11-25 08:25:47,2024-11-25 15:38:22,Mike Chen,New Business,LinkedIn,Sales Pipeline,30,2040,Melissa Morgan,Initial Tech

@@ -1,0 +1,51 @@
+Contact Name,Account Name,Email,Created Time,Last Activity Time,Last Login Date,Deal Count,Won Deal Count,Open Deal Count,Total Deal Value,Days Since Last Contact,Email Opened Count,Email Clicked Count,Call Count,Meeting Count,Task Completed Count,Support Tickets,Product Usage Score,Contact Owner
+Michael Chen,Acme Corp,michael.chen@acmecorp.com,2024-09-15 10:23:12,2025-01-17 14:30:45,2025-01-17,3,1,1,67000,0,45,23,8,4,12,2,85,Sarah Johnson
+Emily Davis,Tech Solutions Inc,emily.davis@techsolutions.com,2024-10-22 11:15:33,2025-01-16 16:22:11,2025-01-16,2,0,1,17000,1,32,15,5,2,8,1,72,Mike Chen
+Robert Lee,Global Innovations,robert.lee@globalinno.com,2024-08-18 10:42:18,2025-01-15 09:15:32,2025-01-15,1,1,0,22000,2,58,31,12,6,15,0,92,Sarah Johnson
+Jessica Brown,Digital Dynamics,jessica.brown@digitaldyn.com,2024-11-05 14:55:27,2025-01-14 11:45:18,2025-01-14,1,0,1,52000,3,41,19,7,3,10,1,78,Tom Williams
+Mark Wilson,Quick Start LLC,mark.wilson@quickstart.com,2024-12-01 08:30:44,2025-01-13 15:20:33,2025-01-10,1,0,0,7200,4,18,7,3,1,4,0,45,Mike Chen
+Linda Martinez,Smart Systems,linda.martinez@smartsys.com,2024-09-28 13:17:52,2025-01-12 10:33:21,2025-01-12,1,1,0,19500,5,52,28,10,5,14,0,88,Sarah Johnson
+David Garcia,Future Tech,david.garcia@futuretech.com,2024-10-14 09:44:19,2025-01-11 14:12:05,2025-01-11,1,0,1,48000,6,38,17,6,3,9,1,74,Tom Williams
+Amy Rodriguez,Startup Hub,amy.rodriguez@startuphub.com,2024-12-08 15:28:36,2025-01-10 16:55:42,2025-01-09,1,0,1,6800,7,22,9,4,2,6,0,58,Mike Chen
+Chris Anderson,Enterprise Co,chris.anderson@enterpriseco.com,2024-09-12 11:33:48,2025-01-09 09:22:14,2025-01-09,2,1,1,42000,8,49,25,9,4,13,1,82,Sarah Johnson
+Patricia Taylor,Mega Corp,patricia.taylor@megacorp.com,2024-08-25 10:15:23,2025-01-08 11:45:39,2025-01-08,1,1,0,55000,9,61,34,14,7,18,0,95,Tom Williams
+Michael Thomas,Mini Business,michael.thomas@minibiz.com,2024-11-18 14:42:55,2025-01-07 13:18:27,2025-01-05,1,0,0,5500,10,15,5,2,1,3,0,38,Mike Chen
+Jennifer White,Mid Market Inc,jennifer.white@midmarket.com,2024-10-03 09:27:31,2025-01-06 15:42:18,2025-01-06,1,1,0,23500,11,55,29,11,5,16,0,90,Sarah Johnson
+Daniel Harris,Big Enterprise,daniel.harris@bigent.com,2024-11-20 13:55:19,2025-01-05 10:33:52,2025-01-05,1,0,1,50000,12,39,18,7,3,10,1,76,Tom Williams
+Karen Martin,Little Co,karen.martin@littleco.com,2024-12-15 08:18:44,2025-01-04 11:25:36,2025-01-03,1,0,1,7800,13,20,8,4,2,5,0,52,Mike Chen
+Steven Thompson,Growth Corp,steven.thompson@growthcorp.com,2024-09-07 16:39:27,2025-01-03 14:55:21,2025-01-03,2,1,1,41500,14,47,24,8,4,12,1,80,Sarah Johnson
+Barbara Moore,Major Player,barbara.moore@majorplayer.com,2024-08-30 11:22:15,2025-01-02 10:28:45,2025-01-02,1,1,0,58000,15,63,36,15,7,19,0,96,Tom Williams
+William Jackson,New Venture,william.jackson@newventure.com,2024-11-25 09:47:33,2025-01-01 14:35:19,2024-12-28,1,0,0,6200,16,16,6,2,1,3,0,41,Mike Chen
+Susan Lewis,Scale Up,susan.lewis@scaleup.com,2024-10-10 14:12:48,2024-12-31 09:52:33,2024-12-31,1,1,0,24000,17,56,30,11,6,16,0,91,Sarah Johnson
+Joseph Walker,Top Tier,joseph.walker@toptier.com,2024-11-28 10:35:21,2024-12-30 11:18:45,2024-12-30,1,0,1,62000,18,40,19,7,3,10,1,77,Tom Williams
+Lisa Hall,Micro Biz,lisa.hall@microbiz.com,2024-12-20 15:58:44,2024-12-29 16:45:22,2024-12-27,1,0,1,5800,19,19,7,3,1,4,0,48,Mike Chen
+Richard Allen,Medium Enterprise,richard.allen@medent.com,2024-09-18 11:23:17,2024-12-28 10:42:35,2024-12-28,1,0,1,22500,20,48,25,9,4,13,1,83,Sarah Johnson
+Mary Young,Enterprise Solutions,mary.young@entsol.com,2024-08-22 09:15:42,2024-12-27 15:33:28,2024-12-27,2,2,0,73000,21,64,37,15,8,20,0,97,Tom Williams
+Charles King,Small Biz Co,charles.king@smallbizco.com,2024-11-30 13:48:29,2024-12-26 11:25:44,2024-12-23,1,0,0,7100,22,17,6,2,1,3,0,42,Mike Chen
+Nancy Wright,Growing Fast,nancy.wright@growingfast.com,2024-10-05 10:52:36,2024-12-25 14:18:52,2024-12-25,1,1,0,21500,23,54,28,10,5,15,0,89,Sarah Johnson
+Paul Lopez,Elite Corp,paul.lopez@elitecorp.com,2024-12-02 14:27:18,2024-12-24 09:45:31,2024-12-24,1,0,1,56000,24,38,17,6,3,9,1,75,Tom Williams
+Sandra Hill,Tiny Tech,sandra.hill@tinytech.com,2024-12-18 08:41:53,2024-12-23 15:33:17,2024-12-20,1,0,1,6500,25,21,8,4,2,5,0,55,Mike Chen
+Kevin Scott,Expand Co,kevin.scott@expandco.com,2024-09-25 16:19:45,2024-12-22 13:28:44,2024-12-22,2,1,1,44000,26,50,26,9,4,13,1,84,Sarah Johnson
+Betty Green,Premier Inc,betty.green@premier.com,2024-08-28 11:34:22,2024-12-21 10:15:39,2024-12-21,1,1,0,54000,27,62,35,14,7,18,0,94,Tom Williams
+Edward Adams,Begin Here,edward.adams@beginhere.com,2024-12-05 09:28:47,2024-12-20 14:42:21,2024-12-17,1,0,0,5900,28,18,7,3,1,4,0,44,Mike Chen
+Margaret Baker,Progress Ltd,margaret.baker@progressltd.com,2024-10-12 13:55:31,2024-12-19 11:33:45,2024-12-19,1,1,0,20000,29,53,27,10,5,14,0,87,Sarah Johnson
+George Gonzalez,Supreme Corp,george.gonzalez@supremecorp.com,2024-12-08 10:18:25,2024-12-18 15:22:18,2024-12-18,1,0,1,59000,30,41,20,7,3,10,1,78,Tom Williams
+Dorothy Nelson,Launch Pad,dorothy.nelson@launchpad.com,2024-12-22 15:42:19,2024-12-17 16:28:55,2024-12-14,1,0,1,7500,31,23,9,4,2,6,0,60,Mike Chen
+Ronald Carter,Advance Inc,ronald.carter@advanceinc.com,2024-09-20 11:27:44,2024-12-16 10:15:33,2024-12-16,1,0,1,22000,32,46,23,8,4,12,1,81,Sarah Johnson
+Carol Mitchell,Excellence Ltd,carol.mitchell@excelltd.com,2024-08-17 09:13:58,2024-12-15 14:52:27,2024-12-15,2,2,0,74000,33,65,38,16,8,21,0,98,Tom Williams
+Jason Perez,First Step,jason.perez@firststep.com,2024-12-10 14:38:42,2024-12-14 09:35:18,2024-12-11,1,0,0,6300,34,19,7,3,1,4,0,46,Mike Chen
+Sarah Roberts,Momentum Co,sarah.roberts@momentumco.com,2024-10-08 10:45:27,2024-12-13 15:28:41,2024-12-13,1,1,0,21800,35,57,30,11,5,16,0,90,Sarah Johnson
+Brian Turner,Premium Services,brian.turner@premium.com,2024-11-15 13:22:15,2024-12-12 11:45:52,2024-12-12,1,0,1,57000,36,42,21,7,3,10,1,79,Tom Williams
+Deborah Phillips,Rookie Inc,deborah.phillips@rookieinc.com,2024-12-25 08:57:33,2024-12-11 14:22:48,2024-12-08,1,0,1,6900,37,24,10,4,2,6,0,62,Mike Chen
+Timothy Campbell,Ascend Corp,timothy.campbell@ascendcorp.com,2024-09-30 16:11:29,2024-12-10 09:38:22,2024-12-10,1,0,1,23500,38,51,27,9,4,13,1,85,Sarah Johnson
+Jessica Parker,Ultimate Solutions,jessica.parker@ultimate.com,2024-08-20 11:48:36,2024-12-09 10:42:15,2024-12-09,1,1,0,60000,39,66,39,16,8,22,0,99,Tom Williams
+Gary Evans,Genesis Co,gary.evans@genesisco.com,2024-12-12 09:33:41,2024-12-08 13:15:44,2024-12-05,1,0,0,5700,40,20,8,3,1,4,0,47,Mike Chen
+Sharon Edwards,Rise Up,sharon.edwards@riseup.com,2024-10-18 14:25:18,2024-12-07 11:25:33,2024-12-07,1,1,0,20800,41,58,31,11,6,16,0,92,Sarah Johnson
+Justin Collins,Peak Performance,justin.collins@peakperf.com,2024-11-22 10:52:44,2024-12-06 14:33:27,2024-12-06,2,1,1,76000,42,43,22,8,4,11,1,86,Tom Williams
+Carolyn Stewart,Origin Labs,carolyn.stewart@originlabs.com,2024-12-28 15:18:52,2024-12-05 16:42:35,2024-12-02,1,0,1,7200,43,25,10,4,2,6,0,63,Mike Chen
+Brandon Sanchez,Thrive Inc,brandon.sanchez@thriveinc.com,2024-10-02 11:35:27,2024-12-04 10:28:19,2024-12-04,1,0,1,22200,44,52,28,9,5,14,1,84,Sarah Johnson
+Nicole Morris,Apex Group,nicole.morris@apexgroup.com,2024-08-15 09:47:13,2024-12-03 15:18:42,2024-12-03,1,1,0,58000,45,67,40,17,9,23,0,100,Tom Williams
+Jeremy Rogers,Seed Ventures,jeremy.rogers@seedventures.com,2024-12-15 13:29:55,2024-12-02 11:45:28,2024-11-29,1,0,0,6100,46,21,8,3,1,4,0,49,Mike Chen
+Stephanie Reed,Flourish Co,stephanie.reed@flourishco.com,2024-10-25 10:15:38,2024-12-01 14:33:51,2024-12-01,1,1,0,21200,47,59,32,12,6,17,0,93,Sarah Johnson
+Aaron Cook,Summit Corp,aaron.cook@summitcorp.com,2024-11-28 14:42:21,2024-11-30 10:22:45,2024-11-30,1,0,1,61000,49,44,23,8,4,11,1,80,Tom Williams
+Melissa Morgan,Initial Tech,melissa.morgan@initialtech.com,2024-12-30 08:25:47,2024-11-29 15:38:22,2024-11-26,1,0,1,6800,50,26,11,4,2,6,0,64,Mike Chen
