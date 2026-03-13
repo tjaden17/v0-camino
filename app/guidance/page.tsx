@@ -4,11 +4,10 @@ import type React from "react"
 import { useState, useRef, useMemo } from "react"
 import { issueTreeData, type SubIssue, getParentIssue } from "@/lib/issue-tree-data"
 import { getActiveProfile } from "@/lib/demo-mode"
-import { saveIssue } from "@/lib/saved-issues"
-import { getTopIssuesByVOI } from "@/lib/value-of-information"
 import { IssueCard } from "@/components/issue-card"
 import { IssueDetailCard } from "@/components/issue-detail-card"
 import { ShareDialog } from "@/components/share-dialog"
+import { TagDialog } from "@/components/tag-dialog"
 import { TreeView } from "@/components/tree-view"
 import { TickerView } from "@/components/ticker-view"
 import { BottomNav } from "@/components/bottom-nav"
@@ -17,7 +16,6 @@ import { ChevronUp, ChevronDown, Target, LayoutGrid, GitBranch, TrendingUp } fro
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertsBell } from "@/components/alerts-bell"
-// import { LockScreen } from "@/components/lock-screen"
 
 export default function GuidancePage() {
   const activeProfile = getActiveProfile()
@@ -33,7 +31,6 @@ export default function GuidancePage() {
       })
     }
     flattenIssues(issueTreeData.subIssues)
-    console.log("[v0] Total flattened issues:", flatList.length)
     return flatList
   }, [])
 
@@ -47,10 +44,12 @@ export default function GuidancePage() {
   const [currentIndex, setCurrentIndex] = useState(issueTreeData.subIssues.findIndex((i) => i.id === defaultIssue.id))
   const [showDetail, setShowDetail] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [tagDialogOpen, setTagDialogOpen] = useState(false)
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null)
   const [viewMode, setViewMode] = useState<"issue" | "tree" | "ticker">("issue")
   const [dateRange, setDateRange] = useState<"7days" | "30days" | "quarter">("7days")
+  const [currentLayer, setCurrentLayer] = useState<"data" | "analysis" | "synthesis">("analysis")
   const lastTapRef = useRef<number>(0)
   const { toast } = useToast()
 
@@ -79,7 +78,13 @@ export default function GuidancePage() {
     const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY)
     const isVerticalSwipe = Math.abs(distanceY) > Math.abs(distanceX)
 
-    if (isVerticalSwipe && Math.abs(distanceY) > 50) {
+    if (isHorizontalSwipe && Math.abs(distanceX) > 50) {
+      if (distanceX > 0) {
+        handleNavigateLeft()
+      } else {
+        handleNavigateRight()
+      }
+    } else if (isVerticalSwipe && Math.abs(distanceY) > 50) {
       if (distanceY > 0) {
         handleNextIssue()
       } else {
@@ -128,42 +133,32 @@ export default function GuidancePage() {
   }
 
   const handleNextIssue = () => {
-    console.log("[v0] handleNextIssue called, currentFlatIndex:", currentFlatIndex)
     if (currentFlatIndex < allIssuesList.length - 1) {
       const nextIndex = currentFlatIndex + 1
       const nextIssue = allIssuesList[nextIndex]
-      console.log("[v0] Moving to next issue:", nextIssue.name, "at index:", nextIndex)
       setCurrentFlatIndex(nextIndex)
       setCurrentIssueId(nextIssue.id)
 
-      // Update hierarchical tracking for tree view sync
       const result = findIssueInLevel(nextIssue.id)
       if (result) {
         setCurrentLevel(result.level)
         setCurrentIndex(result.index)
       }
-    } else {
-      console.log("[v0] Already at last issue")
     }
   }
 
   const handlePreviousIssue = () => {
-    console.log("[v0] handlePreviousIssue called, currentFlatIndex:", currentFlatIndex)
     if (currentFlatIndex > 0) {
       const prevIndex = currentFlatIndex - 1
       const prevIssue = allIssuesList[prevIndex]
-      console.log("[v0] Moving to previous issue:", prevIssue.name, "at index:", prevIndex)
       setCurrentFlatIndex(prevIndex)
       setCurrentIssueId(prevIssue.id)
 
-      // Update hierarchical tracking for tree view sync
       const result = findIssueInLevel(prevIssue.id)
       if (result) {
         setCurrentLevel(result.level)
         setCurrentIndex(result.index)
       }
-    } else {
-      console.log("[v0] Already at first issue")
     }
   }
 
@@ -187,106 +182,65 @@ export default function GuidancePage() {
     return findInTree(issueTreeData, targetId)
   }
 
-  const handleSave = () => {
-    saveIssue(currentIssue)
-    toast({
-      title: "Issue Saved",
-      description: `"${currentIssue.name}" has been saved to your bookmarks.`,
-    })
+  const handleTag = () => {
+    setTagDialogOpen(true)
   }
 
   const handleShare = () => {
     setShareDialogOpen(true)
   }
 
-  const handleIssueClick = (issue: SubIssue) => {
-    const flatIndex = allIssuesList.findIndex((i) => i.id === issue.id)
-    if (flatIndex !== -1) {
-      setCurrentFlatIndex(flatIndex)
-      setCurrentIssueId(issue.id)
+  const handleViewAnalysis = () => {
+    setCurrentLayer("analysis")
+  }
+
+  const handleViewSynthesis = () => {
+    setCurrentLayer("synthesis")
+  }
+
+  const handleNavigateLeft = () => {
+    if (currentLayer === "analysis") {
+      setCurrentLayer("data")
+      toast({
+        title: "Data Layer",
+        description: "Viewing raw data sources and extracts",
+      })
+    } else if (currentLayer === "synthesis") {
+      setCurrentLayer("analysis")
     }
   }
 
-  const handleIssueDoubleClick = (issue: SubIssue) => {
-    navigateToIssue(issue)
-    setViewMode("issue") // Switch to card view
-    toast({
-      title: "Viewing Issue",
-      description: `Opened: ${issue.name}`,
-    })
+  const handleNavigateRight = () => {
+    if (currentLayer === "data") {
+      setCurrentLayer("analysis")
+    } else if (currentLayer === "analysis") {
+      setCurrentLayer("synthesis")
+      toast({
+        title: "Synthesis Layer",
+        description: "Viewing strategic synthesis",
+      })
+    }
+  }
+
+  const handleAlertClick = () => {
+    // Placeholder for handleAlertClick logic
   }
 
   const handleFocusOnMostImportant = () => {
-    const topIssues = getTopIssuesByVOI(issueTreeData.subIssues, 1)
-    if (topIssues.length > 0) {
-      navigateToIssue(topIssues[0])
-      toast({
-        title: "Most Important Issue",
-        description: `Focused on: ${topIssues[0].name}`,
-      })
-    }
+    // Placeholder for handleFocusOnMostImportant logic
   }
 
-  const handleAlertClick = (issueId: string) => {
-    // Find issue by ID and navigate to it
-    const findIssue = (issues: SubIssue[]): SubIssue | null => {
-      for (const issue of issues) {
-        if (issue.id === issueId) return issue
-        if (issue.subIssues) {
-          const found = findIssue(issue.subIssues)
-          if (found) return found
-        }
-      }
-      return null
-    }
-
-    const issue = findIssue(issueTreeData.subIssues)
-    if (issue) {
-      navigateToIssue(issue)
-      toast({
-        title: "Navigated to Alert",
-        description: `Viewing: ${issue.name}`,
-      })
-    }
+  const handleIssueClick = (id: string) => {
+    // Placeholder for handleIssueClick logic
   }
 
-  const navigateToIssue = (issue: SubIssue) => {
-    const flatIndex = allIssuesList.findIndex((i) => i.id === issue.id)
-    if (flatIndex !== -1) {
-      setCurrentFlatIndex(flatIndex)
-      setCurrentIssueId(issue.id)
-    }
-
-    const findIssueLevel = (
-      node: { subIssues?: SubIssue[] },
-      targetId: string,
-    ): { level: SubIssue[]; index: number } | null => {
-      if (!node.subIssues) return null
-
-      const index = node.subIssues.findIndex((i) => i.id === targetId)
-      if (index !== -1) {
-        return { level: node.subIssues, index }
-      }
-
-      for (const subIssue of node.subIssues) {
-        const result = findIssueLevel(subIssue, targetId)
-        if (result) return result
-      }
-
-      return null
-    }
-
-    const result = findIssueLevel(issueTreeData, issue.id)
-    if (result) {
-      setCurrentLevel(result.level)
-      setCurrentIndex(result.index)
-    }
+  const handleIssueDoubleClick = (id: string) => {
+    // Placeholder for handleIssueDoubleClick logic
   }
 
   const parent = getParentIssue(currentIssue.id)
   const canGoBack = showDetail || parent !== null
   const canGoDeeper = currentIssue.subIssues && currentIssue.subIssues.length > 0
-
   const canGoUp = currentFlatIndex > 0
   const canGoDown = currentFlatIndex < allIssuesList.length - 1
 
@@ -302,7 +256,6 @@ export default function GuidancePage() {
       <div className="sticky top-[57px] z-10 bg-card border-b border-border shadow-sm">
         <div className="container max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-2">
-            {/* Focus button - left side */}
             <Button
               variant="ghost"
               size="icon"
@@ -314,7 +267,6 @@ export default function GuidancePage() {
               <span className="sr-only">Focus on most important issue</span>
             </Button>
 
-            {/* View toggle - center */}
             <Select value={viewMode} onValueChange={(v) => setViewMode(v as "issue" | "tree" | "ticker")}>
               <SelectTrigger className="w-[100px] h-9 border-border shrink-0">
                 <div className="flex items-center gap-1.5">
@@ -331,7 +283,6 @@ export default function GuidancePage() {
               </SelectContent>
             </Select>
 
-            {/* Date range - right side */}
             <Select value={dateRange} onValueChange={(v) => setDateRange(v as "7days" | "30days" | "quarter")}>
               <SelectTrigger className="w-[95px] h-9 text-xs border-border shrink-0">
                 <SelectValue />
@@ -360,7 +311,7 @@ export default function GuidancePage() {
                 <IssueDetailCard
                   issue={currentIssue}
                   onBack={() => setShowDetail(false)}
-                  onSave={handleSave}
+                  onSave={handleTag}
                   onShare={handleShare}
                 />
 
@@ -396,7 +347,7 @@ export default function GuidancePage() {
               </div>
             ) : (
               <div className="relative">
-                <IssueCard issue={currentIssue} onSave={handleSave} onShare={handleShare} dateRange={dateRange} />
+                <IssueCard issue={currentIssue} onTag={handleTag} onShare={handleShare} dateRange={dateRange} />
 
                 {canGoUp && (
                   <Button
@@ -436,11 +387,12 @@ export default function GuidancePage() {
           <TreeView
             currentIssueId={currentIssueId}
             onIssueClick={handleIssueClick}
-            onIssueDoubleClick={handleIssueDoubleClick} // Pass double click handler
+            onIssueDoubleClick={handleIssueDoubleClick}
             onNextIssue={handleNextIssue}
             onPreviousIssue={handlePreviousIssue}
             canGoUp={canGoUp}
             canGoDown={canGoDown}
+            dateRange={dateRange}
           />
         )}
 
@@ -448,7 +400,8 @@ export default function GuidancePage() {
           <TickerView
             issues={issueTreeData.subIssues}
             onIssueClick={handleIssueClick}
-            onIssueDoubleClick={handleIssueDoubleClick} // Added double-click handler to ticker view
+            onIssueDoubleClick={handleIssueDoubleClick}
+            dateRange={dateRange}
           />
         )}
       </main>
@@ -456,6 +409,12 @@ export default function GuidancePage() {
       <BottomNav />
 
       <ShareDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen} issueName={currentIssue.name} />
+      <TagDialog
+        open={tagDialogOpen}
+        onOpenChange={setTagDialogOpen}
+        issueName={currentIssue.name}
+        existingTags={currentIssue.tags || []}
+      />
     </div>
   )
 }

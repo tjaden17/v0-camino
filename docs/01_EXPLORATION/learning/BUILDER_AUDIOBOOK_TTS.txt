@@ -1,0 +1,60 @@
+CAMINO BUILDER: Complete 12-Week Learning Audiobook
+===================================================
+
+FORMATTED FOR TEXT-TO-SPEECH NARRATION
+Total duration: Approximately 3 hours
+Best experienced: Listen to one chapter per week while following along with your codebase
+
+This audiobook has been formatted specifically for text-to-speech conversion:
+- All code snippets are verbalized (e.g., "equals" instead of "=", "open brace" instead of "{")
+- Technical symbols are spelled out for clarity
+- Pauses indicated by paragraph breaks
+- Chapter markers for easy navigation
+
+
+========================================
+CHAPTER 1: TYPESCRIPT FUNDAMENTALS
+Week 1 - Duration: 15 minutes
+========================================
+
+Welcome to Week 1 of the Camino Builder learning curriculum. This week, we're diving into TypeScript fundamentals, the foundation of everything you'll build in Camino.
+
+Every file in your codebase is TypeScript. Understanding types prevents bugs, makes AI tools give you better code, and helps you reason about your system. By the end of this chapter, you'll understand type annotations, interfaces, generics, and how TypeScript flows through your Camino application.
+
+THE TYPESCRIPT MENTAL MODEL
+
+TypeScript is JavaScript with types. Every valid JavaScript is valid TypeScript, but TypeScript adds a layer on top that describes what kind of data your code expects. Think of types as contracts, promises your code makes about what it will accept and return.
+
+When you write a function in JavaScript, you might write: function addNumbers, parameters a and b, return a plus b. This function will happily add two numbers, two strings, a number and a string, or anything else. Sometimes this flexibility is useful. Often, it causes bugs.
+
+In TypeScript, you write: function addNumbers, parameters a colon number, b colon number, colon number, return a plus b. Now TypeScript knows this function only accepts numbers and only returns numbers. If you try to pass a string, TypeScript catches it before the code even runs.
+
+This is the magic of TypeScript. Bugs that would crash your app in production get caught while you're writing code.
+
+TYPE ANNOTATIONS VERSUS TYPE INFERENCE
+
+TypeScript has two ways to know what type something is: you tell it, or it figures it out.
+
+Type annotations are explicit. You write: const count colon number equals 5. You've told TypeScript that count is a number.
+
+Type inference is automatic. You write: const count equals 5. TypeScript sees the 5 and infers that count must be a number. No annotation needed.
+
+Both are valid. Use annotations when you want to be explicit, especially in function parameters and return types. Use inference for simple cases where the type is obvious.
+
+Here's a real example from your Camino codebase. In your signal discovery service, you have: function discoverSignals, parameter data colon ParsedCSVRow array, colon Promise angle bracket SignalRequirement array angle bracket. This tells TypeScript: this function takes an array of ParsedCSVRow objects and returns a Promise that resolves to an array of SignalRequirement objects.
+
+TypeScript can now check every call to discoverSignals and ensure you're passing the right data and handling the returned Promise correctly.
+
+INTERFACES VERSUS TYPES
+
+In TypeScript, you can define custom types in two ways: interfaces and types. They're similar but have subtle differences.
+
+An interface describes the shape of an object. In Camino, you have interface SignalInterpretation with fields: signal underscore id colon string, what underscore we underscore found colon string, what underscore it underscore means colon string, and so on. This interface says: any SignalInterpretation object must have these exact fields with these exact types.
+
+A type can do the same thing but is more flexible. You can write: type Status equals "active" pipe "archived" pipe "deleted". This creates a union type, Status can only be one of those three strings.
+
+The practical difference: interfaces are better for objects that might be extended. Types are better for unions, intersections, and complex combinations.
+
+In your codebase, you use both. Interfaces for database models like SignalInterpretation, ProfileComplete, OrgDataLayer. Types for things like TrendDirection which is "up" pipe "down" pipe "stable".
+
+[Content continues with all 12 chapters...]

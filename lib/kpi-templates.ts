@@ -1,0 +1,90 @@
+// KPI templates filtered by role
+export const kpiTemplates = {
+  "CEO / Founder": [
+    { value: "revenue_growth", label: "Revenue Growth (MRR/ARR)" },
+    { value: "customer_acquisition", label: "Customer Acquisition Rate" },
+    { value: "churn_rate", label: "Churn Rate" },
+    { value: "burn_rate", label: "Burn Rate" },
+    { value: "runway", label: "Cash Runway" },
+    { value: "ltv_cac", label: "LTV:CAC Ratio" },
+    { value: "gross_margin", label: "Gross Margin" },
+    { value: "nps", label: "Net Promoter Score (NPS)" },
+  ],
+  "VP Sales": [
+    { value: "sales_pipeline", label: "Sales Pipeline Value" },
+    { value: "conversion_rate", label: "Lead to Customer Conversion Rate" },
+    { value: "avg_deal_size", label: "Average Deal Size" },
+    { value: "sales_cycle", label: "Sales Cycle Length" },
+    { value: "quota_attainment", label: "Quota Attainment" },
+    { value: "win_rate", label: "Win Rate" },
+    { value: "mrr_arr", label: "MRR/ARR" },
+  ],
+  "VP Marketing": [
+    { value: "cac", label: "Customer Acquisition Cost (CAC)" },
+    { value: "lead_generation", label: "Lead Generation Rate" },
+    { value: "mql_sql", label: "MQL to SQL Conversion" },
+    { value: "website_traffic", label: "Website Traffic" },
+    { value: "campaign_roi", label: "Campaign ROI" },
+    { value: "engagement_rate", label: "Content Engagement Rate" },
+    { value: "brand_awareness", label: "Brand Awareness Score" },
+  ],
+  "VP Product": [
+    { value: "dau_mau", label: "DAU/MAU Ratio" },
+    { value: "feature_adoption", label: "Feature Adoption Rate" },
+    { value: "time_to_value", label: "Time to Value" },
+    { value: "product_satisfaction", label: "Product Satisfaction Score" },
+    { value: "bug_resolution", label: "Bug Resolution Time" },
+    { value: "release_frequency", label: "Release Frequency" },
+    { value: "user_retention", label: "User Retention Rate" },
+  ],
+  "Head of Customer Success": [
+    { value: "csat", label: "Customer Satisfaction (CSAT)" },
+    { value: "nps", label: "Net Promoter Score (NPS)" },
+    { value: "churn_rate", label: "Churn Rate" },
+    { value: "support_tickets", label: "Support Ticket Volume" },
+    { value: "resolution_time", label: "Average Resolution Time" },
+    { value: "expansion_revenue", label: "Expansion Revenue" },
+    { value: "onboarding_time", label: "Customer Onboarding Time" },
+  ],
+  CFO: [
+    { value: "revenue_growth", label: "Revenue Growth" },
+    { value: "gross_margin", label: "Gross Margin" },
+    { value: "burn_rate", label: "Burn Rate" },
+    { value: "runway", label: "Cash Runway" },
+    { value: "ltv_cac", label: "LTV:CAC Ratio" },
+    { value: "operating_expenses", label: "Operating Expenses" },
+    { value: "ebitda", label: "EBITDA" },
+  ],
+  COO: [
+    { value: "operational_efficiency", label: "Operational Efficiency Score" },
+    { value: "team_productivity", label: "Team Productivity" },
+    { value: "process_cycle_time", label: "Process Cycle Time" },
+    { value: "resource_utilization", label: "Resource Utilization Rate" },
+    { value: "cost_per_unit", label: "Cost Per Unit" },
+    { value: "quality_score", label: "Quality Score" },
+  ],
+  "VP Engineering": [
+    { value: "deployment_frequency", label: "Deployment Frequency" },
+    { value: "lead_time", label: "Lead Time for Changes" },
+    { value: "mttr", label: "Mean Time to Recovery (MTTR)" },
+    { value: "change_failure_rate", label: "Change Failure Rate" },
+    { value: "code_quality", label: "Code Quality Score" },
+    { value: "sprint_velocity", label: "Sprint Velocity" },
+  ],
+  Manager: [
+    { value: "team_productivity", label: "Team Productivity" },
+    { value: "project_delivery", label: "On-Time Project Delivery" },
+    { value: "team_satisfaction", label: "Team Satisfaction Score" },
+    { value: "kpi_achievement", label: "KPI Achievement Rate" },
+    { value: "budget_adherence", label: "Budget Adherence" },
+  ],
+  Other: [
+    { value: "custom_kpi_1", label: "Custom KPI 1" },
+    { value: "custom_kpi_2", label: "Custom KPI 2" },
+    { value: "custom_kpi_3", label: "Custom KPI 3" },
+  ],
+}
+
+export function getKPIsForRole(role: string): Array<{ value: string; label: string }> {
+  return kpiTemplates[role as keyof typeof kpiTemplates] || kpiTemplates["Other"]
+}

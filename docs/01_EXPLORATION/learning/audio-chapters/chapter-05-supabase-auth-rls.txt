@@ -1,0 +1,237 @@
+Chapter 5: Supabase Auth and Row Level Security
+
+Duration: approximately 15 minutes
+Topic: Understanding authentication flow, JWT tokens, and how RLS policies protect your data.
+
+Introduction
+
+Welcome to Week 5 of the Camino Builder learning curriculum. This week, we're focusing on Supabase Auth and Row Level Security, the systems that secure your application and protect user data.
+
+Your app's security depends on authentication and RLS policies. Understanding how they work prevents data leaks between organizations, protects sensitive information, and makes your app trustworthy. By the end of this chapter, you'll understand the auth flow, JWT tokens, RLS policy syntax, and the difference between service role and anon keys.
+
+The Authentication Flow: From Sign Up to Session
+
+Authentication is the process of verifying who a user is. In Camino, when someone signs up or logs in, here's what happens:
+
+Step 1: User submits email and password through your login form.
+
+Step 2: Your app calls Supabase Auth: supabase dot auth dot sign in with password open parenthesis open brace email comma password close brace close parenthesis.
+
+Step 3: Supabase checks the credentials against its auth dot users table. If they match, it creates a session.
+
+Step 4: Supabase returns a JWT token. This token contains the user's ID and other claims. It's signed by Supabase so it can't be tampered with.
+
+Step 5: Your app stores the token in a secure HTTP only cookie. This cookie is sent with every request.
+
+Step 6: On subsequent requests, your app reads the cookie, verifies the token, and knows who the user is.
+
+This flow means your app never handles passwords directly. Supabase manages all the crypto, token generation, and session management. Your code just checks: is there a valid session?
+
+JWT Tokens: Proof of Identity
+
+JWT stands for JSON Web Token. It's a string that encodes information in a secure way.
+
+A JWT has three parts: header, payload, and signature. The payload contains claims about the user, like their ID and email. The signature proves the token is valid and hasn't been modified.
+
+When your app checks authentication, it reads the JWT and extracts the user ID. This user ID is available in SQL as auth dot uid open parenthesis close parenthesis.
+
+This is the magic that makes Row Level Security work. RLS policies can reference auth dot uid open parenthesis close parenthesis to ensure users only see their own data.
+
+You don't create or decode JWTs manually. The Supabase client handles it. But knowing how they work helps you understand authentication errors and security.
+
+Row Level Security: Database-Level Protection
+
+Row Level Security, or RLS, is a Postgres feature that restricts which rows users can access. With RLS, your database enforces security, not just your application code.
+
+Without RLS, any authenticated user could query: SELECT asterisk FROM signals and see every signal from every user. This is a data leak.
+
+With RLS, you add a policy to the signals table:
+
+CREATE POLICY quote select signals quote ON signals FOR SELECT USING open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis semicolon
+
+This policy says: users can only SELECT rows where user underscore id matches their own ID. Even if your application code forgets to filter by user, the database enforces it.
+
+RLS is your safety net. It prevents entire classes of bugs where you forget to add WHERE user underscore id equals filters.
+
+RLS Policy Syntax: USING and WITH CHECK
+
+RLS policies have two parts: USING and WITH CHECK.
+
+USING applies to SELECT, UPDATE, and DELETE. It defines which rows the user can see or modify.
+
+Example: USING open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis. The user can only see or modify rows where user underscore id matches their ID.
+
+WITH CHECK applies to INSERT and UPDATE. It defines which rows the user can create or change to.
+
+Example: WITH CHECK open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis. The user can only insert rows with their own user ID, or update rows to have their own user ID.
+
+Together, these prevent users from accessing or modifying data they shouldn't.
+
+Here's a complete policy from your database:
+
+CREATE POLICY quote users manage own signals quote ON signals FOR ALL USING open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis WITH CHECK open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis semicolon
+
+This allows authenticated users to SELECT, INSERT, UPDATE, and DELETE their own signals, but nobody else's.
+
+Multi-Tenancy with Organisation ID
+
+Your app has multi-tenancy: users belong to organizations, and organizations have their own data. RLS enforces this.
+
+The profiles table has an organisation underscore id column. The organisations table stores organization details. When a user creates a signal, it's associated with their organization.
+
+Your RLS policies check organisation underscore id instead of just user underscore id:
+
+USING open parenthesis organisation underscore id equals open parenthesis SELECT organisation underscore id FROM profiles WHERE id equals auth dot uid open parenthesis close parenthesis close parenthesis close parenthesis
+
+This reads as: users can access rows where organisation underscore id matches their organization. A subquery fetches the user's organization from their profile.
+
+This pattern ensures data isolation between organizations. No matter what bugs exist in your application code, the database won't let users see other organizations' data.
+
+Service Role Key Versus Anon Key
+
+Supabase gives you two API keys:
+
+The anon key is for client-side code. It's safe to expose in your browser. When used, it enforces RLS policies. Users can only access data they're allowed to see.
+
+The service role key is for server-side code. It bypasses RLS policies. With this key, you can access any data in the database. Never expose this key in client-side code.
+
+In your codebase, the anon key is in NEXT underscore PUBLIC underscore SUPABASE underscore ANON underscore KEY. The NEXT underscore PUBLIC prefix means it's exposed to the browser.
+
+The service role key is in SUPABASE underscore SERVICE underscore ROLE underscore KEY. No NEXT underscore PUBLIC prefix. It's only accessible on the server.
+
+You use the service role key when you need to bypass RLS, like when an admin operation needs to see all data, or when a background job processes data across users.
+
+Use the anon key for almost everything. Use the service role key only when absolutely necessary and only in server-side code.
+
+Auth Helpers for Next.js
+
+Supabase provides helpers for Next dot js that manage sessions automatically. You use two main functions:
+
+create browser client open parenthesis close parenthesis: Creates a Supabase client for browser-side code. It uses the anon key and enforces RLS. Use this in client components.
+
+create server client open parenthesis close parenthesis: Creates a Supabase client for server-side code. It reads cookies to get the user's session. Use this in server components, server actions, and API routes.
+
+Here's the pattern in a server component:
+
+import open brace create server client close brace from quote at slash lib slash supabase slash server quote
+
+export default async function Signals Page open parenthesis close parenthesis open brace
+  const supabase equals create server client open parenthesis close parenthesis
+  const open brace data colon signals close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis
+  return open angle bracket div close angle bracket render signals open angle bracket slash div close angle bracket
+close brace
+
+The create server client function handles reading the session cookie and setting up the client with the user's auth context. You just call it and use the client.
+
+In a client component:
+
+import open brace create browser client close brace from quote at slash lib slash supabase slash client quote
+
+export function Some Client Component open parenthesis close parenthesis open brace
+  const supabase equals create browser client open parenthesis close parenthesis
+  async function fetch data open parenthesis close parenthesis open brace
+    const open brace data close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis
+  close brace
+  return open angle bracket div close angle bracket dot dot dot open angle bracket slash div close angle bracket
+close brace
+
+These helpers ensure the client always has the right auth context. You don't manage tokens manually.
+
+Checking Authentication in Layouts
+
+Your protected layout at app slash open parenthesis protected close parenthesis slash layout dot tsx checks if the user is authenticated. If not, it redirects to login.
+
+Here's the pattern:
+
+const supabase equals create server client open parenthesis close parenthesis
+const open brace data colon open brace user close brace close brace equals await supabase dot auth dot get user open parenthesis close parenthesis
+
+if not user open brace
+  redirect open parenthesis quote slash login quote close parenthesis
+close brace
+
+This runs on the server before rendering the page. If there's no authenticated user, the redirect happens before any protected content loads.
+
+This protects every route inside the open parenthesis protected close parenthesis route group. You don't repeat auth checks on every page. The layout handles it once.
+
+RLS Policies in Your Camino Database
+
+Let's walk through the RLS policies in your scripts slash 00 underscore SETUP underscore DATABASE dot sql file.
+
+Policy on signals:
+
+CREATE POLICY quote users manage own signals quote ON signals FOR ALL USING open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis WITH CHECK open parenthesis user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis semicolon
+
+This allows users to manage their own signals. Simple and secure.
+
+Policy on profiles:
+
+CREATE POLICY quote users view own profile quote ON profiles FOR SELECT USING open parenthesis id equals auth dot uid open parenthesis close parenthesis close parenthesis semicolon
+
+Users can view their own profile but nobody else's. This prevents leaking user information between accounts.
+
+Policy on organisations:
+
+CREATE POLICY quote users view own organisation quote ON organisations FOR SELECT USING open parenthesis id IN open parenthesis SELECT organisation underscore id FROM profiles WHERE id equals auth dot uid open parenthesis close parenthesis close parenthesis close parenthesis semicolon
+
+Users can view their organization's data. The subquery ensures they're actually a member of that organization.
+
+These policies work together to create a secure multi-tenant system. Users see only their data, organizations see only their data, and the database enforces it at every query.
+
+Testing RLS Policies
+
+You can test RLS policies manually in the Supabase SQL Editor. There's a mode that runs queries as if you're an authenticated user.
+
+Switch to the quote RLS enabled quote mode. Paste your user ID. Run a query:
+
+SELECT asterisk FROM signals semicolon
+
+You'll only see signals where user underscore id equals your ID. The policy is enforced.
+
+Now try to insert a signal for a different user:
+
+INSERT INTO signals open parenthesis name comma user underscore id close parenthesis VALUES open parenthesis quote Test quote comma quote other user id quote close parenthesis semicolon
+
+It fails. The WITH CHECK policy rejects it because you're trying to insert a row with a user underscore id that's not yours.
+
+This testing helps you verify policies work as expected before deploying.
+
+Common RLS Pitfalls
+
+Pitfall 1: Forgetting to enable RLS on a table. If RLS isn't enabled, all policies are ignored. Always: ALTER TABLE table name ENABLE ROW LEVEL SECURITY semicolon.
+
+Pitfall 2: Creating policies but not covering all operations. If you only create a SELECT policy, users can't INSERT, UPDATE, or DELETE even if they should be able to. Create policies for all operations you need.
+
+Pitfall 3: Using the service role key in client-side code. This bypasses RLS and exposes all data. Never do this. Keep the service role key server-side only.
+
+Pitfall 4: Complex policies that are slow. Policies run on every query. If your policy has expensive subqueries, it slows down your app. Keep policies simple and ensure referenced columns are indexed.
+
+Pitfall 5: Not testing policies with different users. Always test: can user A access user B's data? If yes, your policy is wrong.
+
+Practical Exercise: Add a New Policy
+
+Let's practice. You're going to add a new RLS policy to a table.
+
+Open scripts slash 00 underscore SETUP underscore DATABASE dot sql. Find the signal underscore interpretations table. It probably doesn't have a policy yet.
+
+Add this policy:
+
+ALTER TABLE signal underscore interpretations ENABLE ROW LEVEL SECURITY semicolon
+
+CREATE POLICY quote users view own interpretations quote ON signal underscore interpretations FOR SELECT USING open parenthesis EXISTS open parenthesis SELECT 1 FROM signals WHERE signals dot id equals signal underscore interpretations dot signal underscore id AND signals dot user underscore id equals auth dot uid open parenthesis close parenthesis close parenthesis close parenthesis semicolon
+
+This policy says: users can view interpretations only if they own the related signal. The EXISTS subquery checks the relationship.
+
+Run this in the SQL editor. Now test: query signal underscore interpretations. You'll only see interpretations for your own signals.
+
+This teaches you: how to write policies that check relationships between tables, how to use subqueries, and how to protect data that's indirectly owned by users.
+
+Next Steps
+
+This week, practice reading RLS policies in your database. Open scripts slash 00 underscore SETUP underscore DATABASE dot sql and understand every policy. Ask: what does this allow? What does it prevent?
+
+Try writing a new policy for a table that doesn't have one yet. Test it in the SQL editor.
+
+Next week, we'll dive into Supabase queries and real-time features. You'll learn the query builder API, how to fetch related data, and how to handle errors. But everything will be protected by the RLS policies you learned this week, so this foundation matters.
+
+For now, remember: authentication proves who the user is, RLS ensures they only see their data, policies are enforced by the database not your code, and the database is your security layer. Keep this mental model and your app stays secure.

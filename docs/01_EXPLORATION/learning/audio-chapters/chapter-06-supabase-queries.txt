@@ -1,0 +1,353 @@
+Chapter 6: Supabase Queries and Real-Time
+
+Duration: approximately 15 minutes
+Topic: Mastering the Supabase query builder and understanding how to fetch, filter, and manage data efficiently.
+
+Introduction
+
+Welcome to Week 6 of the Camino Builder learning curriculum. This week, we're focusing on Supabase queries and real-time capabilities, the tools you use every day to interact with your data.
+
+Every data operation in Camino goes through Supabase. Understanding the query builder means you can write efficient queries, fetch related data in one call, and handle errors gracefully. By the end of this chapter, you'll master the query builder API, understand relationships, and know when to use different query patterns.
+
+The Query Builder: Chainable Methods
+
+The Supabase client provides a query builder that generates SQL behind the scenes. You chain methods to build complex queries.
+
+The basic pattern starts with from:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis
+
+This targets the signals table. Now you chain methods to specify what you want.
+
+For SELECT queries, add dot select:
+
+dot select open parenthesis quote asterisk quote close parenthesis
+
+This selects all columns. You can specify columns:
+
+dot select open parenthesis quote id comma name comma description quote close parenthesis
+
+You can even select specific fields using column list notation.
+
+The query doesn't run until you await it. This lets you build queries conditionally:
+
+let query equals supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis
+
+if user wants filtered open brace
+  query equals query dot eq open parenthesis quote status quote comma quote active quote close parenthesis
+close brace
+
+const open brace data close brace equals await query
+
+This pattern is powerful for building dynamic queries based on user input.
+
+Filtering: eq, in, gte, lte, like
+
+The query builder has methods for every type of filter.
+
+dot eq open parenthesis quote column quote comma value close parenthesis: Equals. Returns rows where column equals value.
+
+Example: dot eq open parenthesis quote user underscore id quote comma user id close parenthesis. Only signals for that user.
+
+dot neq open parenthesis quote column quote comma value close parenthesis: Not equals. Returns rows where column doesn't equal value.
+
+dot gt open parenthesis quote column quote comma value close parenthesis: Greater than.
+dot gte open parenthesis quote column quote comma value close parenthesis: Greater than or equal.
+dot lt open parenthesis quote column quote comma value close parenthesis: Less than.
+dot lte open parenthesis quote column quote comma value close parenthesis: Less than or equal.
+
+Example: dot gte open parenthesis quote created underscore at quote comma quote 2026 dash 01 dash 01 quote close parenthesis. Signals created after January 1st.
+
+dot in open parenthesis quote column quote comma array close parenthesis: In a list of values.
+
+Example: dot in open parenthesis quote status quote comma open square bracket quote active quote comma quote pending quote close square bracket close parenthesis.
+
+dot like open parenthesis quote column quote comma pattern close parenthesis: Pattern matching with wildcards.
+
+Example: dot like open parenthesis quote name quote comma quote percent support percent quote close parenthesis. Signals with quote support quote in the name. The percent signs match any characters.
+
+dot is open parenthesis quote column quote comma null close parenthesis: Check for NULL values.
+
+Example: dot is open parenthesis quote deleted underscore at quote comma null close parenthesis. Only non-deleted signals.
+
+You can chain multiple filters. They combine with AND logic:
+
+supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot eq open parenthesis quote user underscore id quote comma user id close parenthesis dot eq open parenthesis quote status quote comma quote active quote close parenthesis
+
+This returns signals where user underscore id equals the user AND status equals active.
+
+For OR logic, use dot or:
+
+supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot or open parenthesis quote status dot eq dot active comma status dot eq dot pending quote close parenthesis
+
+This returns signals where status equals active OR status equals pending.
+
+Ordering: order and limit
+
+dot order open parenthesis quote column quote comma options close parenthesis: Sort results.
+
+Example: dot order open parenthesis quote created underscore at quote comma open brace ascending colon false close brace close parenthesis. Sort by created underscore at, newest first. Without ascending colon false, it defaults to oldest first.
+
+You can order by multiple columns:
+
+dot order open parenthesis quote status quote close parenthesis dot order open parenthesis quote created underscore at quote comma open brace ascending colon false close brace close parenthesis
+
+This sorts by status first, then by date within each status.
+
+dot limit open parenthesis number close parenthesis: Limit how many rows are returned.
+
+Example: dot limit open parenthesis 10 close parenthesis. Return only 10 rows.
+
+dot range open parenthesis start comma end close parenthesis: Pagination with start and end indexes.
+
+Example: dot range open parenthesis 0 comma 9 close parenthesis. First 10 rows.
+Example: dot range open parenthesis 10 comma 19 close parenthesis. Next 10 rows, for page 2.
+
+Together, these let you build paginated lists:
+
+const page equals 2
+const page size equals 10
+const start equals open parenthesis page minus 1 close parenthesis times page size
+const end equals start plus page size minus 1
+
+supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot range open parenthesis start comma end close parenthesis
+
+Selecting Relationships: Nested Queries
+
+One of Supabase's most powerful features is fetching related data in a single query. Instead of multiple queries, you nest relationships in select.
+
+Your signals table relates to data underscore points. To fetch a signal and its data points:
+
+supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk comma data underscore points open parenthesis asterisk close parenthesis quote close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis dot single open parenthesis close parenthesis
+
+The syntax: quote asterisk comma data underscore points open parenthesis asterisk close parenthesis quote tells Supabase to include all columns from signals and nest all data underscore points.
+
+The result looks like:
+
+open brace
+  id colon quote signal 123 quote comma
+  name colon quote Support Tickets quote comma
+  data underscore points colon open square bracket
+    open brace id colon quote dp 1 quote comma value colon 42 close brace comma
+    open brace id colon quote dp 2 quote comma value colon 38 close brace
+  close square bracket
+close brace
+
+You can nest multiple relationships:
+
+dot select open parenthesis quote asterisk comma data underscore points open parenthesis asterisk close parenthesis comma signal underscore interpretations open parenthesis asterisk close parenthesis quote close parenthesis
+
+Now the result includes both data underscore points and signal underscore interpretations nested arrays.
+
+You can even filter the nested data:
+
+dot select open parenthesis quote asterisk comma data underscore points exclamation mark inner open parenthesis value close parenthesis dot gte dot value dot 10 quote close parenthesis
+
+The exclamation mark inner syntax applies a filter to the nested relation. This fetches the signal and only data points where value is greater than or equal to 10.
+
+This is much more efficient than fetching the signal, then fetching data points in a second query. One round trip to the database instead of two.
+
+Inserting Data: insert and upsert
+
+dot insert open parenthesis data close parenthesis: Insert new rows.
+
+Example:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot insert open parenthesis open brace name colon quote New Signal quote comma description colon quote Description quote comma user underscore id colon user id close brace close parenthesis dot select open parenthesis close parenthesis
+
+The dot select open parenthesis close parenthesis at the end returns the inserted row. Without it, data is null.
+
+You can insert multiple rows at once:
+
+dot insert open parenthesis open square bracket
+  open brace name colon quote Signal 1 quote comma user underscore id colon user id close brace comma
+  open brace name colon quote Signal 2 quote comma user underscore id colon user id close brace
+close square bracket close parenthesis
+
+All rows are inserted in a single transaction.
+
+dot upsert open parenthesis data close parenthesis: Insert if the row doesn't exist, update if it does.
+
+Example:
+
+dot upsert open parenthesis open brace id colon quote signal 123 quote comma name colon quote Updated Name quote close brace close parenthesis
+
+If a row with id equals quote signal 123 quote exists, it's updated. Otherwise, a new row is inserted.
+
+Upsert requires a unique constraint, usually on the id column. It's useful for sync operations where you're not sure if the data already exists.
+
+Updating Data: update
+
+dot update open parenthesis data close parenthesis: Update existing rows.
+
+Example:
+
+const open brace error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot update open parenthesis open brace status colon quote archived quote close brace close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis
+
+This updates the status to quote archived quote for the signal with that ID.
+
+Always include a filter like dot eq. Without it, you update every row in the table, which is almost never what you want.
+
+You can update multiple columns:
+
+dot update open parenthesis open brace status colon quote archived quote comma archived underscore at colon new Date open parenthesis close parenthesis dot to ISO String open parenthesis close parenthesis close brace close parenthesis
+
+Deleting Data: delete
+
+dot delete open parenthesis close parenthesis: Delete rows.
+
+Example:
+
+const open brace error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot delete open parenthesis close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis
+
+This deletes the signal with that ID.
+
+Like update, always include a filter. dot delete open parenthesis close parenthesis without a filter deletes everything.
+
+Consider soft deletes instead of hard deletes. Add a deleted underscore at column and set it instead of deleting the row:
+
+dot update open parenthesis open brace deleted underscore at colon new Date open parenthesis close parenthesis dot to ISO String open parenthesis close parenthesis close brace close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis
+
+This preserves data for audit trails and lets you undo deletions.
+
+Error Handling: The data, error Pattern
+
+Every Supabase query returns an object with data and error properties. One is always null.
+
+If the query succeeds, data contains the result and error is null.
+If the query fails, error contains the error object and data is null.
+
+Always check error:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis
+
+if open parenthesis error close parenthesis open brace
+  console dot error open parenthesis quote Error fetching signals colon quote comma error close parenthesis
+  return null
+close brace
+
+return data
+
+Don't assume data is valid. Check error first.
+
+The error object has properties like message, details, and code. Use these to provide helpful feedback to users:
+
+if open parenthesis error close parenthesis open brace
+  if open parenthesis error dot code equals equals equals quote 23505 quote close parenthesis open brace
+    alert open parenthesis quote A signal with that name already exists quote close parenthesis
+  close brace else open brace
+    alert open parenthesis quote An error occurred colon quote plus error dot message close parenthesis
+  close brace
+close brace
+
+Error code 23505 is a unique constraint violation in Postgres. You can catch specific errors and show better messages.
+
+Single Versus Multiple Results
+
+dot single open parenthesis close parenthesis: Expect exactly one row. If there are zero or multiple rows, it's an error.
+
+Use single when querying by ID or unique field:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis dot single open parenthesis close parenthesis
+
+data is a single object, not an array.
+
+dot maybe single open parenthesis close parenthesis: Expect zero or one row. If there are multiple rows, it's an error.
+
+Use when a row might not exist:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk quote close parenthesis dot eq open parenthesis quote id quote comma signal id close parenthesis dot maybe single open parenthesis close parenthesis
+
+If the signal doesn't exist, data is null and error is null. No error thrown.
+
+Without single or maybe single, data is always an array, even if there's only one row.
+
+Real-Time Subscriptions
+
+Supabase supports real-time data. You can subscribe to changes on a table and get notified instantly.
+
+Example:
+
+const channel equals supabase dot channel open parenthesis quote signals changes quote close parenthesis dot on open parenthesis quote postgres underscore changes quote comma
+  open brace event colon quote asterisk quote comma schema colon quote public quote comma table colon quote signals quote close brace comma
+  open parenthesis payload close parenthesis equals close angle bracket open brace
+    console dot log open parenthesis quote Change detected colon quote comma payload close parenthesis
+  close brace
+close parenthesis dot subscribe open parenthesis close parenthesis
+
+Now whenever a signal is inserted, updated, or deleted, your callback runs with the payload containing the change.
+
+This is useful for live dashboards where you want data to update automatically without refreshing.
+
+To unsubscribe:
+
+channel dot unsubscribe open parenthesis close parenthesis
+
+Real-time has performance implications. Only subscribe to data you're actively displaying. Don't subscribe to entire tables with thousands of rows.
+
+Applying Queries to Your Camino Codebase
+
+Let's walk through a real query from your app. Open your signals page server component.
+
+You'll see something like:
+
+const supabase equals create server client open parenthesis close parenthesis
+const open brace data colon signals comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote asterisk comma signal underscore interpretations open parenthesis asterisk close parenthesis quote close parenthesis dot eq open parenthesis quote user underscore id quote comma user id close parenthesis dot order open parenthesis quote created underscore at quote comma open brace ascending colon false close brace close parenthesis
+
+Let's break it down:
+
+1 dot from open parenthesis quote signals quote close parenthesis: Target the signals table.
+2 dot select open parenthesis quote asterisk comma signal underscore interpretations open parenthesis asterisk close parenthesis quote close parenthesis: Get all signal columns plus nested interpretations.
+3 dot eq open parenthesis quote user underscore id quote comma user id close parenthesis: Filter to this user's signals. RLS would enforce this anyway, but being explicit is good practice.
+4 dot order open parenthesis quote created underscore at quote comma open brace ascending colon false close brace close parenthesis: Sort by newest first.
+
+The result is an array of signals, each with an embedded interpretations array. You render them in the UI.
+
+This pattern, fetch related data in one query, is everywhere in your codebase. It's efficient and keeps your code simple.
+
+Common Query Patterns in Camino
+
+Pattern 1: Fetch list with details.
+Fetch signals with their data points and interpretations in one query. Use nested select.
+
+Pattern 2: Fetch single item by ID.
+Use dot eq open parenthesis quote id quote comma id close parenthesis dot single open parenthesis close parenthesis. Expect exactly one result.
+
+Pattern 3: Paginated list.
+Use dot range open parenthesis start comma end close parenthesis with calculated start and end based on page number.
+
+Pattern 4: Filtered list.
+Chain multiple dot eq, dot in, dot gte methods to filter by user input. Build the query conditionally based on what filters are applied.
+
+Pattern 5: Upsert for sync.
+Use dot upsert when syncing data from external APIs. If it exists, update it. If not, insert it.
+
+Practical Exercise: Write a Complex Query
+
+Let's practice. You're going to write a query that fetches signals with multiple filters and nested data.
+
+Open your signals service or a server component. Write this query:
+
+const open brace data comma error close brace equals await supabase dot from open parenthesis quote signals quote close parenthesis dot select open parenthesis quote id comma name comma created underscore at comma data underscore points exclamation mark inner open parenthesis value comma recorded underscore at close parenthesis dot gte dot recorded underscore at dot quote 2026 dash 01 dash 01 quote quote close parenthesis dot eq open parenthesis quote user underscore id quote comma user id close parenthesis dot in open parenthesis quote status quote comma open square bracket quote active quote comma quote pending quote close square bracket close parenthesis dot order open parenthesis quote created underscore at quote comma open brace ascending colon false close brace close parenthesis dot limit open parenthesis 5 close parenthesis
+
+This query:
+1 Selects specific columns from signals.
+2 Nests data points, but only those recorded after January 1st 2026.
+3 Filters to the current user's signals.
+4 Filters to active or pending status.
+5 Orders by newest first.
+6 Limits to 5 results.
+
+Run it and inspect the result. You'll see complex nested data fetched in one efficient query.
+
+This teaches you: how to combine filters, how to filter nested data, and how to build queries that match real-world requirements.
+
+Next Steps
+
+This week, practice writing queries in your codebase. Find every supabase dot from call and understand what it does. Try modifying filters and see how results change.
+
+Experiment in the Supabase SQL Editor. Write queries, test filters, and check performance.
+
+Next week, we'll dive into AI SDK and prompt engineering. You'll learn how to generate interpretations, structure AI output, and optimize prompt quality. But all the data you send to the AI comes from queries you learned this week, so this foundation matters.
+
+For now, remember: the query builder chains methods to generate SQL, always check error before using data, nest relationships to fetch everything in one query, and use filters to keep queries efficient. Keep this approach and your data layer stays clean and fast.

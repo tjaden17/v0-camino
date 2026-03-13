@@ -1,0 +1,402 @@
+CAMINO BUILDER: 12-WEEK LEARNING CURRICULUM
+=============================================
+
+Goal: Build technical depth in the exact stack you're shipping.
+Format: 2-3 hours per week. Learn on Sunday, apply on Monday.
+Philosophy: Every topic maps to something in YOUR codebase. No abstract theory.
+All resources are free unless marked (paid).
+
+
+PHASE 1: FOUNDATIONS (Weeks 1-4)
+=================================
+"Understand what you've built and why it works"
+
+
+WEEK 1: TYPESCRIPT FUNDAMENTALS
+---------------------------------
+Why now: Every file in Camino is TypeScript. Understanding types prevents bugs
+and makes AI tools give you better code.
+
+Key concepts:
+  - Type annotations vs type inference
+  - Interfaces vs types (you use both - e.g. SignalInterpretation interface)
+  - Generics (how Promise<boolean> works in your checkConnection function)
+  - Union types (how "up" | "down" | "stable" works in your signal trend field)
+  - Optional properties (the ? in your interfaces)
+  - Type narrowing (how `error instanceof Error` works in your catch blocks)
+
+Apply to Camino:
+  - Open lib/interpretation-service.ts and read every type definition
+  - Open lib/signal-discovery-service.ts and trace how types flow through functions
+  - Try adding a new field to the SignalInterpretation interface and see what breaks
+
+Resources:
+  - TypeScript Handbook: typescriptlang.org/docs/handbook (Chapters 1-5)
+  - Matt Pocock's "Total TypeScript" free tutorials: totaltypescript.com/tutorials
+  - Practice: Type the return value of every function in lib/signals-service.ts
+
+
+WEEK 2: REACT FUNDAMENTALS
+-----------------------------
+Why now: Your entire UI is React components. Understanding the mental model
+prevents "why isn't this updating?" bugs.
+
+Key concepts:
+  - Components as functions that return JSX
+  - Props: how data flows parent to child (your signal-accordion-card.tsx receives signal data)
+  - State: useState and why re-renders happen
+  - Effects: useEffect and when it runs (your upload-page-client.tsx uses this)
+  - Conditional rendering (how you show/hide expanded signal cards)
+  - Lists and keys (how you render arrays of signals)
+  - Event handlers (how your upload button triggers the file selection)
+
+Apply to Camino:
+  - Open components/upload-page-client.tsx - trace every useState
+  - Open components/signal-accordion-card.tsx - list every prop it receives
+  - Add a new piece of state (e.g. a "sort by" toggle) to the signals page
+
+Resources:
+  - react.dev/learn (the official tutorial - do the whole thing)
+  - react.dev/reference/react/useState
+  - react.dev/reference/react/useEffect
+
+
+WEEK 3: NEXT.JS APP ROUTER
+-----------------------------
+Why now: Your app runs on Next.js 16. Understanding the routing model explains
+why some code runs on the server and some on the client.
+
+Key concepts:
+  - File-based routing: how app/(protected)/signals/page.tsx becomes /signals
+  - Route groups: what (protected) means and why it doesn't appear in the URL
+  - Server Components vs Client Components ("use client" directive)
+  - Layouts: how app/layout.tsx wraps everything, how (protected)/layout.tsx adds auth
+  - API Routes: how app/api/upload/route.ts handles HTTP requests
+  - Server Actions: functions that run on the server, called from the client
+  - Loading and error states: loading.tsx and error.tsx files
+  - Middleware: how authentication redirects work
+
+Apply to Camino:
+  - Map every route in your app: list each page.tsx and what URL it creates
+  - Identify which components are Server vs Client (search for "use client")
+  - Open app/(protected)/layout.tsx - understand how auth protection works
+  - Open any API route - understand the Request/Response pattern
+
+Resources:
+  - nextjs.org/docs/app (read Getting Started and Routing sections)
+  - nextjs.org/docs/app/building-your-application/routing
+  - nextjs.org/docs/app/building-your-application/data-fetching
+
+
+WEEK 4: SQL AND DATABASE FUNDAMENTALS
+----------------------------------------
+Why now: You use two databases (Supabase and Neon). Understanding SQL means
+you can write migrations, debug data issues, and query with confidence.
+
+Key concepts:
+  - Tables, rows, columns (your 18 Supabase tables)
+  - SELECT, INSERT, UPDATE, DELETE
+  - WHERE clauses and filtering
+  - JOINs: how signals connects to data_points via signal_id
+  - Indexes: why you have idx_signals_user_id and what it does for performance
+  - Foreign keys: how signal_id in data_points references signals.id
+  - Aggregations: COUNT, SUM, AVG (used in your signal calculations)
+  - NULL handling: COALESCE (used in your RLS policies)
+
+Apply to Camino:
+  - Open Supabase SQL Editor for camino-dev
+  - Run: SELECT * FROM signals LIMIT 10;
+  - Run: SELECT s.name, COUNT(dp.id) FROM signals s LEFT JOIN data_points dp ON dp.signal_id = s.id GROUP BY s.name;
+  - Read scripts/00_SETUP_DATABASE.sql and understand every CREATE TABLE
+
+Resources:
+  - SQLBolt: sqlbolt.com (interactive, do all 18 lessons)
+  - Supabase docs: supabase.com/docs/guides/database
+  - PostgreSQL tutorial: postgresqltutorial.com (first 10 sections)
+
+
+PHASE 2: YOUR STACK IN DEPTH (Weeks 5-8)
+==========================================
+"Go deeper on the specific tools you use every day"
+
+
+WEEK 5: SUPABASE - AUTH AND RLS
+----------------------------------
+Why now: Your app's security depends on Supabase Auth and Row Level Security.
+Understanding RLS prevents data leaks between organisations.
+
+Key concepts:
+  - Supabase Auth flow: sign up, sign in, session management
+  - JWT tokens: what auth.uid() returns and why
+  - Row Level Security: how policies restrict data access per user
+  - RLS policy syntax: USING (for SELECT) vs WITH CHECK (for INSERT)
+  - Service role vs anon key: when to use which
+  - Auth helpers for Next.js: createBrowserClient vs createServerClient
+
+Apply to Camino:
+  - Read every RLS policy in scripts/00_SETUP_DATABASE.sql
+  - Understand why signals has "SELECT USING (true)" (anyone can read)
+  - Understand why profiles has "SELECT USING (auth.uid() = id)" (only own profile)
+  - Open lib/supabase/client.ts and lib/supabase/server.ts - understand the difference
+  - Test: log in as user A, try to read user B's profile via the SQL editor
+
+Resources:
+  - supabase.com/docs/guides/auth
+  - supabase.com/docs/guides/auth/row-level-security
+  - supabase.com/docs/guides/auth/server-side/nextjs
+
+
+WEEK 6: SUPABASE - QUERIES AND REAL-TIME
+-------------------------------------------
+Why now: Every data operation in Camino goes through Supabase. Understanding
+the query builder means you can write efficient queries without raw SQL.
+
+Key concepts:
+  - Supabase client query builder: .from().select().eq().order()
+  - Filtering: .eq(), .in(), .gte(), .lte(), .like()
+  - Relationships: .select("*, data_points(*)") for nested data
+  - Inserting: .insert() and .upsert() (used in your signal creation)
+  - Error handling: the { data, error } pattern
+  - Real-time subscriptions (future: live signal updates)
+  - Storage: file uploads (future: beyond CSV)
+  - Edge Functions (future: background processing)
+
+Apply to Camino:
+  - Search the codebase for ".from(" - read every Supabase query
+  - Find the query that loads signals for the signals page
+  - Find the query that inserts new signals after discovery
+  - Optimise: add .select() columns to a query that currently selects *
+
+Resources:
+  - supabase.com/docs/reference/javascript/select
+  - supabase.com/docs/reference/javascript/insert
+  - supabase.com/docs/guides/realtime
+
+
+WEEK 7: AI SDK AND PROMPT ENGINEERING
+----------------------------------------
+Why now: Your product's differentiator is the AI-generated 5-section analysis.
+Understanding the AI SDK and prompt engineering directly improves output quality.
+
+Key concepts:
+  - AI SDK basics: generateText() and streamText()
+  - Model selection: which model for which task (speed vs quality)
+  - System prompts: setting the AI's persona and constraints
+  - Structured output: getting JSON back from the AI (your interpretation format)
+  - Temperature: controlling creativity vs consistency
+  - Token limits: understanding context windows and cost
+  - Prompt engineering patterns:
+    - Few-shot examples (show the AI what good output looks like)
+    - Chain of thought (ask the AI to reason step by step)
+    - Role prompting (act as a business analyst)
+  - Error handling: retries, fallbacks, timeouts
+
+Apply to Camino:
+  - Open lib/interpretation-service.ts - read the full system prompt
+  - Modify the prompt to improve the "So What" section quality
+  - Test with different models and compare interpretation quality
+  - Add a few-shot example to the prompt with a real signal and ideal output
+  - Measure: time per interpretation call, token usage, output quality
+
+Resources:
+  - sdk.vercel.ai/docs (AI SDK documentation)
+  - platform.openai.com/docs/guides/prompt-engineering
+  - anthropic.com/research/prompt-engineering-guide
+  - learnprompting.org (free course)
+
+
+WEEK 8: TAILWIND CSS AND COMPONENT DESIGN
+--------------------------------------------
+Why now: Your UI is built entirely with Tailwind and shadcn/ui. Understanding
+the system means you can build new pages fast without fighting CSS.
+
+Key concepts:
+  - Utility-first CSS: what each Tailwind class does
+  - Responsive design: sm:, md:, lg: breakpoints (your app is mobile-first)
+  - Flexbox via Tailwind: flex, items-center, justify-between, gap-4
+  - Design tokens: bg-background, text-foreground, text-muted-foreground
+  - shadcn/ui component anatomy: how Card, Button, Dialog are composed
+  - CSS variables: how --background, --foreground control theming
+  - Tailwind v4: @theme inline, @import "tailwindcss" (your globals.css)
+  - Animation: transition classes, tw-animate-css
+
+Apply to Camino:
+  - Open app/globals.css - understand every CSS variable
+  - Open components/signal-accordion-card.tsx - identify every Tailwind class
+  - Redesign the signal card: change colours, spacing, layout
+  - Build a new component from scratch using only Tailwind classes
+
+Resources:
+  - tailwindcss.com/docs (reference, not a tutorial - look up classes as needed)
+  - ui.shadcn.com/docs/components (every component you have installed)
+  - youtube.com search "Tailwind CSS crash course" (any recent one)
+
+
+PHASE 3: PRODUCTION SKILLS (Weeks 9-12)
+=========================================
+"Ship with confidence and maintain what you've built"
+
+
+WEEK 9: GIT AND DEPLOYMENT
+-----------------------------
+Why now: You're managing code across v0, Cursor, and GitHub. Understanding Git
+prevents lost work and merge conflicts.
+
+Key concepts:
+  - Git mental model: working directory, staging area, commits, branches
+  - Essential commands: add, commit, push, pull, checkout, branch, merge
+  - Branch strategy: main (prod), feature branches, v0 branch
+  - Merge conflicts: how they happen, how to resolve them
+  - .gitignore: why .env.local is listed (security)
+  - Vercel deployment: how pushing to main triggers a deploy
+  - Preview deployments: how branches get preview URLs
+  - Rollback: reverting to a previous deploy on Vercel
+
+Apply to Camino:
+  - Practice: create a feature branch, make a change, push, merge to main
+  - Intentionally create a merge conflict and resolve it
+  - Review your git log: git log --oneline --graph (see your project history)
+  - Set up: always work on a branch, never commit directly to main
+
+Resources:
+  - learngitbranching.js.org (interactive visual tutorial - excellent)
+  - git-scm.com/book/en/v2 (chapters 1-3)
+  - vercel.com/docs/deployments/overview
+
+
+WEEK 10: ERROR HANDLING AND DEBUGGING
+----------------------------------------
+Why now: Your customer will hit bugs. Understanding error handling means the
+app fails gracefully instead of showing ugly error screens.
+
+Key concepts:
+  - try/catch patterns in TypeScript
+  - Error boundaries in React (error.tsx files)
+  - API error responses: status codes (400, 401, 403, 404, 500)
+  - Logging: structured logs vs console.log
+  - The { data, error } pattern in Supabase
+  - Debugging tools: browser DevTools, Cursor debugger, console.log
+  - Common bugs:
+    - Race conditions (two things happening at once)
+    - Null/undefined access (data not loaded yet)
+    - Environment variable missing
+    - CORS errors
+    - Database constraint violations
+
+Apply to Camino:
+  - Search for "catch" in the codebase - review every error handler
+  - Find error handlers that swallow errors (catch without logging)
+  - Add proper error messages to the upload pipeline
+  - Test: upload a malformed CSV and see what error the user gets
+  - Improve: make every error user-friendly, not technical
+
+Resources:
+  - nextjs.org/docs/app/building-your-application/routing/error-handling
+  - kentcdodds.com/blog/use-react-error-boundary
+  - developer.chrome.com/docs/devtools (browser debugging)
+
+
+WEEK 11: TESTING AND DATA VALIDATION
+---------------------------------------
+Why now: You have zero automated tests. Before scaling features, understanding
+testing basics prevents regressions when you change code.
+
+Key concepts:
+  - Why test: confidence to change code without breaking things
+  - Unit tests: testing a single function (e.g. signal calculation logic)
+  - Integration tests: testing API routes end-to-end
+  - Input validation with Zod: ensuring data matches expected shape
+  - Schema validation: validating CSV structure before processing
+  - Manual testing checklist: what to check before every deploy
+  - The testing pyramid: many unit tests, fewer integration, fewest E2E
+
+Apply to Camino:
+  - Read any Zod schemas in the codebase (search for "z.object")
+  - Add Zod validation to the upload API: validate CSV has required columns
+  - Write a manual test checklist for the Tier 1 pipeline
+  - Write your first unit test for a calculation function
+
+Resources:
+  - zod.dev (Zod documentation - you already use it)
+  - vitest.dev (modern test runner for TypeScript)
+  - testing-library.com/docs/react-testing-library/intro
+  - kentcdodds.com/blog/write-tests
+
+
+WEEK 12: PERFORMANCE AND SECURITY
+------------------------------------
+Why now: You're about to have a paying customer. Understanding performance and
+security basics protects their data and keeps the app fast.
+
+Key concepts:
+  - Performance:
+    - Database query optimisation: EXPLAIN ANALYZE
+    - N+1 query problem (loading signals then loading data_points one by one)
+    - Caching: when to cache AI interpretations (you already do this)
+    - Image/asset optimisation: Next.js Image component
+    - Lazy loading: only load what's visible
+    - Bundle size: what ships to the browser
+  - Security:
+    - RLS is your primary defence (already in place)
+    - SQL injection: parameterised queries (Supabase client handles this)
+    - XSS: React handles this by default
+    - CSRF: Next.js handles this for server actions
+    - Environment variables: never expose secret keys to the client
+    - Service role key: never use in client-side code
+    - HTTPS: Vercel handles this automatically
+
+Apply to Camino:
+  - Run EXPLAIN ANALYZE on your slowest query in the Supabase SQL editor
+  - Check: is the service role key ever imported in a "use client" file?
+  - Check: do all API routes validate the user is authenticated?
+  - Add rate limiting to the upload API (prevent abuse)
+  - Measure: how long does a full upload-to-display pipeline take?
+
+Resources:
+  - nextjs.org/docs/app/building-your-application/optimizing
+  - supabase.com/docs/guides/database/query-optimization
+  - owasp.org/www-project-top-ten (top 10 security risks)
+  - web.dev/performance (Google's performance guide)
+
+
+WEEKLY ROUTINE
+===============
+
+Sunday (1 hour): Read the week's resources. Skim, don't memorise.
+Monday (30 min): Apply one concept to Camino. Make a small change.
+Wednesday (30 min): Apply a second concept. Ask the Cursor agent to explain
+  code that relates to this week's topic.
+Friday (30 min): Review what you learned. Write one sentence about the most
+  useful thing you discovered.
+
+Total: 2.5 hours per week. Fits around your building schedule.
+
+
+TRACK YOUR PROGRESS
+=====================
+
+Week 1:  [ ] TypeScript fundamentals
+Week 2:  [ ] React fundamentals
+Week 3:  [ ] Next.js App Router
+Week 4:  [ ] SQL and database fundamentals
+Week 5:  [ ] Supabase Auth and RLS
+Week 6:  [ ] Supabase queries
+Week 7:  [ ] AI SDK and prompt engineering
+Week 8:  [ ] Tailwind CSS and component design
+Week 9:  [ ] Git and deployment
+Week 10: [ ] Error handling and debugging
+Week 11: [ ] Testing and data validation
+Week 12: [ ] Performance and security
+
+
+AFTER 12 WEEKS
+===============
+
+You will be able to:
+  - Read and write TypeScript with confidence
+  - Build new pages and components without AI assistance for simple tasks
+  - Write and debug database queries
+  - Understand why your code works, not just that it works
+  - Debug production issues systematically
+  - Make architectural decisions with informed trade-offs
+  - Ship features faster because you understand the full stack

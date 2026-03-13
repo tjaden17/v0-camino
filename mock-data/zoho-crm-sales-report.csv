@@ -1,0 +1,16 @@
+Zoho CRM - Sales Performance Report
+Generated on: Feb 14, 2024 15:45:23 IST
+User: admin@company.com
+Report Period: Jan 1 - Feb 19, 2024
+
+Date,Lead Count,Opportunity,Deals - Won,Deals Lost,Revenue (USD),Avg Deal Value,Win %,Sales Rep,Region,Notes
+01/01/2024,145,32,18,8,$125,000,"6,944.00",69.2%,John Smith,North America,
+1/8/2024,158,35,21,7,"$142,000",6762,75%,John Smith,North America,Good week
+15-01-2024,162,38,19,12,138000.00,"7,263",61.3,Sarah Johnson,EMEA,
+2024-01-22,171,41,23,9,165k,7174.00,71.9%,Sarah Johnson,EMEA,
+29/1/24,168,39,25,6,$178000,7120,80.6%,Mike Chen,APAC,Strong close
+05-Feb-2024,,44,27,8,195000,"7,222.00",77.1,Mike Chen,APAC,
+2/12/24,175,42,24,11,"$172,000.00",7167.00,68.6%,John Smith,North America,Holiday slowdown
+19/02/2024,189,46,29,7,208k,"7,172",80.6%,Sarah Johnson,EMEA,
+01/01/2024,152,,,,"$130,000",,,,North America,Duplicate entry?
+08-01-2024,,,22,,"145,500",6613.64,,,North America,Partial data

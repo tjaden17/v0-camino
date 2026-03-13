@@ -1,0 +1,173 @@
+Chapter 9: Git and Deployment
+
+Welcome to Week 9 of the Camino Builder learning curriculum. This week, we're focusing on Git and deployment, the essential skills that let you ship your code to production with confidence. You're already managing code across v0, Cursor, and GitHub, and understanding how these tools work together will prevent lost work, merge conflicts, and deployment disasters.
+
+By the end of this chapter, you'll understand the Git mental model, know the essential commands, and be comfortable with your branch strategy and deployment workflow on Vercel.
+
+The Git Mental Model
+
+Git is a version control system. Think of it as a time machine for your code. Every time you make a commit, you're creating a snapshot of your entire project at that moment in time. If something breaks, you can always go back to a previous snapshot.
+
+Understanding Git requires grasping three core concepts: the working directory, the staging area, and commits.
+
+Your working directory is the current state of your files, what you see in your code editor right now. When you edit files in Cursor or v0, you're making changes in your working directory.
+
+The staging area is like a preparation zone. When you run git add, you're telling Git which changes you want to include in your next commit. This lets you be selective. Maybe you fixed two bugs but want to commit them separately for clarity.
+
+A commit is a permanent snapshot. When you run git commit, all the changes in your staging area become a commit with a unique identifier and a message describing what you changed. Commits are immutable. Once created, they can't be changed, only referenced or rolled back.
+
+Here's the typical workflow. First, you edit files in your working directory. Maybe you're building a new signal card component. Second, you stage the changes with git add followed by the filename. This tells Git you want to include this file. Third, you commit with git commit dash m followed by a message in quotes. This creates a permanent snapshot. Fourth, you push with git push. This sends your commit to GitHub so it's backed up and visible to others.
+
+This workflow happens whether you're working in v0, Cursor, or directly on GitHub. The tools are different, but the underlying Git operations are the same.
+
+Essential Git Commands
+
+Let's walk through the commands you'll use every day. Don't worry about memorizing them. You'll internalize them through practice.
+
+Git status shows you what's changed. Run this frequently to understand the current state. You'll see which files are modified, which are staged, and which branch you're on.
+
+Git add stages files for the next commit. You can stage a specific file with git add filename, or stage everything with git add dot. The dot means all changes in the current directory and below.
+
+Git commit dash m message creates a commit with a message. Write clear messages that explain what changed and why. "Fix bug" is vague. "Fix null pointer error in signal calculation" is helpful.
+
+Git push sends your local commits to GitHub. If you're on a branch called feature upload, running git push uploads your commits so they're backed up and visible on GitHub.
+
+Git pull downloads commits from GitHub to your local machine. If someone else made changes, or if you made changes in v0 and want to sync them to Cursor, you pull to get the latest code.
+
+Git checkout dash b branch name creates a new branch and switches to it. Branches let you work on features without affecting the main codebase. More on this in a moment.
+
+Git merge branch name combines changes from one branch into another. If you built a feature on feature signals, you'd merge it into main when it's ready to deploy.
+
+Git log dash dash oneline dash dash graph shows your commit history as a visual graph. This is incredibly useful for understanding how branches have evolved over time.
+
+Branch Strategy: Feature Branches and Main
+
+In Camino, you're using a branch strategy that keeps main stable and deploys feature branches for testing. Let's break down why this matters.
+
+The main branch is your production code. Whatever is on main is live at your production URL. Because of this, you never commit directly to main. Instead, you create feature branches.
+
+A feature branch is a separate timeline where you build a new feature. Let's say you're adding the 3 question upload flow. You'd create a branch called feature upload questions, build the feature there, test it on a preview deployment, and only merge it to main once it's working.
+
+Here's the workflow. Start on main with git checkout main and git pull to get the latest code. Create a feature branch with git checkout dash b feature upload questions. Build your feature and make commits as you go. Git add dot, then git commit dash m with a message. Push to GitHub with git push origin feature upload questions. Vercel automatically creates a preview deployment so you can test. Once tested, create a pull request on GitHub to merge into main. After the pull request is approved and merged, Vercel deploys to production.
+
+This strategy prevents broken code from reaching production. If you discover a bug on your feature branch, you fix it there. Main stays clean.
+
+In v0, you'll notice branches like v0 slash nktran dash 9745. v0 creates these automatically when you work on a project. These are feature branches too. v0 uses them to keep your experimental work separate from main.
+
+Merge Conflicts and How to Resolve Them
+
+A merge conflict happens when two people, or you in two places, edit the same part of the same file differently. Git doesn't know which version to keep, so it asks you to decide.
+
+Here's a typical scenario. You're working on the signals page in Cursor, improving the filter logic. Meanwhile, someone else, or you in v0, also edits the signals page to add a new button. When you try to merge, Git sees that the same lines changed in both places and can't automatically combine them.
+
+Git marks the conflict in your file with special markers. The section between the first marker and the equals signs is your version. The section between the equals signs and the last marker is the incoming version.
+
+To resolve it, you edit the file to keep what you want. Maybe you combine both changes. Then you remove the conflict markers, save the file, stage it with git add, and complete the merge with git commit.
+
+The best way to avoid conflicts is to work on different files or different parts of the same file. Pull from main frequently so you're working with the latest code. And communicate with collaborators about what you're each working on.
+
+Gitignore: What Not to Commit
+
+Your repository has a dot gitignore file that tells Git which files to ignore. This is critical for security and performance.
+
+The most important thing in gitignore is dot env dot local. This file contains secret keys like your Supabase service role key and database passwords. If you commit it to GitHub, anyone with access to your repository can steal your keys and access your database. Always keep environment files out of version control.
+
+Also ignored is node underscore modules. This folder contains thousands of dependency files. It's huge and unnecessary to commit because anyone can regenerate it by running npm install. Your repository only stores package dot json and package dash lock dot json, which define what dependencies you need.
+
+Other common ignores are dot next, which is Next.js build output, dot vercel for Vercel configuration, and dist for build artifacts. These are all generated files that can be recreated.
+
+If you ever accidentally commit a secret, don't just delete it and commit again. It's still in the Git history. You need to rotate the secret, meaning generate a new one and update it everywhere, and optionally use git filter branch to remove it from history.
+
+Vercel Deployment: From Push to Production
+
+Vercel is your deployment platform. It's where your app runs live on the internet. Understanding how it works helps you ship faster and debug deployment issues.
+
+When you push a commit to the main branch on GitHub, Vercel detects it automatically and triggers a production deployment. Here's what happens.
+
+First, Vercel clones your repository at the latest commit on main. Second, it installs dependencies by running npm install. Third, it builds your Next.js app by running npm run build. This compiles your TypeScript, bundles your components, and generates static pages. Fourth, it deploys the built app to Vercel's edge network, servers distributed globally for fast access. Fifth, your production URL, like camino dot vercel dot app, now serves the new version.
+
+The entire process takes about 2 to 3 minutes. You can watch it in real time on the Vercel dashboard.
+
+Preview deployments are one of Vercel's most powerful features. Every time you push to a non-main branch, like feature upload questions, Vercel creates a preview deployment at a unique URL. This lets you test your feature in a production like environment before merging to main. You can share the preview URL with others to get feedback.
+
+If something goes wrong in production, you can rollback to a previous deployment with one click in the Vercel dashboard. Find the deployment that was working, click promote to production, and Vercel instantly switches back. This is a lifesaver when you discover a critical bug after deploying.
+
+Environment Variables on Vercel
+
+Your app relies on environment variables, things like SUPABASE underscore URL, SUPABASE underscore ANON underscore KEY, NEON underscore DATABASE underscore URL. These are configured in the Vercel dashboard under your project settings.
+
+When Vercel builds your app, it injects these variables so your code can access them via process dot env dot SUPABASE underscore URL. This is why you never commit dot env dot local. The secrets live in Vercel's secure storage, not in your repository.
+
+If you add a new environment variable, remember to add it both to your local dot env dot local for local development, and to the Vercel dashboard for production. If a variable is missing in production, you'll see errors like "Cannot read SUPABASE underscore URL of undefined."
+
+Vercel also supports preview environment variables, different values for preview deployments versus production. This is useful if you want previews to use a staging database instead of the production database.
+
+Working Across v0, Cursor, and GitHub
+
+You're working in three environments: v0 for rapid prototyping, Cursor for deep coding sessions, and GitHub as the source of truth. Here's how to keep them in sync.
+
+For the v0 workflow, v0 creates a branch like v0 slash nktran dash 9745 when you start working. All changes you make in v0 are automatically committed and pushed to this branch. When you're happy with the changes, you can either download the code and manually merge it, or use v0's GitHub integration to create a pull request. Once merged to main, the changes deploy to production.
+
+For the Cursor workflow, clone your repository from GitHub with git clone followed by the URL. Create a feature branch with git checkout dash b feature name. Make changes in Cursor and commit frequently with git add dot, then git commit dash m with a message. Push your branch with git push origin feature name. Create a pull request on GitHub, test on the preview deployment, and merge to main.
+
+For syncing between v0 and Cursor, if you make changes in v0 and want to continue in Cursor, pull the v0 branch with git checkout followed by the branch name, then git pull. If you make changes in Cursor and want to see them in v0, push your branch to GitHub and v0 can pull it.
+
+The key is to always push your work to GitHub. GitHub is the single source of truth. Both v0 and Cursor sync with it.
+
+Git Log: Understanding Your Project History
+
+Your project's Git history is a valuable resource. Running git log dash dash oneline dash dash graph shows a visual representation of every commit, when it was made, and how branches have evolved.
+
+Each commit has a unique identifier called a SHA, a long string of letters and numbers. You can reference any commit by its SHA. For example, git checkout followed by a SHA takes you back to that exact state of the codebase. This is incredibly useful for debugging. The bug wasn't there last week, let me check out last week's commit and confirm.
+
+The log also shows who made each commit and when. If you're wondering when a particular feature was added, git log dash dash grep equals quote upload will search commit messages for the word upload.
+
+You can also use git blame filename to see who last edited each line of a file and when. This isn't about blame in the negative sense. It's about understanding the history of the code. If you see a confusing line, git blame tells you which commit introduced it, and you can read the commit message for context.
+
+Practical Exercise: Your First Feature Branch
+
+Let's put this all together with a practical exercise. You're going to create a feature branch, make a small change, test it on a preview deployment, and merge it to main.
+
+Step one: start on main. Open your terminal in Cursor and run git checkout main, then git pull to ensure you're up to date.
+
+Step two: create a feature branch. Run git checkout dash b feature improve signal card. This creates a new branch and switches to it.
+
+Step three: make a small change. Open the signal accordion card component and add a comment at the top. Save the file.
+
+Step four: stage and commit. Run git add followed by the filename, then git commit dash m with a message like "Add comment to signal card."
+
+Step five: push to GitHub. Run git push origin feature improve signal card. This uploads your branch to GitHub.
+
+Step six: check Vercel. Go to the Vercel dashboard. You'll see a new preview deployment for your branch. Click the URL to see your change live.
+
+Step seven: create a pull request. On GitHub, you'll see a prompt to create a pull request for your new branch. Click it, add a description, and create the PR.
+
+Step eight: merge to main. If everything looks good on the preview, merge the pull request. Vercel will automatically deploy to production.
+
+Step nine: clean up. After merging, delete the feature branch on GitHub and locally with git branch dash d feature improve signal card.
+
+Congratulations. You've completed the full workflow. This is the process you'll use for every feature you ship.
+
+Common Git Mistakes and How to Fix Them
+
+Mistake number one: committed to main by accident. If you haven't pushed yet, you can move the commit to a new branch. Create a branch at your current commit with git branch feature oops. Reset main to the previous commit with git reset dash dash hard HEAD tilde 1. Then switch to the new branch with git checkout feature oops.
+
+Mistake number two: want to undo the last commit. If you committed but haven't pushed, run git reset dash dash soft HEAD tilde 1. This undoes the commit but keeps your changes staged so you can recommit with a better message.
+
+Mistake number three: made changes on main instead of a feature branch. If you haven't committed yet, stash your changes with git stash. Create a feature branch with git checkout dash b feature name. Then apply your changes back with git stash pop.
+
+Mistake number four: need to pull but have uncommitted changes. Git won't let you pull if you have uncommitted changes that would conflict. Either commit your changes first, or stash them with git stash, pull with git pull, then reapply with git stash pop.
+
+Deployment Checklist
+
+Before every deploy to production, run through this checklist. All tests pass, once you have tests. Preview deployment looks correct. Database migrations are run, if applicable. Environment variables are up to date on Vercel. No console dot log statements left in the code. No secrets committed to the repository. All dependencies are installed, package dot json is up to date. Build completes without errors locally when you run npm run build.
+
+If something goes wrong in production, don't panic. Check the Vercel logs first. They'll show you exactly what error occurred. If it's a bug in your code, roll back to the previous deployment while you fix it. If it's a missing environment variable, add it in the Vercel dashboard and redeploy.
+
+Next Steps
+
+This week, practice the Git workflow. Create a feature branch for every small change, even if it's just updating a comment. Get comfortable with the commands. Run git status frequently to build intuition.
+
+Next week, we'll focus on error handling and debugging, how to make your app fail gracefully when things go wrong, and how to track down bugs systematically. You'll learn to use browser DevTools, structured logging, and the Cursor debugger to diagnose issues in production.
+
+For now, remember: Git is your safety net. Commit often, push regularly, and always work on feature branches. With Git, you can always go back, so you can move forward fearlessly.

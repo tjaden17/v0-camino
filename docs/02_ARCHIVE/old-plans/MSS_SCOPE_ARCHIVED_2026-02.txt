@@ -1,0 +1,566 @@
+CAMINO - MINIMUM SELLABLE SERVICE (MSS) SCOPE
+================================================
+
+Date: 11 Feb 2026
+Status: Draft
+Version: 1.1 (updated with Data Onboarding + API integration scope)
+
+
+CONTEXT
+-------
+
+Developing a fully productised data pipeline has blockers. The MSS approach puts Camino Admin in the loop to bridge gaps while delivering enough value for the first customer to pay.
+
+
+BILLING GATE (Tier 1)
+---------------------
+
+The customer agrees to pay when ALL of these are true:
+
+1. User onboarding - Exec and manager can tell Camino Admin what's important to them
+   (data types, signal needs, business context, upcoming decisions) when onboarding.
+2. Data onboarding - Manager can send CSV/XLSX sample from all tools to Camino Admin
+   during onboarding.
+3. Data onboarding - Camino Admin helps system understand shape of data, identify
+   signals, make correct calculations during onboarding.
+4. Signals - System generates at least 3 signals from data layer (whether uploaded
+   from user/Camino Admin, or via API integration) with correct values.
+5. AI analysis - Each pinned/saved signal has AI analysis personalised to the
+   organisation (what's important to exec/org KPIs) and user.
+6. Browse signals - Exec can browse signals and read expanded view.
+7. Admin - Admin can create users and upload on their behalf.
+8. Deployed - App is deployed to production.
+
+Note: "API integration" in item 4 refers to connecting to the customer's existing
+tools (Zoho CRM, Zoho Desk, HubSpot, etc.) via their APIs, so data flows in without
+manual CSV uploads. This is crucial for the billing case because manual uploads are
+a key user pain point (Problem 4: Easy Integrations).
+
+
+USER STORIES
+============
+
+
+US1: COLLECT USER CONTEXT
+--------------------------
+
+Purpose: System understands who the user is and what matters to them, so that AI analysis is relevant and personalised.
+
+Acceptance Criteria:
+- User has discovery call with Camino Admin. Admin stores notes via Admin CP.
+- Admin can update user profile fields at any time via Admin CP.
+- System saves user info to database (profiles table).
+- Profile data is used downstream by the AI analysis prompt (US6) to make insights relevant.
+- An org is a collection of users. System can understand org context by understanding the users within it.
+
+Profile fields required:
+- full_name
+- role
+- organization / industry
+- business_context (free text from discovery call)
+- upcoming_priorities (what is top of mind for this user right now)
+- signal_preferences (what type of signals matter most)
+- company_stage
+- team_size
+- market / competitors
+
+Current State:
+- Auth, profiles, orgs exist in the database.
+- Profile page exists at /profile with fields: organization, industry, role, business_context, full_name, company_stage, team_size, market, competitors, business_model, kpi_1/2/3.
+- Admin panel exists at /admin with user management.
+- MISSING: upcoming_priorities and signal_preferences fields on the profiles table.
+- MISSING: Admin CP form to input discovery call notes into a user's profile.
+
+
+US2: USER CAN SEE WHAT IS IMPORTANT TO THEM
+---------------------------------------------
+
+Purpose: User has a profile page that reflects their context, so they trust the system understands them.
+
+Acceptance Criteria:
+- User has a profile page showing:
+  - Role
+  - What's upcoming (upcoming_priorities)
+  - Signal preferences
+  - Org details
+- Profile is read-only for MSS. User cannot edit. Admin edits on their behalf.
+
+Current State:
+- Profile page exists at /profile. Currently shows role, org, industry, company stage, team size, market, competitors, business model, KPIs.
+- Profile page currently allows user to edit. For MSS this should be read-only.
+- MISSING: upcoming_priorities and signal_preferences display on the profile page.
+
+
+US3: DATA INPUT (Upload + API Integration)
+--------------------------------------------
+
+Purpose: Collect data from the user in order to generate signals and analysis. Two paths exist:
+  Path A: CSV/XLSX upload (manual, with admin assistance for data onboarding)
+  Path B: API integration (automated, connects to customer's existing tools)
+
+For MSS, Path A is not fully productised -- Admin assists with data classification.
+Path B is crucial for billing because it solves the customer's "easy integrations" pain point.
+
+Acceptance Criteria (Path A - Upload):
+- User can upload file(s) directly into platform, in CSV or XLSX format.
+- Camino Admin can upload files on behalf of the user.
+- System creates prompts (max 3 per tab) to help understand the data:
+  1. What does each row represent? (leads, deals, tickets, customers, events, agents, other)
+  2. Which column is the main metric? (dropdown of numeric columns, or "just count rows")
+  3. Which column is the date? (dropdown of date columns)
+- For XLSX files with multiple tabs, each tab is treated as a separate data type. User/admin answers the 3 prompts per tab.
+- Admin can answer the prompts on behalf of the user during data onboarding.
+- System stores the data in a persisting org data layer, based on the answers.
+- System normalises and aliases fields so AI can understand them later and services can calculate trends.
+- System accounts for multiple uploads over time. The org data layer accumulates, not replaces.
+
+Acceptance Criteria (Path B - API Integration):
+- System can connect to the customer's existing tools via their APIs (Zoho CRM, Zoho Desk initially).
+- Once connected, system pulls data automatically (no manual CSV export needed).
+- API data feeds into the same signal generation pipeline as uploads.
+- Admin configures the integration during data onboarding.
+
+Data Onboarding (Admin-Assisted):
+- During onboarding, manager sends CSV/XLSX samples from all their tools to Camino Admin.
+- Admin uploads the samples and answers the 3 classification questions per tab.
+- Admin validates the generated signals are correct and meaningful.
+- If API integration is available for the tool, Admin sets it up so future data flows automatically.
+- This is not scalable long-term but overcomes signal flow challenges for MSS.
+
+Current State:
+- Upload page exists at /upload with the 3-question flow per tab, multi-file support, and signal generation.
+- FIELD_ALIASES system exists with ~500 aliases covering Zoho, HubSpot, Salesforce, Zendesk column names.
+- Zoho integration code exists (lib/zoho-api-client.ts, lib/zoho-oauth-service.ts, lib/zoho-desk-processor.ts, lib/zoho-signal-discovery.ts) but is NOT yet connected to the new signal generation pipeline.
+- DONE: 3-question upload flow replaces old upload (Week 1).
+- MISSING: Admin-on-behalf-of-user upload (admin selects which user/org to upload for).
+- MISSING: Persisting org data layer that accumulates across uploads (currently each upload is independent).
+- MISSING: API integration path feeding into the generate pipeline (Zoho code exists but uses old discovery pipeline).
+
+
+US4: SYSTEM GENERATES AT LEAST 3 SIGNALS FROM THE DATA
+---------------------------------------------------------
+
+Purpose: The core value proposition. User sees meaningful metrics extracted from their data.
+
+Acceptance Criteria:
+- Signal discovery: System reads data fields from uploaded files, API integrations, and the persisting org data layer, to determine what signals can be created.
+- Data source is transparent: user can see whether a signal came from upload or API integration.
+- System calculates signals to produce basic info:
+  - Signal name
+  - Value
+  - Trend (direction + percentage change)
+- System saves signal info to database.
+- Every signal shown must have correct, verifiable values. No guessed or heuristic-based calculations.
+
+Current State:
+- Signal discovery service exists with 93 predefined signal definitions.
+- Signal calculation service exists with calcSpec-driven path (11 signals) and legacy heuristic path (82 signals).
+- Upload proto generates signals from user-answered prompts and saves to database.
+- ISSUE: 82 of 93 signal definitions use the legacy heuristic path which guesses calculations from signal name keywords. This produces inaccurate values.
+- CHANGE NEEDED: Reduce to ~15-20 core definitions, all with explicit calcSpecs. Remove the legacy heuristic path. If a signal does not have a calcSpec, do not show it.
+- CHANGE NEEDED: Signal discovery should be driven by the 3-question answers (US3), not by fuzzy-matching 93 definitions against column names.
+
+
+US5: USER CAN SEE SIGNAL CARD AND EXPANDED VIEW
+--------------------------------------------------
+
+Purpose: User can consume signals quickly (card) and deeply (expanded accordion with AI analysis).
+
+Acceptance Criteria:
+- User can see signal basic info (name, value, trend) on a card.
+- User can expand accordion to see AI analysis.
+
+Current State:
+- SignalAccordionCard component exists with L1 (compact card), L2 (detail view with chart), L3 (AI insights).
+- L1 shows: category badge, title, change percentage, trend icon, description, action buttons.
+- L2 shows: data points chart, calculation details.
+- L3 shows: AI-generated 5-section analysis.
+- This user story is COMPLETE for MSS.
+
+
+US6: AI ANALYSIS WITH USER/ORG CONTEXT
+-----------------------------------------
+
+Purpose: The key differentiator. AI produces accurate, relevant analysis based on who the user is and what they care about, not generic commentary.
+
+Acceptance Criteria:
+- System sends prompt to AI with 5-section analysis framework:
+  1. What We Found (factual data)
+  2. What It Means (interpretation)
+  3. So What (business impact)
+  4. Opportunities (positive scenarios)
+  5. Risks (negative scenarios)
+- AI response is saved and cached (signal_interpretations table).
+- AI is prompted when new data is uploaded.
+- Analysis is personalised to user role, upcoming priorities, and org context.
+
+Current State:
+- Interpretation service exists at /lib/interpretation-service.ts.
+- 5-section framework is already implemented (what_we_found, what_it_means, so_what, opportunities, risks).
+- AI prompt uses signal data, trend, consistency, related signals.
+- Caching works via signal_interpretations table.
+- MISSING: The AI prompt does NOT include user context (role, upcoming_priorities, signal_preferences, org details). It only receives signal data. This means analysis is generic, not personalised.
+- CHANGE NEEDED: Fetch user/org profile data and inject it into the prompt so the AI can tailor its analysis. For example, if the user is a Head of Support with "reducing resolution time" as an upcoming priority, the AI should frame ticket volume analysis in terms of resolution time impact.
+
+
+US7: USER CAN BROWSE SIGNALS
+------------------------------
+
+Purpose: User can navigate through all their signals easily.
+
+Acceptance Criteria:
+- User can scroll up and down, with single card focus.
+- User can switch to a stacked/grouped view to see more signals on screen.
+
+Current State:
+- Signals page exists at /signals.
+- Card view (single focus scroll) and grouped view (compact stacked) both exist with a toggle button.
+- This user story is COMPLETE for MSS.
+
+
+US8: ADMIN CAN CREATE USERS AND ORGANISATIONS
+------------------------------------------------
+
+Purpose: Camino Admin can onboard new customers without them self-serving.
+
+Acceptance Criteria:
+- Admin can create new users.
+- Admin can create new organisations.
+- Admin can assign users to organisations.
+
+Current State:
+- Admin panel exists at /admin with pages for users, organisations, signals, uploads, settings.
+- /admin/users lists users, /admin/users/[id] shows user detail.
+- /admin/organisations lists orgs, /admin/organisations/[id] shows org detail with upload capability.
+- Organization service exists for creating orgs, inviting users, managing roles.
+- NEEDS VERIFICATION: Confirm the admin create-user and create-org flows work end-to-end. These pages exist but may have gaps.
+
+
+US9: APP IS DEPLOYED
+---------------------
+
+Purpose: Customer can access the app via a URL, not localhost.
+
+Acceptance Criteria:
+- App is deployed and accessible at a production URL.
+
+Current State:
+- App runs on Vercel. Database on Supabase + Neon.
+- This user story is COMPLETE (or will be on publish).
+
+
+========================================
+TIER 2 / BACKLOG USER STORIES
+========================================
+
+These stories are NOT required for billing. They increase retention, depth, and
+scalability. Recommended order is based on customer retention risk and value.
+
+
+US10: PERSISTING ORG DATA LAYER (Multi-Upload Accumulation)
+-------------------------------------------------------------
+
+Purpose: The system remembers what data it has seen before for each org. Uploading a
+second file adds to the org's data, it doesn't replace it. Cross-file signals become
+possible.
+
+Acceptance Criteria:
+- org_data_sources table persists metadata per tab: org_id, source_name, data_type,
+  columns (JSON), row_count, date_range_start, date_range_end, last_uploaded_at.
+- On upload, system persists tab metadata. On subsequent uploads, system knows all
+  datasets that exist for the org.
+- Returning upload recognition: when uploading a "Deals" file and the org already has
+  deals data, show "Comparing to previous Deals data..." and compute delta.
+- Cross-file signal discovery: if org has both Leads and Deals data, system can
+  compute lead-to-deal conversion rate.
+- Upload history visible to user: list of past uploads with date, file name, tab count,
+  signal count.
+
+Why Tier 2: Important for retention (users expect their data to accumulate over time)
+but not needed for the first billing gate. First billing gate only requires 3 signals
+from a single upload or API pull.
+
+
+US11: API AUTO-REFRESH (Scheduled Sync)
+-----------------------------------------
+
+Purpose: Once an API integration is connected, data refreshes automatically without
+admin manually triggering a sync each time.
+
+Acceptance Criteria:
+- Admin can configure sync frequency per integration (daily, weekly).
+- System automatically pulls latest data from connected APIs on schedule.
+- New data flows through the generate pipeline, updating existing signals or creating
+  new ones.
+- Admin receives a notification if a sync fails.
+
+Why Tier 2: Manual sync is sufficient for billing. Auto-refresh reduces admin workload
+and makes the product feel "alive" to the customer.
+
+
+US12: SIGNAL RELEVANCE SCORING
+---------------------------------
+
+Purpose: Signals are ranked by what matters to the user, not just by trend strength.
+A Head of Support sees support signals first. A CEO sees revenue signals first.
+
+Acceptance Criteria:
+- Each signal gets a relevance score based on user role, upcoming_priorities, and
+  signal_preferences.
+- Default sort on /signals is by relevance score (not rank or trend).
+- User can still switch to other sorts (trend, category, date).
+- Category filter bar: when multiple data types exist, user can filter by category
+  (sales, support, leads, custom).
+
+Why Tier 2: First billing gate only requires the user can "browse" signals. Relevance
+ranking makes browsing better but isn't blocking billing.
+
+
+US13: PARTIAL SIGNAL IDENTIFICATION (What Data Is Missing)
+------------------------------------------------------------
+
+Purpose: System tells the user what data they're missing and what signals they'd unlock
+by uploading it. Creates a pull mechanism for more data.
+
+Acceptance Criteria:
+- System identifies signals it could compute if additional data were uploaded.
+- UI shows prompts like: "Upload deals data to unlock Win Rate and Pipeline Value."
+- Partial signals are greyed out or shown in a separate "Unlock" section.
+
+Why Tier 2: Drives engagement and data completeness. Not needed for first billing but
+important for retention after Week 3.
+
+
+US14: TREND VISUALISATION (Signal Charts)
+-------------------------------------------
+
+Purpose: User can see how a signal has changed over time via a line chart on the
+signal detail view.
+
+Acceptance Criteria:
+- Signal detail/expanded view shows a line chart of value over time.
+- Requires 4+ data points (weeks/months) to show a meaningful chart.
+- If insufficient data, show a note: "More data needed for trend chart."
+- Chart is interactive (hover to see values).
+
+Why Tier 2: Rich visualisation deepens engagement. First billing gate only needs the
+signal value and trend direction, not a full chart.
+
+
+US15: CROSS-SIGNAL AI REFERENCES
+-----------------------------------
+
+Purpose: AI analysis references other signals in the same org, enabling correlation
+insights (e.g. "Ticket volume up 23%, which correlates with your 3 new hires").
+
+Acceptance Criteria:
+- AI prompt includes a summary of all active signals for the org (not just the one
+  being analysed).
+- AI can identify correlations, causations, or contradictions across signals.
+- Analysis includes a "Related Signals" section.
+
+Why Tier 2: Significantly deepens insight quality. First billing gate only needs
+personalised analysis per signal, not cross-signal correlation.
+
+
+US16: KPI IMPLICATION SECTION IN AI ANALYSIS
+-----------------------------------------------
+
+Purpose: AI connects each signal to the user's stated KPIs, making the "so what"
+immediately actionable.
+
+Acceptance Criteria:
+- AI analysis includes a 6th section: "KPI Impact" connecting the signal to the
+  user's KPIs.
+- Example: "This signal impacts your KPI: Customer Retention."
+- If no KPIs are set, this section is omitted.
+
+Why Tier 2: Adds depth to AI analysis. First billing gate uses 5-section analysis.
+This is an enhancement.
+
+
+US17: ADMIN AI REVIEW PANEL
+------------------------------
+
+Purpose: Admin can QA all AI-generated interpretations before users see them.
+
+Acceptance Criteria:
+- Admin panel shows all AI interpretations with status: pending review, approved,
+  edited.
+- Admin can approve, edit text, or regenerate an interpretation.
+- Optionally: only approved interpretations are shown to users (gating).
+
+Why Tier 2: Quality control. During MSS, admin can eyeball the AI output. A formal
+review panel is a safety net for when there are multiple customers.
+
+
+US18: PROGRESSIVE CONTEXT (Refine Preferences Over Time)
+-----------------------------------------------------------
+
+Purpose: Each session, the system asks one new question to refine understanding of
+what the user cares about. Reduces onboarding burden over time.
+
+Acceptance Criteria:
+- System tracks which questions have been asked.
+- After login, shows one contextual question: "Last week you looked at ticket data
+  most. Would you like support signals prioritised?"
+- User answer updates their signal_preferences.
+
+Why Tier 2: Engagement mechanic. First billing gate uses admin-set preferences. This
+self-service refinement is a retention feature.
+
+
+US19: UPLOAD REMINDERS
+------------------------
+
+Purpose: Nudge users to upload fresh data if no new data has arrived in 7+ days.
+
+Acceptance Criteria:
+- System tracks last upload date per org.
+- If 7+ days since last upload and no API integration is connected, show in-app
+  nudge: "Your data is 7 days old. Upload fresh data for updated signals."
+- Admin receives a notification if a customer's data is stale.
+
+Why Tier 2: Retention mechanic. Not needed for billing gate.
+
+
+US20: ADMIN QUALITY DASHBOARD
+--------------------------------
+
+Purpose: Admin has visibility into the health of each customer account.
+
+Acceptance Criteria:
+- Dashboard shows per org: signal count, AI interpretation count, user engagement
+  (last login, signals viewed), data freshness (last upload date).
+- Red/amber/green status indicators for data freshness and engagement.
+
+Why Tier 2: Operational tooling. Admin can manage without it during MSS but it becomes
+essential with 2+ customers.
+
+
+US21: ONBOARDING RUNBOOK
+---------------------------
+
+Purpose: Step-by-step document for onboarding a second customer without re-engineering.
+
+Acceptance Criteria:
+- Written document covering: discovery call template, data onboarding steps, admin
+  setup checklist, signal verification checklist, API integration setup, go-live
+  checklist.
+- Tested by onboarding a second customer.
+
+Why Tier 2: Scalability. First customer is hands-on. Second customer proves the
+process works.
+
+
+========================================
+KEY CHANGES TO MAKE
+========================================
+
+
+CHANGE 1: ADD USER CONTEXT FIELDS TO PROFILE
+----------------------------------------------
+
+What: Add upcoming_priorities (text) and signal_preferences (text) columns to the profiles table.
+
+Why: These fields are referenced in US1, US2, and US6. Without them, the AI analysis cannot be personalised and the profile page cannot show what matters to the user.
+
+Scope: Database migration + update profile page display + update admin user edit form.
+
+
+CHANGE 2: MAKE PROFILE PAGE READ-ONLY FOR USERS
+--------------------------------------------------
+
+What: Remove the edit capability from /profile for non-admin users. Profile is display-only for MSS.
+
+Why: US2 specifies read-only. Admin manages profiles on behalf of users during MSS phase.
+
+Scope: Small change to the profile page component. Conditionally hide edit buttons based on user role.
+
+
+CHANGE 3: REPLACE UPLOAD FLOW WITH 3-QUESTION APPROACH
+---------------------------------------------------------
+
+What: Integrate the upload proto (/uploadproto) into the main upload flow at /upload. Each file upload shows the 3 per-tab questions. Remove the old signal discovery selection step.
+
+Why: US3 specifies the 3-prompt approach. The current flow uses the old fuzzy-matching discovery which produces too many irrelevant signals. The 3-question approach means every signal is grounded in user-confirmed data understanding.
+
+Scope: Replace upload-page-client.tsx upload flow with the proto logic. Remove or bypass the /api/upload/discover route.
+
+
+CHANGE 4: CUT SIGNAL DEFINITIONS TO CORE SET WITH CALCSPECS
+--------------------------------------------------------------
+
+What: Reduce from 93 signal definitions to ~15-20 core ones. Every remaining definition must have a calcSpec. Remove the legacy heuristic calculation path entirely.
+
+Why: US4 requires at least 3 accurate signals. Currently, 82/93 definitions use a guess-based calculation that produces incorrect values. Fewer, correct signals are better than many wrong ones.
+
+Which signals to keep (aligned to first customer using Zoho CRM + Zoho Desk + custom data):
+- Deals: pipeline value, win rate, average deal size, closed-won revenue, deals by owner, deals by stage, sales cycle length
+- Leads: total leads, leads per month, leads by owner, lead conversion rate
+- Support: ticket volume, tickets per month, tickets by status, tickets by priority, resolution time
+- Custom/Activity: event count, events per period, events by entity
+
+Scope: Edit signal-discovery-service.ts to remove unused definitions. Remove calculateSignalLegacy from signal-calculation-service.ts.
+
+
+CHANGE 5: INJECT USER/ORG CONTEXT INTO AI PROMPT
+---------------------------------------------------
+
+What: Update buildInterpretationPrompt in interpretation-service.ts to fetch and include user profile data (role, upcoming_priorities, signal_preferences, business_context) and org data (industry, company_stage, team_size).
+
+Why: US6 requires analysis to be personalised. Currently the prompt only receives signal data. Adding "This user is a Head of Support focused on reducing resolution time" transforms generic analysis into actionable, relevant insight. This is the core value differentiator.
+
+Scope: Modify the generateInterpretation function to fetch user profile before building the prompt. Add a USER CONTEXT section to the prompt template.
+
+
+CHANGE 6: ADD ADMIN UPLOAD-ON-BEHALF-OF-USER
+-----------------------------------------------
+
+What: In the admin panel, add a "Upload for user" action that lets admin select an org/user, upload a file, answer the 3 prompts, and generate signals attributed to that org.
+
+Why: US3 specifies admin can upload and answer prompts on behalf of user. This is essential for the MSS model where Camino Admin is in the loop.
+
+Scope: Add user/org selector to the upload flow when accessed from admin context. Attribute generated signals to the selected org.
+
+
+CHANGE 7: PERSIST ORG DATA LAYER ACROSS UPLOADS
+--------------------------------------------------
+
+What: When a new file is uploaded for an org, store the tab metadata (what type of data, which columns, date range) alongside the org. On subsequent uploads, the system knows what data already exists and can compute cross-file signals.
+
+Why: US3 specifies the system accounts for multiple uploads over time with a persisting data layer. Currently each upload is independent. A user uploading "Deals.csv" then "Tickets.csv" should see signals that span both datasets.
+
+Scope: Add an org_data_sources table (org_id, source_name, data_type, columns, row_count, date_range, last_uploaded). Update signal generation to query all org data sources, not just the current upload.
+
+
+CHANGE 8: API INTEGRATION FOR AUTOMATED DATA FLOW
+-----------------------------------------------------
+
+What: Connect the existing Zoho integration code (zoho-api-client.ts, zoho-oauth-service.ts, zoho-desk-processor.ts) to the new signal generation pipeline (POST /api/upload/generate). Once an admin connects a customer's Zoho account, data flows automatically into the same pipeline as manual uploads.
+
+Why: Billing gate item 4 says "whether uploaded from user/Camino Admin, or via API integration." Manual CSV uploads are a pain point. API integration removes the friction of exporting data from tools. This is essential for the "easy integrations" problem.
+
+How it works:
+1. Admin connects Zoho OAuth via existing /api/integrations/oauth/zoho-crm and /api/integrations/oauth/zoho-desk routes.
+2. System pulls data from Zoho API (deals, leads, tickets) via the existing zoho-api-client.ts.
+3. Pulled data is formatted as "virtual tabs" with column names and rows -- same shape as a CSV upload.
+4. Virtual tabs are sent through the same /api/upload/generate pipeline.
+5. Because the Zoho data shape is known (unlike arbitrary CSVs), the 3-question answers can be pre-filled automatically: row type = "deals", metric column = "Amount", date column = "Closing_Date".
+6. Signals generated from API data are tagged with source_type = "api-zoho-crm" or "api-zoho-desk" (instead of "upload").
+7. Admin triggers sync manually for MSS. Auto-refresh is Week 3+.
+
+Scope: Wire existing Zoho code to the generate pipeline. Pre-fill classification answers for known data types. Tag signals with API source.
+
+
+PRIORITY ORDER
+--------------
+
+1. Change 4 (cut signal definitions) - highest impact on accuracy, lowest risk -- DONE Week 1
+2. Change 3 (3-question upload flow) - unblocks correct signal generation -- DONE Week 1
+3. Change 5 (user context in AI prompt) - the billing differentiator
+4. Change 1 (profile fields) - required by Change 5
+5. Change 8 (API integration) - crucial for billing, solves key user pain point
+6. Change 6 (admin upload for user) - required for MSS operating model
+7. Change 7 (persisting org data layer) - enables multi-file intelligence
+8. Change 2 (read-only profile) - small polish
