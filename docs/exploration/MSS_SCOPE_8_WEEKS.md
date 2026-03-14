@@ -1,15 +1,68 @@
 # Camino — Minimum Sellable Service
 ## 8-Week Scope Document
 > Status: Approved
-> Version: 1.0
+> Version: 2.0
 > Date: March 2026
-> Based on: sign-off session covering 22 product, architecture, and strategy decisions
+> Based on: sign-off session (22 decisions) + use case review session (UC1–UC5)
+> Key updates: operator layer defined and scoped, goal-setting model confirmed, data freshness confirmed, use cases mapped to build plan
 
 ---
 
 ## The Goal
 
 By the end of week 8, Surge (CEO, Locumate) is paying for Camino. He opens the weekly brief every Monday. He has made at least one business decision informed by a Camino signal. The brief saves him meaningful time compared to pulling reports from Zoho manually.
+
+---
+
+## Use Case Coverage — MSS v1
+
+Five use cases were validated against the MSS scope. Here is their status:
+
+| Use Case | Description | Primary User | Covered in MSS? | Notes |
+|---|---|---|---|---|
+| UC1 | Goals and KPIs — setting, tracking, discovering | Admin / Exec / CSM | Partial | Goal context captured via founder-led onboarding call for MSS. Self-service onboarding questionnaire is post-MSS (next product priority). |
+| UC2 | Data ingest — pulling data without friction | CSM | Yes — weeks 1-2 | CSV upload for MSS. Weekly cadence confirmed as sufficient. Scheduled export automation is a week 6-8 stretch goal. |
+| UC3 | Signal synthesis — "so what" from the data | CSM / Exec | Yes — weeks 4-8 | Progressive trust ladder. Sam verifies signals offline. Admin toggle gives Sam formula transparency inside the app. |
+| UC4 | Broad signal exploration — general health browse | CSM / Exec | Yes — week 3+ | Scrollable signal feed as default home screen. Brief pinned at top. Full signal feed below, newest first, browsable anytime. |
+| UC5 | Deep dive and validation — investigate a specific problem | CSM | Level 1 only | Admin toggle (formula + sample rows) is in scope. Full operator investigation surface (signal thread, action log, breakdown views) is post-MSS. Loop closes outside Camino for MSS release. |
+
+---
+
+## Operator Layer Decision — Confirmed
+
+**Three levels were defined. Level 1 is in scope for MSS. Levels 2 and 3 are post-MSS.**
+
+| Level | What it is | In MSS? |
+|---|---|---|
+| Level 1 — Admin toggle | Sam logs in with admin flag. Signal cards show expandable "Calculation Detail" panel: formula in plain English, source table, sample rows, SQL view link. | Yes — 3 days of build |
+| Level 2 — Signal thread | Surge flags a signal to Sam inside Camino. Sam investigates and logs findings. Response surfaces back in Surge's view. Loop closes in the product. | Post-MSS — first release after MSS |
+| Level 3 — Full operator surface | Sam's own dashboard, queue, investigation tools, breakdown views, action log with status tracking. | Post-MSS — MVP phase months 3-6 |
+
+**Rationale:** In weeks 1-8, Sam already investigates issues using Zoho and Shifts reports. Camino accelerates her by surfacing the signal and framing the context. She doesn't yet need a separate product to investigate. The admin toggle gives her formula verification without requiring a separate surface to be built.
+
+---
+
+## Goal Context — Confirmed Model for MSS
+
+**Goal context is captured via a founder-led onboarding call, not a self-service flow, for the MSS.**
+
+- Founder conducts one onboarding call (60 min) with the exec before brief generation begins
+- Output: goals, priorities, concerns, "what's on my mind in the next 90 days" captured as structured notes
+- These notes are entered into the `customer_profiles` table manually by the founder
+- Signal Ranking (Layer 5) and Brief Synthesis (Layer 6) are both personalised against this context
+
+**Self-service progressive onboarding** (in-app questionnaire, 5-7 structured questions, feeds directly into `customer_profiles`) is the first post-MSS product release. This is what makes Camino scalable beyond white-glove onboarding.
+
+---
+
+## Data Freshness — Confirmed
+
+**Weekly data update cadence is sufficient for the MSS.**
+
+- Surge's needs are met by a weekly brief and a weekly signal card refresh
+- Data does not need to move daily in weeks 1-8
+- Scheduled export automation (daily cadence) is a week 6-8 stretch goal, not a core requirement
+- If Surge requests more frequent updates between briefs, this is addressed in the MVP phase with native API integration
 
 ---
 
@@ -34,15 +87,18 @@ The following are explicitly out of scope for weeks 1-8:
 
 | Out of scope | When it comes |
 |---|---|
-| Operator (Sam) UI surface | MVP — months 3-6 |
+| Operator Level 2 — signal thread (Surge flags to Sam, loop closes in product) | First post-MSS release |
+| Operator Level 3 — full operator surface (Sam's dashboard, queue, breakdown views) | MVP — months 3-6 |
+| Self-service onboarding questionnaire (replaces founder-led onboarding call) | First post-MSS release |
 | Signal share primitive (exec to operator) | MVP — months 3-6 |
 | Action log and decision notes | MVP — months 3-6 |
 | Push notification threshold alerts | Week 6 stretch goal |
+| Daily data refresh / scheduled export automation | Week 6-8 stretch goal |
 | Native Zoho OAuth API integration | Month 3+ |
 | External virality features | Growth phase — months 7-18 |
 | Group formation and portfolio views | Growth phase |
 | Full organisational memory (annotation, decision log, goal evolution) | Growth phase |
-| Benchmark data against market | Month 6+ |
+| Benchmark data (LLM-researched from public sources) | Month 6+ |
 | Thumbs up / thumbs down signal feedback | Post-launch |
 
 ---
@@ -159,9 +215,11 @@ THIS WEEK IN SUMMARY
 - CSV upload handler with Papaparse streaming
 - Schema fingerprint generation — AI maps columns, Sam reviews and confirms
 - SQL views for all single-table KPIs (win rate, pipeline, fill rate, agency usage)
-- Signal card UI — mobile-first, one card per screen
+- Signal card UI — mobile-first, one card per screen, scrollable feed as default home screen
+- Admin toggle: Sam's account flagged as admin. Signal cards gain expandable "Calculation Detail" panel — formula in plain English, source table, row count, 3 sample rows, SQL view name. Exec accounts never see this panel.
+- `customer_profiles` table populated from founder onboarding call notes
 
-**Test:** Surge looks at Win Rate in Camino and confirms it matches what he calculates in Zoho. Trust established.
+**Test:** Surge looks at Win Rate in Camino and confirms it matches what he calculates in Zoho. Trust established. Sam opens Calculation Detail on the same card and confirms the formula is correct.
 
 **Key question to resolve with Sam this week:** Which stages count as "Lost" for win rate calculation? ("Closed - No Budget", "Closed - Timing", etc.) — this is a business question, not a technical one.
 
@@ -177,7 +235,7 @@ THIS WEEK IN SUMMARY
 - Surface as a dedicated "insight card" in the signal feed — visually distinct from single-table signals
 - `kpi_snapshots` table and `snapshot_kpis()` Postgres function
 
-**Test:** Surge sees the cross-table card. He recognises the pharmacy groups. He says "I didn't know that."
+**Test:** Surge sees the cross-table card. He recognises the pharmacy groups. He says "I didn't know that." He can also browse the full signal feed — scrolling through all active signals, not just the ones in the brief.
 
 ---
 
