@@ -1,7 +1,9 @@
 # Camino: Revised Architecture
-> Status: Exploration / Strategic Draft
+> Status: Approved — post sign-off session
+> Version: 2.0
 > Author: CTO/CPO Strategy Session
 > Date: March 2026
+> Sign-off decisions incorporated: A1, A3, B1, B2, C1–C4, D1, D2, E1–E3, F1–F3, G1–G2
 
 ---
 
@@ -17,26 +19,52 @@ The core problem the current spec-driven approach could not solve:
 
 ---
 
+## Confirmed Scope Decisions
+
+**Data sources in scope for Minimum Sellable Service (8 weeks):**
+- Zoho CRM Deals
+- Zoho Desk (support tickets)
+- Shifts data (internal operational data)
+- Zoho CRM Leads (lower priority — data quality currently poor, include but deprioritise)
+
+**CSV is temporary scaffolding.** It exists to learn data shapes before native integrations are built. The canonical schema is designed now to accommodate native integrations later. The customer never re-onboards when the delivery mechanism changes.
+
+**Operator surface (Sam/CSM view) is post-MSS.** The 8-week build is exec-only. The signal share primitive and action log schema are designed into the data model from day one, but the operator UI is built in the MVP phase (months 3-6).
+
+**Organisational memory is post-MSS.** The only memory captured in weeks 1-8 is whether Camino's signals helped KPIs trend in the right direction. Full annotation, decision log, and goal evolution tracking come later.
+
+**Benchmark data** will be sourced from LLM research against public databases — not from aggregated customer data. No consent or privacy implications in the near term.
+
+---
+
 ## The Guiding Principle
 
 > Build the pipeline once. Let the data delivery mechanism change over time without touching anything downstream.
 
-CSV upload today. Scheduled export in weeks 6-8. Native Zoho/HubSpot API in month 3. In all three cases, the customer never re-onboards. Their KPIs, history, and signals are fully preserved.
+CSV upload today. Scheduled export in weeks 6-8. Native Zoho API in month 3+. In all three phases, the customer never re-onboards. Their KPIs, history, and signals are fully preserved.
 
 ---
 
 ## The Full Stack
 
+**Confirmed database decision: Supabase Postgres only. No Neon. No separate data warehouse.**
+
 | Concern | Technology | Reason |
 |---|---|---|
-| Database | Neon (Postgres) | SQL views, JSONB, pg_trgm fuzzy match, point-in-time snapshots |
+| Database | Supabase (Postgres) | Single database. SQL views, JSONB, pg_trgm fuzzy match, point-in-time snapshots. RLS for customer data isolation. |
 | Backend | Next.js Route Handlers | Already in stack, handles async pipeline chains |
 | AI layer | Vercel AI SDK + Claude Anthropic | `generateObject` for structured outputs, Haiku for ranking, Opus for synthesis |
 | Schema validation | Zod | Type-safe AI outputs, prevents broken pipeline from malformed LLM responses |
-| ORM | Drizzle | SQL-first, lightweight, pairs with Neon, manages view migrations |
+| ORM | Drizzle | SQL-first, lightweight, pairs with Supabase, manages view migrations |
 | File parsing | Papaparse | Streaming CSV parse, handles large files without memory issues |
 | Scheduling | Vercel Cron Jobs | Weekly brief generation trigger |
 | Email delivery | Resend | Transactional email for weekly brief delivery |
+
+**Supabase-specific advantages for this architecture:**
+- Row Level Security (RLS) enforces `customer_id` isolation at the database level — one policy ensures no customer ever sees another's data, without application-layer guards
+- Supabase Storage can hold raw CSV files for audit replay if needed
+- Supabase Auth handles operator and exec user accounts natively
+- `pg_trgm` extension available — needed for the cross-table fuzzy group name matching
 
 ---
 
