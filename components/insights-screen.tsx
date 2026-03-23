@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { InsightCard } from "@/components/insight-card"
+import { InsufficientDataCard } from "@/components/insufficient-data-card"
 import { TickerCard } from "@/components/ticker-card"
 import { ExpandedInsightCard } from "@/components/expanded-insight-card"
 import { ShareModal } from "@/components/share-modal"
@@ -810,18 +811,22 @@ export function InsightsScreen() {
           </div>
         ) : (
           <div className="flex flex-col gap-4 p-4 w-full">
-            {filteredInsights.map((insight) => (
-              <InsightCard
-                key={insight.id}
-                insight={insight}
-                isSaved={savedInsights.has(insight.id)}
-                onSave={() => handleSave(insight.id)}
-                onShare={() => handleShare(insight)}
-                onExpand={() => handleExpand(insight.id)}
-                onDelete={isDemoSignal(insight.id) ? () => handleDelete(insight.id) : undefined}
-                fullScreen={false}
-              />
-            ))}
+            {filteredInsights.map((insight) =>
+              insight.insufficientData ? (
+                <InsufficientDataCard key={insight.id} insight={insight} />
+              ) : (
+                <InsightCard
+                  key={insight.id}
+                  insight={insight}
+                  isSaved={savedInsights.has(insight.id)}
+                  onSave={() => handleSave(insight.id)}
+                  onShare={() => handleShare(insight)}
+                  onExpand={() => handleExpand(insight.id)}
+                  onDelete={isDemoSignal(insight.id) ? () => handleDelete(insight.id) : undefined}
+                  fullScreen={false}
+                />
+              )
+            )}
           </div>
         )}
       </div>

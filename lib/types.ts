@@ -46,6 +46,13 @@ export interface UserProfile {
   businessStage?: string
 }
 
+export interface InsufficientDataRequirement {
+  field: string
+  description: string
+  source: string
+  example?: string
+}
+
 export interface Insight {
   id: string
   category: InsightCategory
@@ -70,5 +77,11 @@ export interface Insight {
     productCategory?: string[]
     productStage?: string[]
     businessStage?: string[]
+  }
+  insufficientData?: {
+    reason: string
+    formula: string
+    requiredData: InsufficientDataRequirement[]
+    howToConnect: string
   }
 }
